@@ -1,232 +1,233 @@
 @model ShoppeWebApp.ViewModels.Admin.ProductViewModel
 @{
-	Layout = "~/Areas/Admin/Shared/_Layout.cshtml";
-	ViewData["Title"] = "Danh sách sản phẩm";
+    Layout = "~/Areas/Admin/Shared/_Layout.cshtml"; 
+    ViewData["Title"] = "Danh sách sản phẩm";
 }
 
 <div class="container mt-4">
-	<div class="p-5 border border-success rounded" style="background-color: #fdfdfd; min-height: 80vh;">
+    <div class="p-5 border border-success rounded" style="background-color: #fdfdfd; min-height: 80vh;">
 
-		<!-- Thông tin cửa hàng -->
-		<div class="mb-4 p-4 bg-white border border-primary rounded shadow-lg" style="background-image: linear-gradient(to right, #f9f9f9, #e3f2fd); position: relative;">
+        <!-- Thông tin cửa hàng -->
+        <div class="mb-4 p-4 bg-white border border-primary rounded shadow-lg" style="background-image: linear-gradient(to right, #f9f9f9, #e3f2fd); position: relative;">
 
-			<!-- Nút quay lại đặt ở góc trên bên trái -->
-			<div style="position: absolute; top: 1rem; left: 1rem;">
-				<a asp-area="Admin" asp-controller="Shop" asp-action="Index" class="btn btn-danger btn-sm">
-					<i class="fas fa-arrow-left me-1"></i> Quay lại
-				</a>
-			</div>
+            <!-- Nút quay lại đặt ở góc trên bên trái -->
+            <div style="position: absolute; top: 1rem; left: 1rem;">
+                <a asp-area="Admin" asp-controller="Shop" asp-action="Index" class="btn btn-danger btn-sm">
+                    <i class="fas fa-arrow-left me-1"></i> Quay lại
+                </a>
+            </div>
 
-			<!-- Thông tin chi tiết -->
-			<!-- Nội dung chính căn giữa -->
-			<div class="d-flex justify-content-center align-items-center text-center flex-wrap mt-4">
-				<!-- Ảnh cửa hàng -->
-				<div class="me-4">
-					@if (!string.IsNullOrEmpty(Model.UrlAnhCuaHang))
-					{
-						<img src="@Url.Content(Model.UrlAnhCuaHang)" alt="Ảnh cửa hàng"
-							 class="rounded-circle shadow-sm"
-							 style="width: 150px; height: 150px; object-fit: cover;" />
-					}
-					else
-					{
-						<img src="/images/default-shop.png" alt="Ảnh cửa hàng"
-							 class="rounded-circle shadow-sm"
-							 style="width: 150px; height: 150px; object-fit: cover;" />
-					}
-				</div>
+            <!-- Nội dung chính căn giữa -->
+            <div class="d-flex justify-content-center align-items-center text-center flex-wrap mt-4">
+                <!-- Ảnh cửa hàng -->
+                <div class="me-4">
+                    @if (!string.IsNullOrEmpty(Model.UrlAnhCuaHang))
+                    {
+                        <img src="@Url.Content(Model.UrlAnhCuaHang)" alt="Ảnh cửa hàng"
+                            class="rounded-circle shadow-sm"
+                            style="width: 150px; height: 150px; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <img src="/images/default-shop.png" alt="Ảnh cửa hàng"
+                            class="rounded-circle shadow-sm"
+                            style="width: 150px; height: 150px; object-fit: cover;" />
+                    }
+                </div>
 
-				<!-- Thông tin chi tiết -->
-				<div>
-					<h2 class="fw-bold text-danger mb-3" style="font-size: 2rem;">@Model.TenCuaHang</h2>
-					<p class="mb-2"><strong>Địa chỉ:</strong> <span class="text-dark">@Model.DiaChi</span></p>
-					<p class="mb-0"><strong>Số điện thoại:</strong> <span class="text-dark">@Model.SoDienThoai</span></p>
-				</div>
-			</div>
-		</div>
+                <!-- Thông tin chi tiết -->
+                <div>
+                    <h2 class="fw-bold text-danger mb-3" style="font-size: 2rem;">@Model.TenCuaHang</h2>
+                    <p class="mb-2"><strong>Địa chỉ:</strong> <span class="text-dark">@Model.DiaChi</span></p>
+                    <p class="mb-0"><strong>Số điện thoại:</strong> <span class="text-dark">@Model.SoDienThoai</span></p>
+                </div>
+            </div>
 
-		<div class="text-center mb-4">
-			<h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 7px;">
-				Quản lý sản phẩm
-			</h2>
-		</div>
+        </div>
 
 
-		<!-- Hiển thị thông báo thành công -->
-		@if (TempData["SuccessMessage"] != null)
-		{
-			<div class="alert alert-success alert-dismissible fade show text-center" role="alert">
-				@TempData["SuccessMessage"]
-				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-			</div>
-		}
-
-		<!-- Form lọc và tìm kiếm -->
-		<form method="get" asp-area="Admin" asp-controller="Product" asp-action="Index" class="mb-4">
-			<div class="row g-3 align-items-end">
-				<div class="col-md-4">
-					<label class="form-label fw-bold">Lọc theo danh mục</label>
-					<select name="IdDanhMuc" class="form-select">
-						<option value="">Tất cả danh mục</option>
-						@foreach (var category in Model.categories)
-						{
-							<option value="@category.IdDanhMuc" selected="@(Model.danhMuc == category.IdDanhMuc)">
-								@category.TenDanhMuc
-							</option>
-						}
-					</select>
-				</div>
-				<div class="col-md-4">
-					<label class="form-label fw-bold">Tìm kiếm</label>
-					<input type="text" name="searchQuery" class="form-control" placeholder="Nhập tên sản phẩm hoặc ID sản phẩm..." />
-				</div>
-				<div class="col-md-2">
-					<button type="submit" class="btn btn-primary w-100">
-						<i class="fas fa-search me-1"></i> Tìm kiếm
-					</button>
-				</div>
-				<div class="col-md-2">
-					<a asp-area="Admin" asp-controller="Product" asp-action="Index" class="btn btn-secondary w-100">
-						<i class="fas fa-undo me-1"></i> Xóa lọc
-					</a>
-				</div>
-			</div>
-		</form>
-
-		<!-- Tổng số người dùng và nút thêm tài khoản -->
-		<div class="mb-3 d-flex justify-content-between align-items-center">
-			<div class="fw-bold" style="font-size: 1.5rem;">
-				Tổng số sản phẩm: @Model?.productInfos?.Count()
-			</div>
-
-			<a asp-area="Admin" asp-controller="Product" asp-action="Create" asp-route-IdCuaHang="@Model.IdCuaHang" class="btn btn-success">Thêm sản phẩm</a>
-		</div>
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 7px;">
+                Quản lý sản phẩm
+            </h2>
+        </div>
 
 
-		<!-- Danh sách sản phẩm -->
-		<div class="row">
-			@if (Model.productInfos.Any())
-			{
-				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-					@foreach (var product in Model.productInfos)
-					{
-						<div class="col">
-							<div class="card h-100 shadow-sm position-relative">
-								<!-- Hiển thị ID sản phẩm căn giữa -->
-								<div class="text-center fw-bold text-muted mt-2">
-									ID: @product.IdSanPham
-								</div>
+        <!-- Hiển thị thông báo thành công -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
 
-								<!-- Ảnh sản phẩm và giảm giá -->
-								<div class="position-relative" style="width: 100%; height: 200px;">
-									@if (!string.IsNullOrEmpty(product.UrlAnh))
-									{
-										<img src="@Url.Content($"~/{product.UrlAnh}")" alt="Ảnh sản phẩm"
-											 class="card-img-top"
-											 style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;" />
-									}
-									<!-- Hiển thị giảm giá ở góc trên bên phải của ảnh -->
-									<div class="position-absolute top-0 end-0 bg-danger text-white px-2 py-1 rounded-start">
-										@string.Format("{0:0}%", product.TyLeGiamGia)
-									</div>
-								</div>
+        <!-- Form lọc và tìm kiếm -->
+        <form method="get" asp-area="Admin" asp-controller="Product" asp-action="Index" class="mb-4">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Lọc theo danh mục</label>
+                    <select name="IdDanhMuc" class="form-select">
+                        <option value="">Tất cả danh mục</option>
+                        @foreach (var category in Model.categories)
+                        {
+                            <option value="@category.IdDanhMuc" selected="@(Model.danhMuc == category.IdDanhMuc)">
+                                @category.TenDanhMuc
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Tìm kiếm</label>
+                    <input type="text" name="searchQuery" class="form-control" placeholder="Nhập tên sản phẩm hoặc ID sản phẩm..." />
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-1"></i> Tìm kiếm
+                    </button>
+                </div>
+                <div class="col-md-2">
+                    <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="btn btn-secondary w-100">
+                        <i class="fas fa-undo me-1"></i> Xóa lọc
+                    </a>
+                </div>
+            </div>
+        </form>
 
-								<!-- Nội dung sản phẩm -->
-								<div class="card-body">
-									<h6 class="break-word text-center fw-bold line-clamp-2">
-										@product.TenSanPham
-									</h6>
-									<div class="d-flex justify-content-between align-items-center mb-2">
-										@if (product.GiaBan == product.GiaGoc)
-										{
-											<!-- Chỉ hiển thị giá bán nếu giá bán bằng giá gốc -->
-											<span class="text-danger fw-bold">
-												@string.Format("{0:#,##0} ₫", product.GiaBan)
-											</span>
-										}
-										else
-										{
-											<!-- Hiển thị cả giá gốc và giá bán nếu giá bán khác giá gốc -->
-											<span class="text-muted" style="text-decoration: line-through;">
-												@string.Format("{0:#,##0} ₫", product.GiaGoc)
-											</span>
-											<span class="text-danger fw-bold">
-												@string.Format("{0:#,##0} ₫", product.GiaBan)
-											</span>
-										}
-									</div>
-									<!-- Đã bán căn trái -->
-									<p class="mb-1 text-muted text-start">
-										<strong>Đã bán:</strong> @product.SoLuongDaBan
-									</p>
-								</div>
+        <!-- Tổng số người dùng và nút thêm tài khoản -->
+        <div class="mb-3 d-flex justify-content-between align-items-center">
+            <div class="fw-bold" style="font-size: 1.5rem;">
+                Tổng số sản phẩm: @Model?.productInfos?.Count() 
+            </div>
 
-								<!-- Footer với các nút -->
-								<div class="card-footer bg-transparent text-center">
-									<a asp-area="Admin" asp-controller="Product" asp-action="DetailsProduct"
-									   asp-route-IdSanPham="@product.IdSanPham" asp-route-IdCuaHang="@Model.IdCuaHang"
-									   class="btn btn-dark btn-sm me-1">
-										<i class="fas fa-info-circle"></i> Chi tiết
-									</a>
-									<a asp-area="Admin" asp-controller="Product" asp-action="Delete"
-									   asp-route-IdSanPham="@product.IdSanPham" asp-route-IdCuaHang="@Model.IdCuaHang"
-									   class="btn btn-danger btn-sm">
-										<i class="fas fa-trash-alt"></i> Xóa
-									</a>
-								</div>
-							</div>
-						</div>
-					}
-				</div>
-			}
-			else
-			{
-				<div class="alert alert-info text-center" role="alert">
-					Không có sản phẩm nào phù hợp.
-				</div>
-			}
-		</div>
+            <a asp-area="Admin" asp-controller="Product" asp-action="Create" asp-route-IdCuaHang="@Model.IdCuaHang" class="btn btn-success">Thêm sản phẩm</a>
+        </div>
 
-		<!-- Phân trang -->
-		<div class="d-flex justify-content-center mt-4">
-			<nav>
-				<ul class="pagination">
-					@{
-						int currentPage = Convert.ToInt32(ViewData["CurrentPage"]);
-						int totalPages = Convert.ToInt32(ViewData["TotalPages"]);
-					}
 
-					<li class="page-item @(currentPage == 1 ? "disabled" : "")">
-						<a class="page-link" href="?page=1">Đầu</a>
-					</li>
-					<li class="page-item @(currentPage == 1 ? "disabled" : "")">
-						<a class="page-link" href="?page=@(currentPage - 1)">Trước</a>
-					</li>
-					@for (int i = 1; i <= totalPages; i++)
-					{
-						<li class="page-item @(currentPage == i ? "active" : "")">
-							<a class="page-link" href="?page=@i">@i</a>
-						</li>
-					}
-					<li class="page-item @(currentPage == totalPages ? "disabled" : "")">
-						<a class="page-link" href="?page=@(currentPage + 1)">Tiếp</a>
-					</li>
-					<li class="page-item @(currentPage == totalPages ? "disabled" : "")">
-						<a class="page-link" href="?page=@totalPages">Cuối</a>
-					</li>
-				</ul>
-			</nav>
-		</div>
-	</div>
+        <!-- Danh sách sản phẩm -->
+        <div class="row">
+            @if (Model.productInfos.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                    @foreach (var product in Model.productInfos)
+                    {
+                        <div class="col">
+                            <div class="card h-100 shadow-sm position-relative">
+                                <!-- Hiển thị ID sản phẩm căn giữa -->
+                                <div class="text-center fw-bold text-muted mt-2">
+                                    ID: @product.IdSanPham
+                                </div>
+
+                                <!-- Ảnh sản phẩm và giảm giá -->
+                                <div class="position-relative" style="width: 100%; height: 200px;">
+                                    @if (!string.IsNullOrEmpty(product.UrlAnh))
+                                    {
+                                        <img src="@Url.Content($"~/{product.UrlAnh}")" alt="Ảnh sản phẩm"
+                                            class="card-img-top"
+                                            style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;" />
+                                    }
+                                    <!-- Hiển thị giảm giá ở góc trên bên phải của ảnh -->
+                                    <div class="position-absolute top-0 end-0 bg-danger text-white px-2 py-1 rounded-start">
+                                        @string.Format("{0:0}%", product.TyLeGiamGia)
+                                    </div>
+                                </div>
+                        
+                                <!-- Nội dung sản phẩm -->
+                                <div class="card-body">
+                                    <h6 class="break-word text-center fw-bold line-clamp-2">
+                                        @product.TenSanPham
+                                    </h6>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        @if (product.GiaBan == product.GiaGoc)
+                                        {
+                                            <!-- Chỉ hiển thị giá bán nếu giá bán bằng giá gốc -->
+                                            <span class="text-danger fw-bold">
+                                                @string.Format("{0:#,##0} ₫", product.GiaBan)
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <!-- Hiển thị cả giá gốc và giá bán nếu giá bán khác giá gốc -->
+                                            <span class="text-muted" style="text-decoration: line-through;">
+                                                @string.Format("{0:#,##0} ₫", product.GiaGoc)
+                                            </span>
+                                            <span class="text-danger fw-bold">
+                                                @string.Format("{0:#,##0} ₫", product.GiaBan)
+                                            </span>
+                                        }
+                                    </div>
+                                    <!-- Đã bán căn trái -->
+                                    <p class="mb-1 text-muted text-start">
+                                        <strong>Đã bán:</strong> @product.SoLuongDaBan
+                                    </p>
+                                </div>
+                        
+                                <!-- Footer với các nút -->
+                                <div class="card-footer bg-transparent text-center">
+                                    <a asp-area="Admin" asp-controller="Product" asp-action="DetailsProduct" 
+                                       asp-route-IdSanPham="@product.IdSanPham" asp-route-IdCuaHang="@Model.IdCuaHang"
+                                       class="btn btn-dark btn-sm me-1">
+                                        <i class="fas fa-info-circle"></i> Chi tiết
+                                    </a>
+                                    <a asp-area="Admin" asp-controller="Product" asp-action="Delete" 
+                                       asp-route-IdSanPham="@product.IdSanPham" asp-route-IdCuaHang="@Model.IdCuaHang"
+                                       class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash-alt"></i> Xóa
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center" role="alert">
+                    Không có sản phẩm nào phù hợp.
+                </div>
+            }
+        </div>
+
+        <!-- Phân trang -->
+        <div class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination">
+                    @{
+                        int currentPage = Convert.ToInt32(ViewData["CurrentPage"]);
+                        int totalPages = Convert.ToInt32(ViewData["TotalPages"]);
+                    }
+
+                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" href="?page=1">Đầu</a>
+                    </li>
+                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" href="?page=@(currentPage - 1)">Trước</a>
+                    </li>
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        <li class="page-item @(currentPage == i ? "active" : "")">
+                            <a class="page-link" href="?page=@i">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                        <a class="page-link" href="?page=@(currentPage + 1)">Tiếp</a>
+                    </li>
+                    <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                        <a class="page-link" href="?page=@totalPages">Cuối</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
 </div>
 
 <style>
-	.line-clamp-2 {
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
-		text-align: center;
-		word-wrap: break-word;
-	}
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2; 
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-align: center;
+        word-wrap: break-word;
+    }
 </style>
