@@ -14,6 +14,7 @@ namespace ShoppeWebApp.ViewModels.Admin
         public string? danhMuc { get; set; }
 
         // Thông tin cửa hàng
+        public string? IdCuaHang { get; set; }
         public string? TenCuaHang { get; set; }
         public string? DiaChi { get; set; }
         public string? SoDienThoai { get; set; }

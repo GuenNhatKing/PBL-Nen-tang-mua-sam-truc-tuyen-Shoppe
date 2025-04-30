@@ -61,15 +61,17 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
                 .Select(user => new UserViewModel
                 {
                     Id = user.IdNguoiDung,
+                    Status = user.TrangThai,
                     Name = user.HoVaTen,
                     Email = user.Email,
                     Cccd = user.Cccd,
                     Address = user.DiaChi,
                     Role = user.VaiTro == 1 ? "Khách hàng" : user.VaiTro == 2 ? "Chủ Shop" : "Admin"
                 })
-                .OrderBy(user => user.Role == "Khách hàng" ? 1 : user.Role == "Chủ Shop" ? 2 : 3)
-                .ThenBy(user => user.Id)
-                .ThenBy(user => user.Name)
+                .OrderByDescending(user => user.Status) // Sắp xếp giảm dần theo Status (1 trước, 0 sau)
+                .ThenBy(user => user.Role == "Khách hàng" ? 1 : user.Role == "Chủ Shop" ? 2 : 3) // Sắp xếp theo Role
+                .ThenBy(user => user.Id) // Sắp xếp theo Id
+                .ThenBy(user => user.Name) // Sắp xếp theo Name
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
@@ -311,9 +313,45 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
                 ModelState.AddModelError("", "Đã xảy ra lỗi khi cập nhật tài khoản: " + ex.Message);
                 return View(model);
             }
-        }        
+        }     
+
+        [HttpGet]
+        public IActionResult Details(string id)
+        {
+            // Tìm người dùng theo ID
+            var user = _context.Nguoidungs.FirstOrDefault(u => u.IdNguoiDung == id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Tìm tài khoản liên kết với người dùng
+            var account = _context.Taikhoans.FirstOrDefault(a => a.IdNguoiDung == id);
+            if (account == null)
+            {
+                return NotFound();
+            }
+
+            // Tạo ViewModel với dữ liệu từ cơ sở dữ liệu
+            var model = new EditAccountViewModel
+            {
+                Id = user.IdNguoiDung,
+                Username = account.Username,
+                AvatarUrl =  "/Images/avatar-mac-dinh.jpg", // Đường dẫn ảnh đại diện
+                Name = user.HoVaTen,
+                Email = user.Email,
+                Cccd = user.Cccd,
+                Sdt = user.Sdt,
+                Address = user.DiaChi,
+                Role = user.VaiTro,
+                Password = account.Password, // Mật khẩu hiện tại
+                ConfirmPassword = account.Password // Xác nhận mật khẩu
+            };
+
+            return View(model);
+        }
     
-         [HttpGet]
+        [HttpGet]
         public IActionResult Delete(string id)
         {
             // Tìm người dùng theo ID
