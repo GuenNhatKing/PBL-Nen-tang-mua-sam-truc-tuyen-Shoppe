@@ -33,6 +33,8 @@ public partial class Nguoidung
     public int VaiTro { get; set; }
 
     public int TrangThai { get; set; }
+    [Column(TypeName = "decimal(18, 2)")]
+    public decimal SoDu { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? ThoiGianTao { get; set; }
