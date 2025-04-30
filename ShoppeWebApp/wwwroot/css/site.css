@@ -381,6 +381,10 @@ ul {
     grid-column: span 6;
 }
 
+.box-padding-15 {
+    padding: 15px;
+}
+
 .box-padding-20 {
     padding: 20px;
 }
@@ -502,3 +506,133 @@ ul {
     .btn-buy:hover {
         background-color: #e6451a;
     }
+
+.product-main-info-label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #555;
+}
+
+.product-main-info-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #222;
+}
+
+.gray-box {
+    background-color: #fafafa;
+    margin-top: 15px;
+    padding: 10px 20px;
+    border-radius: 6px;
+}
+
+.chossing-section {
+    margin-top: 30px;
+}
+
+.counting-box {
+    background-color: #fff;
+    text-align: center;
+    border: none;
+    width: 2.5rem;
+    height: 2rem;
+    border-right: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.counting-input {
+    background-color: #fff;
+    width: 2.5rem;
+    height: 2rem;
+    text-align: center;
+    border: none;
+    outline: none;
+}
+
+.btn-add-shopping-cart {
+    border: 1px solid #f7542e;
+    color: #f7542e;
+    background-color: #fff;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+    .btn-add-shopping-cart:hover {
+        background-color: #fff3f0;
+    }
+
+.btn-buy {
+    background-color: #f7542e;
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+    .btn-buy:hover {
+        background-color: #e6451a;
+    }
+
+.product-main-info-store {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+    .product-main-info-store img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 1.5px solid grey;
+        object-fit: cover;
+    }
+
+.product-main-info-store-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.product-main-info-stat {
+    font-size: 1rem;
+    margin-top: 6px;
+}
+
+.product-main-info-review {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+}
+
+.product-main-info-review-item {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eee;
+}
+
+.product-main-info-review-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #777;
+    margin-bottom: 6px;
+}
+
+.product-main-info-review-content {
+    font-size: 1rem;
+    line-height: 1.4;
+}
