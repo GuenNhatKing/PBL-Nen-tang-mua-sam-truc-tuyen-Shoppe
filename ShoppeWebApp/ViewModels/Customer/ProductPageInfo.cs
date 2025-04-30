@@ -25,6 +25,7 @@
     public class DanhGiaSanPham
     {
         public string IdNguoiDung { get; set; } = null!;
+        public string? UrlAnhNguoiDung { get; set; } = null!;
         public string TenNguoiDung { get; set; } = null!;
         public int DiemDanhGia { get; set; }
         public string? NoiDung { get; set; }

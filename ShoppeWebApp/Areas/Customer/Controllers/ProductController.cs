@@ -56,6 +56,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                 .Select(i => new DanhGiaSanPham
                 {
                     IdNguoiDung = i.IdNguoiDung,
+                    UrlAnhNguoiDung = i.IdNguoiDungNavigation.UrlAnh,
                     DiemDanhGia = i.DiemDanhGia,
                     NoiDung = i.NoiDung,
                     TenNguoiDung = i.IdNguoiDungNavigation.HoVaTen,
