@@ -12,10 +12,10 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
     [Area("Customer")]
     public class AccountController : Controller
     {
-        private readonly ShoppeWebAppDbContext _context;
+        private readonly ShoppeWebAppContext _context;
         private readonly ILogger<AccountController> _logger;
 
-        public AccountController(ShoppeWebAppDbContext context, ILogger<AccountController> logger)
+        public AccountController(ShoppeWebAppContext context, ILogger<AccountController> logger)
         {
             _context = context;
             _logger = logger;
@@ -31,16 +31,16 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
         {
             if (ModelState.IsValid)
             {
-                var Taikhoan = _context.Taikhoans
+                var taiKhoan = _context.TaiKhoans
                     .FirstOrDefault(a => a.Username == model.Username && a.Password == model.Password);
 
-                if (Taikhoan != null)
+                if (taiKhoan != null)
                 {
-                    _context.Entry(Taikhoan).Reference(i => i.IdNguoiDungNavigation).Load();
-                    if (Taikhoan.IdNguoiDungNavigation.VaiTro == Constants.ADMIN_ROLE)
+                    _context.Entry(taiKhoan).Reference(i => i.IdNguoiDungNavigation).Load();
+                    if (taiKhoan.IdNguoiDungNavigation.VaiTro == Constants.ADMIN_ROLE)
                     {
-                        Console.WriteLine($"Dang nhap cho admin, id={Taikhoan.IdNguoiDung}");
-                        var identity = ViewModels.Authentication.AuthenticationInfo.CreateAdminIdentity(Taikhoan.IdNguoiDung, Taikhoan.Username);
+                        Console.WriteLine($"Dang nhap cho admin, id={taiKhoan.IdNguoiDung}");
+                        var identity = ViewModels.Authentication.AuthenticationInfo.CreateAdminIdentity(taiKhoan.IdNguoiDung, taiKhoan.Username);
                         var principal = new ClaimsPrincipal(identity);
                         var properties = new AuthenticationProperties
                         {
@@ -50,10 +50,10 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                         await HttpContext.SignInAsync("CustomerSchema", principal, properties);
                         return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
                     }
-                    if (Taikhoan.IdNguoiDungNavigation.VaiTro == Constants.CUSTOMER_ROLE)
+                    if (taiKhoan.IdNguoiDungNavigation.VaiTro == Constants.CUSTOMER_ROLE)
                     {
-                        Console.WriteLine($"Dang nhap cho customer, id={Taikhoan.IdNguoiDung}");
-                        var identity = ViewModels.Authentication.AuthenticationInfo.CreateCustomerIdentity(Taikhoan.IdNguoiDung, Taikhoan.Username);
+                        Console.WriteLine($"Dang nhap cho customer, id={taiKhoan.IdNguoiDung}");
+                        var identity = ViewModels.Authentication.AuthenticationInfo.CreateCustomerIdentity(taiKhoan.IdNguoiDung, taiKhoan.Username);
                         var principal = new ClaimsPrincipal(identity);
                         var properties = new AuthenticationProperties
                         {
@@ -88,7 +88,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             }
 
             // Kiểm tra email đã tồn tại
-            var existingEmail = _context.Nguoidungs.FirstOrDefault(u => u.Email == model.Email);
+            var existingEmail = _context.NguoiDungs.FirstOrDefault(u => u.Email == model.Email);
             if (existingEmail != null)
             {
                 ModelState.AddModelError(nameof(model.Email), "Email đã được sử dụng.");
@@ -96,7 +96,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             }
 
             // Kiểm tra số điện thoại đã tồn tại
-            var existingPhone = _context.Nguoidungs.FirstOrDefault(u => u.Sdt == model.Sdt);
+            var existingPhone = _context.NguoiDungs.FirstOrDefault(u => u.Sdt == model.Sdt);
             if (existingPhone != null)
             {
                 ModelState.AddModelError(nameof(model.Sdt), "Số điện thoại đã được sử dụng.");
@@ -111,7 +111,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             }
 
             // Tạo ID bằng cách tìm ID lớn nhất hiện tại và tăng lên
-            var maxId = _context.Nguoidungs
+            var maxId = _context.NguoiDungs
                 .OrderByDescending(u => u.IdNguoiDung)
                 .Select(u => u.IdNguoiDung)
                 .FirstOrDefault();
@@ -127,7 +127,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                 newId = (long.Parse(maxId) + 1).ToString("D10"); // Tăng ID lên 1 và định dạng thành 10 chữ số
             }
 
-            var Nguoidung = new Nguoidung
+            var nguoiDung = new NguoiDung
             {
                 IdNguoiDung = newId,
                 HoVaTen = model.HoVaTen,
@@ -140,7 +140,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                 ThoiGianTao = DateTime.Now
             };
 
-            var Taikhoan = new Taikhoan
+            var taiKhoan = new TaiKhoan
             {
                 Username = model.TenDangNhap,
                 Password = model.MatKhau,
@@ -149,8 +149,8 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
 
             try
             {
-                _context.Nguoidungs.Add(Nguoidung);
-                _context.Taikhoans.Add(Taikhoan);
+                _context.NguoiDungs.Add(nguoiDung);
+                _context.TaiKhoans.Add(taiKhoan);
                 _context.SaveChanges();
 
                 TempData["SuccessMessage"] = "Đăng ký thành công! Vui lòng đăng nhập.";
@@ -175,11 +175,11 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             {
                 try
                 {
-                    var Taikhoan = _context.Taikhoans
+                    var taiKhoan = _context.TaiKhoans
                         .Include(a => a.IdNguoiDungNavigation)
                         .FirstOrDefault(a => a.Username == model.Username && a.IdNguoiDungNavigation.Sdt == model.PhoneNumber);
 
-                    if (Taikhoan != null)
+                    if (taiKhoan != null)
                     {
                         return RedirectToAction("ResetPassword", "Account", new { username = model.Username });
                     }
@@ -211,15 +211,15 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             {
                 if (model.NewPassword == model.ConfirmPassword)
                 {
-                    var Taikhoan = await _context.Taikhoans.FirstOrDefaultAsync(a => a.Username == model.Username);
-                    if (Taikhoan != null)
+                    var taiKhoan = await _context.TaiKhoans.FirstOrDefaultAsync(a => a.Username == model.Username);
+                    if (taiKhoan != null)
                     {
                         _logger.LogInformation("Tài khoản tìm thấy: {Username}", model.Username);
-                        Taikhoan.Password = model.NewPassword;
+                        taiKhoan.Password = model.NewPassword;
 
                         try
                         {
-                            _context.Taikhoans.Update(Taikhoan);
+                            _context.TaiKhoans.Update(taiKhoan);
                             await _context.SaveChangesAsync();
                             _logger.LogInformation("Cập nhật mật khẩu thành công cho: {Username}", model.Username);
                             ViewBag.Message = "Mật khẩu đã được đặt lại thành công.";

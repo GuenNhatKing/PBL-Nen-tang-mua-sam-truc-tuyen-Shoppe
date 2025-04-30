@@ -6,15 +6,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ShoppeWebApp.Models;
 
-[Table("cuahang")]
-[Index("IdNguoiDung", Name = "IdNguoiDung")]
-public partial class Cuahang
+[Table("CuaHang")]
+public partial class CuaHang
 {
     [Key]
     [StringLength(10)]
+    [Unicode(false)]
     public string IdCuaHang { get; set; } = null!;
 
     [StringLength(10)]
+    [Unicode(false)]
     public string IdNguoiDung { get; set; } = null!;
 
     [StringLength(100)]
@@ -28,23 +29,24 @@ public partial class Cuahang
 
     [Column("SDT")]
     [StringLength(10)]
+    [Unicode(false)]
     public string Sdt { get; set; } = null!;
 
-    [StringLength(1000)]
+    [StringLength(255)]
     public string DiaChi { get; set; } = null!;
 
     public int TrangThai { get; set; }
 
     [Column(TypeName = "datetime")]
-    public DateTime? ThoiGianTao { get; set; }
+    public DateTime ThoiGianTao { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? ThoiGianXoa { get; set; }
 
     [ForeignKey("IdNguoiDung")]
-    [InverseProperty("Cuahangs")]
-    public virtual Nguoidung IdNguoiDungNavigation { get; set; } = null!;
+    [InverseProperty("CuaHangs")]
+    public virtual NguoiDung IdNguoiDungNavigation { get; set; } = null!;
 
     [InverseProperty("IdCuaHangNavigation")]
-    public virtual ICollection<Sanpham> Sanphams { get; set; } = new List<Sanpham>();
+    public virtual ICollection<SanPham> SanPhams { get; set; } = new List<SanPham>();
 }

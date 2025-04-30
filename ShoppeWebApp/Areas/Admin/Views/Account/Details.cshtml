@@ -1,0 +1,81 @@
+@model ShoppeWebApp.ViewModels.Admin.EditAccountViewModel
+
+@{
+    Layout = "~/Areas/Admin/Shared/_Layout.cshtml"; 
+}
+
+<div class="container mt-5">
+    <!-- Tiêu đề chi tiết tài khoản -->
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 10px;">
+            Chi tiết tài khoản
+        </h2>
+    </div>
+
+    <!-- Hiển thị thông tin tài khoản -->
+    <div class="p-4 border border-success rounded" style="background-color: #fdfdfd;">
+        <div class="row">
+            <!-- Cột bên trái: Ảnh đại diện -->
+            <div class="col-md-4 text-center">
+                <label class="form-label fw-bold">Ảnh đại diện</label>
+                <div>
+                    <img src="@Model.AvatarUrl" alt="Avatar" class="img-thumbnail mb-3" style="width: 200px; height: 200px; object-fit: cover;" />
+                </div>
+            </div>
+
+            <!-- Cột bên phải: Các trường thông tin -->
+            <div class="col-md-8">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">ID Người dùng</label>
+                    <p class="form-control-plaintext " readonly style="background-color: #e9ecef; cursor: not-allowed;" >@Model.Id </p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tên đăng nhập</label>
+                    <p class="form-control-plaintext"readonly style="background-color: #e9ecef; cursor: not-allowed;" >@Model.Username</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tên người dùng</label>
+                    <p class="form-control-plaintext" readonly style="background-color: #e9ecef; cursor: not-allowed;">@Model.Name</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Email</label>
+                    <p class="form-control-plaintext" readonly style="background-color: #e9ecef; cursor: not-allowed;">@Model.Email</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">CCCD</label>
+                    <p class="form-control-plaintext" readonly style="background-color: #e9ecef; cursor: not-allowed;">@Model.Cccd</p>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <!-- Các trường bên dưới -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Số điện thoại</label>
+                    <p class="form-control-plaintext" readonly style="background-color: #e9ecef; cursor: not-allowed;">@Model.Sdt</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Địa chỉ</label>
+                    <p class="form-control-plaintext" readonly style="background-color: #e9ecef; cursor: not-allowed;">@Model.Address</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Vai trò</label>
+            <p class="form-control-plaintext" readonly style="background-color: #e9ecef; cursor: not-allowed;">
+                @(Model.Role == 1 ? "Khách hàng" : Model.Role == 2 ? "Chủ Shop" : "Admin")
+            </p>
+        </div>
+
+        <!-- Nút quay lại -->
+        <div class="text-end">
+            <a asp-area="Admin" asp-controller="Account" asp-action="Index" class="btn btn-secondary">Quay lại</a>
+        </div>
+    </div>
+</div>

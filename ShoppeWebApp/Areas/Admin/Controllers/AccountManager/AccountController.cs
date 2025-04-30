@@ -14,9 +14,9 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
     [Area("Admin")]
     public class AccountController : Controller
     {
-        private readonly ShoppeWebAppDbContext _context;
+        private readonly ShoppeWebAppContext _context;
 
-        public AccountController(ShoppeWebAppDbContext context)
+        public AccountController(ShoppeWebAppContext context)
         {
             _context = context;
         }
@@ -26,9 +26,9 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
             // Đảm bảo giá trị hợp lệ cho page và pageSize
             page = page < 1 ? 1 : page;
             pageSize = pageSize < 1 ? 10 : pageSize;
-
+        
             // Khởi tạo truy vấn
-            var query = _context.Nguoidungs.AsQueryable();
+            var query = _context.NguoiDungs.AsQueryable();
         
             // Tìm kiếm theo từ khóa (ID, tên người dùng, CCCD, Email, địa chỉ)
             if (!string.IsNullOrEmpty(searchQuery))
@@ -61,15 +61,17 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
                 .Select(user => new UserViewModel
                 {
                     Id = user.IdNguoiDung,
+                    Status = user.TrangThai,
                     Name = user.HoVaTen,
                     Email = user.Email,
                     Cccd = user.Cccd,
                     Address = user.DiaChi,
                     Role = user.VaiTro == 1 ? "Khách hàng" : user.VaiTro == 2 ? "Chủ Shop" : "Admin"
                 })
-                .OrderBy(user => user.Role == "Khách hàng" ? 1 : user.Role == "Chủ Shop" ? 2 : 3)
-                .ThenBy(user => user.Id)
-                .ThenBy(user => user.Name)
+                .OrderByDescending(user => user.Status) // Sắp xếp giảm dần theo Status (1 trước, 0 sau)
+                .ThenBy(user => user.Role == "Khách hàng" ? 1 : user.Role == "Chủ Shop" ? 2 : 3) // Sắp xếp theo Role
+                .ThenBy(user => user.Id) // Sắp xếp theo Id
+                .ThenBy(user => user.Name) // Sắp xếp theo Name
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
@@ -103,28 +105,28 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
             }
         
             // Kiểm tra email đã tồn tại (trong cùng vai trò)
-            if (_context.Nguoidungs.Any(user => user.Email == model.Email && user.VaiTro == model.Role))
+            if (_context.NguoiDungs.Any(user => user.Email == model.Email && user.VaiTro == model.Role))
             {
                 ModelState.AddModelError(nameof(model.Email), "Email đã được sử dụng bởi người dùng khác trong cùng vai trò.");
                 return View(model);
             }
         
             // Kiểm tra CCCD đã tồn tại (trong cùng vai trò)
-            if (_context.Nguoidungs.Any(user => user.Cccd == model.Cccd && user.VaiTro == model.Role))
+            if (_context.NguoiDungs.Any(user => user.Cccd == model.Cccd && user.VaiTro == model.Role))
             {
                 ModelState.AddModelError(nameof(model.Cccd), "CCCD đã được sử dụng bởi người dùng khác trong cùng vai trò.");
                 return View(model);
             }
         
             // Kiểm tra SĐT đã tồn tại (trong cùng vai trò)
-            if (_context.Nguoidungs.Any(user => user.Sdt == model.Sdt && user.VaiTro == model.Role))
+            if (_context.NguoiDungs.Any(user => user.Sdt == model.Sdt && user.VaiTro == model.Role))
             {
                 ModelState.AddModelError(nameof(model.Sdt), "Số điện thoại đã được sử dụng bởi người dùng khác trong cùng vai trò.");
                 return View(model);
             }
         
             // Tạo ID người dùng mới bằng cách tìm ID lớn nhất hiện tại và tăng lên
-            var maxId = _context.Nguoidungs
+            var maxId = _context.NguoiDungs
                 .OrderByDescending(u => u.IdNguoiDung)
                 .Select(u => u.IdNguoiDung)
                 .FirstOrDefault();
@@ -140,7 +142,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
             }
         
             // Tạo đối tượng người dùng mới
-            var newUser = new Nguoidung
+            var newUser = new NguoiDung
             {
                 IdNguoiDung = newId,
                 HoVaTen = model.Name ?? string.Empty,
@@ -154,7 +156,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
             };
         
             // Tạo tài khoản mới
-            var newAccount = new Taikhoan
+            var newAccount = new TaiKhoan
             {
                 IdNguoiDung = newId,
                 Username = model.Username ?? string.Empty,
@@ -164,8 +166,8 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
             try
             {
                 // Lưu vào cơ sở dữ liệu
-                _context.Nguoidungs.Add(newUser);
-                _context.Taikhoans.Add(newAccount);
+                _context.NguoiDungs.Add(newUser);
+                _context.TaiKhoans.Add(newAccount);
                 _context.SaveChanges();
         
                 TempData["SuccessMessage"] = "Tạo tài khoản thành công!";
@@ -182,14 +184,14 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
         public IActionResult Edit(string id)
         {
             // Tìm người dùng theo ID
-            var user = _context.Nguoidungs.FirstOrDefault(u => u.IdNguoiDung == id);
+            var user = _context.NguoiDungs.FirstOrDefault(u => u.IdNguoiDung == id);
             if (user == null)
             {
                 return NotFound();
             }
         
             // Tìm tài khoản liên kết với người dùng
-            var account = _context.Taikhoans.FirstOrDefault(a => a.IdNguoiDung == id);
+            var account = _context.TaiKhoans.FirstOrDefault(a => a.IdNguoiDung == id);
             if (account == null)
             {
                 return NotFound();
@@ -224,35 +226,35 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
             }
         
             // Tìm người dùng hiện tại theo ID
-            var user = _context.Nguoidungs.FirstOrDefault(u => u.IdNguoiDung == model.Id);
+            var user = _context.NguoiDungs.FirstOrDefault(u => u.IdNguoiDung == model.Id);
             if (user == null)
             {
                 return NotFound();
             }
         
             // Tìm tài khoản liên kết với người dùng
-            var account = _context.Taikhoans.FirstOrDefault(a => a.IdNguoiDung == model.Id);
+            var account = _context.TaiKhoans.FirstOrDefault(a => a.IdNguoiDung == model.Id);
             if (account == null)
             {
                 return NotFound();
             }
         
             // Kiểm tra email đã tồn tại (trừ người dùng hiện tại và cùng vai trò)
-            if (_context.Nguoidungs.Any(u => u.Email == model.Email && u.IdNguoiDung != model.Id && u.VaiTro == model.Role))
+            if (_context.NguoiDungs.Any(u => u.Email == model.Email && u.IdNguoiDung != model.Id && u.VaiTro == model.Role))
             {
                 ModelState.AddModelError(nameof(model.Email), "Email đã được sử dụng bởi người dùng khác trong cùng vai trò.");
                 return View(model);
             }
             
             // Kiểm tra CCCD đã tồn tại (trừ người dùng hiện tại và cùng vai trò)
-            if (_context.Nguoidungs.Any(u => u.Cccd == model.Cccd && u.IdNguoiDung != model.Id && u.VaiTro == model.Role))
+            if (_context.NguoiDungs.Any(u => u.Cccd == model.Cccd && u.IdNguoiDung != model.Id && u.VaiTro == model.Role))
             {
                 ModelState.AddModelError(nameof(model.Cccd), "CCCD đã được sử dụng bởi người dùng khác trong cùng vai trò.");
                 return View(model);
             }
             
             // Kiểm tra SĐT đã tồn tại (trừ người dùng hiện tại và cùng vai trò)
-            if (_context.Nguoidungs.Any(u => u.Sdt == model.Sdt && u.IdNguoiDung != model.Id && u.VaiTro == model.Role))
+            if (_context.NguoiDungs.Any(u => u.Sdt == model.Sdt && u.IdNguoiDung != model.Id && u.VaiTro == model.Role))
             {
                 ModelState.AddModelError(nameof(model.Sdt), "Số điện thoại đã được sử dụng bởi người dùng khác trong cùng vai trò.");
                 return View(model);
@@ -269,7 +271,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
             if (user.VaiTro == 1 && (model.Role == 2 || model.Role == 0))
             {
                 // Lấy danh sách đơn hàng của người dùng thông qua IdLienHe
-                var pendingOrders = _context.Donhangs
+                var pendingOrders = _context.DonHangs
                     .Where(dh => dh.IdLienHeNavigation.IdNguoiDung == user.IdNguoiDung && dh.TrangThai != 3) // Trạng thái khác 3 (chưa hoàn thành)
                     .ToList();
             
@@ -311,13 +313,49 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
                 ModelState.AddModelError("", "Đã xảy ra lỗi khi cập nhật tài khoản: " + ex.Message);
                 return View(model);
             }
-        }        
-    
+        }  
+
+        [HttpGet]
+        public IActionResult Details(string id)
+        {
+            // Tìm người dùng theo ID
+            var user = _context.NguoiDungs.FirstOrDefault(u => u.IdNguoiDung == id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+        
+            // Tìm tài khoản liên kết với người dùng
+            var account = _context.TaiKhoans.FirstOrDefault(a => a.IdNguoiDung == id);
+            if (account == null)
+            {
+                return NotFound();
+            }
+        
+            // Tạo ViewModel với dữ liệu từ cơ sở dữ liệu
+            var model = new EditAccountViewModel
+            {
+                Id = user.IdNguoiDung,
+                Username = account.Username,
+                AvatarUrl =  "/Images/avatar-mac-dinh.jpg", // Đường dẫn ảnh đại diện
+                Name = user.HoVaTen,
+                Email = user.Email,
+                Cccd = user.Cccd,
+                Sdt = user.Sdt,
+                Address = user.DiaChi,
+                Role = user.VaiTro,
+                Password = account.Password, // Mật khẩu hiện tại
+                ConfirmPassword = account.Password // Xác nhận mật khẩu
+            };
+        
+            return View(model);
+        }
+   
          [HttpGet]
         public IActionResult Delete(string id)
         {
             // Tìm người dùng theo ID
-            var user = _context.Nguoidungs.FirstOrDefault(u => u.IdNguoiDung == id && u.TrangThai == 1); // Chỉ lấy tài khoản đang hoạt động
+            var user = _context.NguoiDungs.FirstOrDefault(u => u.IdNguoiDung == id && u.TrangThai == 1); // Chỉ lấy tài khoản đang hoạt động
             if (user == null)
             {
                 return NotFound();
@@ -328,7 +366,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
             if (user.VaiTro == 1) // Nếu là khách hàng
             {
                 // Kiểm tra nếu người dùng là khách hàng và có đơn hàng
-                var orders = _context.Donhangs
+                var orders = _context.DonHangs
                     .Where(dh => dh.IdLienHeNavigation.IdNguoiDung == id)
                     .ToList();
         
@@ -355,13 +393,13 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
             else if (user.VaiTro == 2) // Nếu là Chủ Shop
             {
                 // Lấy danh sách sản phẩm thuộc cửa hàng của shop
-                var shopProducts = _context.Sanphams
+                var shopProducts = _context.SanPhams
                     .Where(sp => sp.IdCuaHangNavigation.IdNguoiDung == id)
                     .Select(sp => sp.IdSanPham)
                     .ToList();
         
                 // Kiểm tra nếu có sản phẩm nào thuộc đơn hàng
-                var relatedOrders = _context.Chitietdonhangs
+                var relatedOrders = _context.ChiTietDonHangs
                     .Where(ctdh => shopProducts.Contains(ctdh.IdSanPham))
                     .Select(ctdh => ctdh.IdDonHang)
                     .Distinct()
@@ -395,7 +433,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
         public IActionResult DeleteConfirmed(string id)
         {
             // Tìm người dùng theo ID
-            var user = _context.Nguoidungs.FirstOrDefault(u => u.IdNguoiDung == id && u.TrangThai == 1); // Chỉ xóa tài khoản đang hoạt động
+            var user = _context.NguoiDungs.FirstOrDefault(u => u.IdNguoiDung == id && u.TrangThai == 1); // Chỉ xóa tài khoản đang hoạt động
             if (user == null)
             {
                 return NotFound();

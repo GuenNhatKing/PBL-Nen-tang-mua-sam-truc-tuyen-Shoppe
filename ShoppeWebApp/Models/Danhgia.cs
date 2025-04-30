@@ -6,19 +6,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ShoppeWebApp.Models;
 
-[Table("danhgia")]
-[Index("IdNguoiDung", Name = "IdNguoiDung")]
-[Index("IdSanPham", Name = "IdSanPham")]
-public partial class Danhgia
+public partial class DanhGia
 {
     [Key]
     [StringLength(10)]
+    [Unicode(false)]
     public string IdDanhGia { get; set; } = null!;
 
     [StringLength(10)]
+    [Unicode(false)]
     public string IdNguoiDung { get; set; } = null!;
 
     [StringLength(10)]
+    [Unicode(false)]
     public string IdSanPham { get; set; } = null!;
 
     public int DiemDanhGia { get; set; }
@@ -27,13 +27,13 @@ public partial class Danhgia
     public string? NoiDung { get; set; }
 
     [Column("ThoiGianDG", TypeName = "datetime")]
-    public DateTime? ThoiGianDg { get; set; }
+    public DateTime ThoiGianDg { get; set; }
 
     [ForeignKey("IdNguoiDung")]
-    [InverseProperty("Danhgia")]
-    public virtual Nguoidung IdNguoiDungNavigation { get; set; } = null!;
+    [InverseProperty("DanhGia")]
+    public virtual NguoiDung IdNguoiDungNavigation { get; set; } = null!;
 
     [ForeignKey("IdSanPham")]
-    [InverseProperty("Danhgia")]
-    public virtual Sanpham IdSanPhamNavigation { get; set; } = null!;
+    [InverseProperty("DanhGia")]
+    public virtual SanPham IdSanPhamNavigation { get; set; } = null!;
 }

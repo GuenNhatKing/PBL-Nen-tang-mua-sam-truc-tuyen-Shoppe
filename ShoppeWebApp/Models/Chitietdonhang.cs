@@ -7,28 +7,29 @@ using Microsoft.EntityFrameworkCore;
 namespace ShoppeWebApp.Models;
 
 [PrimaryKey("IdDonHang", "IdSanPham")]
-[Table("chitietdonhang")]
-[Index("IdSanPham", Name = "IdSanPham")]
-public partial class Chitietdonhang
+[Table("ChiTietDonHang")]
+public partial class ChiTietDonHang
 {
     [Key]
     [StringLength(10)]
+    [Unicode(false)]
     public string IdDonHang { get; set; } = null!;
 
     [Key]
     [StringLength(10)]
+    [Unicode(false)]
     public string IdSanPham { get; set; } = null!;
 
     public int SoLuong { get; set; }
 
-    [Precision(18, 2)]
+    [Column(TypeName = "decimal(18, 2)")]
     public decimal DonGia { get; set; }
 
     [ForeignKey("IdDonHang")]
-    [InverseProperty("Chitietdonhangs")]
-    public virtual Donhang IdDonHangNavigation { get; set; } = null!;
+    [InverseProperty("ChiTietDonHangs")]
+    public virtual DonHang IdDonHangNavigation { get; set; } = null!;
 
     [ForeignKey("IdSanPham")]
-    [InverseProperty("Chitietdonhangs")]
-    public virtual Sanpham IdSanPhamNavigation { get; set; } = null!;
+    [InverseProperty("ChiTietDonHangs")]
+    public virtual SanPham IdSanPhamNavigation { get; set; } = null!;
 }

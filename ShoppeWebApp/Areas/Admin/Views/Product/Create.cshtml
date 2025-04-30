@@ -1,0 +1,82 @@
+@model ShoppeWebApp.ViewModels.Admin.CreateProductViewModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Thêm sản phẩm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5 border border-success p-4">
+        <!-- Tiêu đề -->
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 10px;">
+                Thêm sản phẩm
+            </h2>
+        </div>
+
+        <!-- Form thêm sản phẩm -->
+        <div class="p-4 border border-success rounded" style="background-color: #fdfdfd;">
+            <form asp-area="Admin" asp-controller="Product" asp-action="Create" method="post" enctype="multipart/form-data">
+                <!-- Hiển thị lỗi tổng quát -->
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none" role="alert"></div>
+
+                <input asp-for="IdCuaHang" type="hidden" />
+
+                <div class="mb-3">
+                    <label asp-for="TenSanPham" class="form-label fw-bold">Tên sản phẩm</label>
+                    <input asp-for="TenSanPham" class="form-control" placeholder="Nhập tên sản phẩm" />
+                    <span asp-validation-for="TenSanPham" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="IdDanhMuc" class="form-label fw-bold">Danh mục</label>
+                    <select asp-for="IdDanhMuc" class="form-select">
+                        <option value="">-- Chọn danh mục --</option>
+                        @foreach (var category in ViewBag.Categories)
+                        {
+                            <option value="@category.IdDanhMuc">@category.TenDanhMuc</option>
+                        }
+                    </select>
+                    <span asp-validation-for="IdDanhMuc" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="SoLuongKho" class="form-label fw-bold">Số lượng kho</label>
+                    <input asp-for="SoLuongKho" class="form-control" placeholder="Nhập số lượng kho" />
+                    <span asp-validation-for="SoLuongKho" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="GiaGoc" class="form-label fw-bold">Giá gốc</label>
+                    <input asp-for="GiaGoc" class="form-control" placeholder="Nhập giá gốc" />
+                    <span asp-validation-for="GiaGoc" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="GiaBan" class="form-label fw-bold">Giá bán</label>
+                    <input asp-for="GiaBan" class="form-control" placeholder="Nhập giá bán" />
+                    <span asp-validation-for="GiaBan" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="MoTa" class="form-label fw-bold">Mô tả</label>
+                    <textarea asp-for="MoTa" class="form-control" placeholder="Nhập mô tả sản phẩm" style="white-space: pre-line;"></textarea>
+                    <span asp-validation-for="MoTa" class="text-danger"></span>
+                </div>
+                
+                <div class="mb-3">
+                    <label asp-for="UrlAnh" class="form-label fw-bold">Tải lên ảnh</label>
+                    <input asp-for="UrlAnh" type="file" class="form-control" accept="image/*" />
+                    <span asp-validation-for="UrlAnh" class="text-danger"></span>
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-success">Thêm sản phẩm</button>
+                    <a asp-area="Admin" asp-controller="Product" asp-action="Index" asp-route-IdCuaHang="@Model.IdCuaHang" class="btn btn-primary"> Hủy</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

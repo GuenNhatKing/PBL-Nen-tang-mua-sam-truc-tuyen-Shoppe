@@ -11,9 +11,9 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
     [Area("Admin")]
     public class ShopController : Controller
     {
-        private readonly ShoppeWebAppDbContext _context;
+        private readonly ShoppeWebAppContext _context;
 
-        public ShopController(ShoppeWebAppDbContext context)
+        public ShopController(ShoppeWebAppContext context)
         {
             _context = context;
         }
@@ -25,7 +25,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
             pageSize = pageSize < 1 ? 12 : pageSize;
         
             // Khởi tạo truy vấn
-            var query = _context.Cuahangs.AsQueryable();
+            var query = _context.CuaHangs.AsQueryable();
         
             // Tìm kiếm theo ID cửa hàng, ID chủ sở hữu hoặc tên cửa hàng
             if (!string.IsNullOrEmpty(searchQuery))
@@ -114,7 +114,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
             Console.WriteLine("File path: " + filePath);
         
             // Kiểm tra vai trò của chủ Shop
-            var seller = _context.Nguoidungs.FirstOrDefault(user => user.IdNguoiDung == model.IdSeller);
+            var seller = _context.NguoiDungs.FirstOrDefault(user => user.IdNguoiDung == model.IdSeller);
             if (seller == null || seller.VaiTro != 2)
             {
                 ModelState.AddModelError(nameof(model.IdSeller), "Chủ sở hữu phải có vai trò là Chủ Shop.");
@@ -122,28 +122,28 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
             }
         
             // Kiểm tra nếu chủ Shop đã có cửa hàng
-            if (_context.Cuahangs.Any(shop => shop.IdNguoiDung == model.IdSeller))
+            if (_context.CuaHangs.Any(shop => shop.IdNguoiDung == model.IdSeller))
             {
                 ModelState.AddModelError(nameof(model.IdSeller), "Chủ Shop này đã sở hữu một cửa hàng.");
                 return View(model);
             }
         
             // Kiểm tra tên cửa hàng đã tồn tại
-            if (_context.Cuahangs.Any(shop => shop.TenCuaHang == model.TenCuaHang))
+            if (_context.CuaHangs.Any(shop => shop.TenCuaHang == model.TenCuaHang))
             {
                 ModelState.AddModelError(nameof(model.TenCuaHang), "Tên cửa hàng đã tồn tại.");
                 return View(model);
             }
         
             // Kiểm tra số điện thoại đã tồn tại
-            if (_context.Cuahangs.Any(shop => shop.Sdt == model.Sdt))
+            if (_context.CuaHangs.Any(shop => shop.Sdt == model.Sdt))
             {
                 ModelState.AddModelError(nameof(model.Sdt), "Số điện thoại đã được sử dụng bởi cửa hàng khác.");
                 return View(model);
             }
         
             // Tạo ID cửa hàng mới bằng cách tìm ID lớn nhất hiện tại và tăng lên
-            var maxId = _context.Cuahangs
+            var maxId = _context.CuaHangs
                 .OrderByDescending(shop => shop.IdCuaHang)
                 .Select(shop => shop.IdCuaHang)
                 .FirstOrDefault();
@@ -160,7 +160,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
             }
         
             // Tạo đối tượng cửa hàng mới
-            var newShop = new Cuahang
+            var newShop = new CuaHang
             {
                 IdCuaHang = newId,
                 TenCuaHang = model.TenCuaHang,
@@ -176,7 +176,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
             try
             {
                 // Lưu vào cơ sở dữ liệu
-                _context.Cuahangs.Add(newShop);
+                _context.CuaHangs.Add(newShop);
                 _context.SaveChanges();
         
                 TempData["SuccessMessage"] = "Tạo cửa hàng thành công!";
@@ -200,7 +200,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
             }
         
             // Lấy thông tin cửa hàng từ cơ sở dữ liệu
-            var shop = _context.Cuahangs
+            var shop = _context.CuaHangs
                 .Where(s => s.IdCuaHang == id)
                 .Select(s => new ShopViewModel
                 {
@@ -213,9 +213,9 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
                     DiaChi = s.DiaChi,
                     MoTa = s.MoTa,
                     ThoiGianTao = s.ThoiGianTao,
-                    SoSanPham = s.Sanphams.Count, // Đếm số sản phẩm thuộc cửa hàng
-                    SoDonHang = _context.Donhangs // Đếm số đơn hàng liên quan đến sản phẩm của cửa hàng
-                        .Where(dh => dh.Chitietdonhangs
+                    SoSanPham = s.SanPhams.Count, // Đếm số sản phẩm thuộc cửa hàng
+                    SoDonHang = _context.DonHangs // Đếm số đơn hàng liên quan đến sản phẩm của cửa hàng
+                        .Where(dh => dh.ChiTietDonHangs
                             .Any(ct => ct.IdSanPhamNavigation.IdCuaHang == id))
                         .Count()
                 })
@@ -243,7 +243,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
             }
         
             // Lấy thông tin cửa hàng từ cơ sở dữ liệu
-            var shop = _context.Cuahangs
+            var shop = _context.CuaHangs
                 .Where(s => s.IdCuaHang == id)
                 .Select(s => new EditShopViewModel
                 {
@@ -279,7 +279,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
             }
         
             // Lấy thông tin cửa hàng từ cơ sở dữ liệu
-            var shop = _context.Cuahangs.FirstOrDefault(s => s.IdCuaHang == model.IdCuaHang);
+            var shop = _context.CuaHangs.FirstOrDefault(s => s.IdCuaHang == model.IdCuaHang);
             if (shop == null)
             {
                 TempData["ErrorMessage"] = "Không tìm thấy cửa hàng.";
@@ -287,14 +287,14 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
             }
         
             // Kiểm tra tên cửa hàng không trùng với cửa hàng khác
-            if (_context.Cuahangs.Any(s => s.TenCuaHang == model.TenCuaHang && s.IdCuaHang != model.IdCuaHang))
+            if (_context.CuaHangs.Any(s => s.TenCuaHang == model.TenCuaHang && s.IdCuaHang != model.IdCuaHang))
             {
                 ModelState.AddModelError(nameof(model.TenCuaHang), "Tên cửa hàng đã tồn tại.");
                 return View(model);
             }
         
             // Kiểm tra số điện thoại không trùng với cửa hàng khác
-            if (_context.Cuahangs.Any(s => s.Sdt == model.Sdt && s.IdCuaHang != model.IdCuaHang))
+            if (_context.CuaHangs.Any(s => s.Sdt == model.Sdt && s.IdCuaHang != model.IdCuaHang))
             {
                 ModelState.AddModelError(nameof(model.Sdt), "Số điện thoại đã được sử dụng bởi cửa hàng khác.");
                 return View(model);
@@ -338,7 +338,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
             try
             {
                 // Lưu thay đổi vào cơ sở dữ liệu
-                _context.Cuahangs.Update(shop);
+                _context.CuaHangs.Update(shop);
                 _context.SaveChanges();
         
                 TempData["SuccessMessage"] = "Cập nhật thông tin cửa hàng thành công!";
@@ -362,7 +362,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
             }
         
             // Lấy thông tin cửa hàng từ cơ sở dữ liệu
-            var shop = _context.Cuahangs
+            var shop = _context.CuaHangs
                 .Where(s => s.IdCuaHang == id)
                 .Select(s => new ShopViewModel
                 {
@@ -375,9 +375,9 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
                     DiaChi = s.DiaChi,
                     MoTa = s.MoTa,
                     ThoiGianTao = s.ThoiGianTao,
-                    SoSanPham = s.Sanphams.Count,
-                    SoDonHang = _context.Donhangs
-                        .Where(dh => dh.Chitietdonhangs
+                    SoSanPham = s.SanPhams.Count,
+                    SoDonHang = _context.DonHangs
+                        .Where(dh => dh.ChiTietDonHangs
                             .Any(ct => ct.IdSanPhamNavigation.IdCuaHang == id))
                         .Count()
                 })
@@ -412,7 +412,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
             }
         
             // Lấy thông tin cửa hàng từ cơ sở dữ liệu
-            var shop = _context.Cuahangs.FirstOrDefault(s => s.IdCuaHang == id);
+            var shop = _context.CuaHangs.FirstOrDefault(s => s.IdCuaHang == id);
             if (shop == null)
             {
                 TempData["ErrorMessage"] = "Không tìm thấy cửa hàng.";
@@ -420,8 +420,8 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
             }
         
             // Kiểm tra nếu cửa hàng có đơn hàng liên quan
-            var hasOrders = _context.Donhangs
-                .Any(dh => dh.Chitietdonhangs
+            var hasOrders = _context.DonHangs
+                .Any(dh => dh.ChiTietDonHangs
                     .Any(ct => ct.IdSanPhamNavigation.IdCuaHang == id));
         
             if (hasOrders)
@@ -434,7 +434,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
                 // Xóa mềm cửa hàng (đánh dấu trạng thái là đã xóa)
                 shop.TrangThai = 0; // Đánh dấu cửa hàng là đã xóa
                 shop.ThoiGianXoa = DateTime.Now; // Ghi lại thời gian xóa
-                _context.Cuahangs.Update(shop);
+                _context.CuaHangs.Update(shop);
                 _context.SaveChanges();
         
                 TempData["SuccessMessage"] = "Cửa hàng đã được xóa thành công!";

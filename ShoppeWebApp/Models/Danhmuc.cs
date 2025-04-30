@@ -6,19 +6,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ShoppeWebApp.Models;
 
-[Table("danhmuc")]
-public partial class Danhmuc
+[Table("DanhMuc")]
+public partial class DanhMuc
 {
     [Key]
     [StringLength(10)]
+    [Unicode(false)]
     public string IdDanhMuc { get; set; } = null!;
 
-    [StringLength(100)]
+    [StringLength(50)]
     public string TenDanhMuc { get; set; } = null!;
 
-    [StringLength(1000)]
-    public string MoTa { get; set; } = null!;
+    [StringLength(255)]
+    public string? MoTa { get; set; }
 
     [InverseProperty("IdDanhMucNavigation")]
-    public virtual ICollection<Sanpham> Sanphams { get; set; } = new List<Sanpham>();
+    public virtual ICollection<SanPham> SanPhams { get; set; } = new List<SanPham>();
 }

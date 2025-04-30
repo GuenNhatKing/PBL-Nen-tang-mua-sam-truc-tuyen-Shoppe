@@ -8,30 +8,43 @@
     <div class="p-5 border border-success rounded" style="background-color: #fdfdfd; min-height: 80vh;">
 
         <!-- Thông tin cửa hàng -->
-        <div class="mb-4 p-4 bg-white border border-primary rounded shadow-lg d-flex justify-content-center align-items-center text-center" style="background-image: linear-gradient(to right, #f9f9f9, #e3f2fd);">
-            <!-- Ảnh cửa hàng -->
-            <div class="me-4">
-                @if (!string.IsNullOrEmpty(Model.UrlAnhCuaHang))
-                {
-                    <img src="@Url.Content(Model.UrlAnhCuaHang)" alt="Ảnh cửa hàng"
-                         class="rounded-circle shadow-sm"
-                         style="width: 150px; height: 150px; object-fit: cover;" />
-                }
-                else
-                {
-                    <img src="/images/default-shop.png" alt="Ảnh cửa hàng"
-                         class="rounded-circle shadow-sm"
-                         style="width: 150px; height: 150px; object-fit: cover;" />
-                }
+        <div class="mb-4 p-4 bg-white border border-primary rounded shadow-lg" style="background-image: linear-gradient(to right, #f9f9f9, #e3f2fd); position: relative;">
+
+            <!-- Nút quay lại đặt ở góc trên bên trái -->
+            <div style="position: absolute; top: 1rem; left: 1rem;">
+                <a asp-area="Admin" asp-controller="Shop" asp-action="Index" class="btn btn-danger btn-sm">
+                    <i class="fas fa-arrow-left me-1"></i> Quay lại
+                </a>
             </div>
-        
-            <!-- Thông tin chi tiết -->
-            <div>
-                <h2 class="fw-bold text-danger mb-3" style="font-size: 2rem;">@Model.TenCuaHang</h2>
-                <p class="mb-2"><strong>Địa chỉ:</strong> <span class="text-dark">@Model.DiaChi</span></p>
-                <p class="mb-0"><strong>Số điện thoại:</strong> <span class="text-dark">@Model.SoDienThoai</span></p>
+
+            <!-- Nội dung chính căn giữa -->
+            <div class="d-flex justify-content-center align-items-center text-center flex-wrap mt-4">
+                <!-- Ảnh cửa hàng -->
+                <div class="me-4">
+                    @if (!string.IsNullOrEmpty(Model.UrlAnhCuaHang))
+                    {
+                        <img src="@Url.Content(Model.UrlAnhCuaHang)" alt="Ảnh cửa hàng"
+                            class="rounded-circle shadow-sm"
+                            style="width: 150px; height: 150px; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <img src="/images/default-shop.png" alt="Ảnh cửa hàng"
+                            class="rounded-circle shadow-sm"
+                            style="width: 150px; height: 150px; object-fit: cover;" />
+                    }
+                </div>
+
+                <!-- Thông tin chi tiết -->
+                <div>
+                    <h2 class="fw-bold text-danger mb-3" style="font-size: 2rem;">@Model.TenCuaHang</h2>
+                    <p class="mb-2"><strong>Địa chỉ:</strong> <span class="text-dark">@Model.DiaChi</span></p>
+                    <p class="mb-0"><strong>Số điện thoại:</strong> <span class="text-dark">@Model.SoDienThoai</span></p>
+                </div>
             </div>
+
         </div>
+
 
         <div class="text-center mb-4">
             <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 7px;">
@@ -87,7 +100,7 @@
                 Tổng số sản phẩm: @Model?.productInfos?.Count() 
             </div>
 
-            <a asp-area="Admin" asp-controller="Product" asp-action="Create" class="btn btn-success">Thêm sản phẩm</a>
+            <a asp-area="Admin" asp-controller="Product" asp-action="Create" asp-route-IdCuaHang="@Model.IdCuaHang" class="btn btn-success">Thêm sản phẩm</a>
         </div>
 
 
@@ -125,13 +138,23 @@
                                         @product.TenSanPham
                                     </h6>
                                     <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <!-- Giá gốc và giá bán trên cùng một hàng -->
-                                        <span class="text-muted" style="text-decoration: line-through;">
-                                            @string.Format("{0:#,##0} ₫", product.GiaGoc)
-                                        </span>
-                                        <span class="text-danger fw-bold">
-                                            @string.Format("{0:#,##0} ₫", product.GiaBan)
-                                        </span>
+                                        @if (product.GiaBan == product.GiaGoc)
+                                        {
+                                            <!-- Chỉ hiển thị giá bán nếu giá bán bằng giá gốc -->
+                                            <span class="text-danger fw-bold">
+                                                @string.Format("{0:#,##0} ₫", product.GiaBan)
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <!-- Hiển thị cả giá gốc và giá bán nếu giá bán khác giá gốc -->
+                                            <span class="text-muted" style="text-decoration: line-through;">
+                                                @string.Format("{0:#,##0} ₫", product.GiaGoc)
+                                            </span>
+                                            <span class="text-danger fw-bold">
+                                                @string.Format("{0:#,##0} ₫", product.GiaBan)
+                                            </span>
+                                        }
                                     </div>
                                     <!-- Đã bán căn trái -->
                                     <p class="mb-1 text-muted text-start">
@@ -141,11 +164,13 @@
                         
                                 <!-- Footer với các nút -->
                                 <div class="card-footer bg-transparent text-center">
-                                    <a asp-area="Admin" asp-controller="Product" asp-action="Details" asp-route-id="@product.IdSanPham"
+                                    <a asp-area="Admin" asp-controller="Product" asp-action="DetailsProduct" 
+                                       asp-route-IdSanPham="@product.IdSanPham" asp-route-IdCuaHang="@Model.IdCuaHang"
                                        class="btn btn-dark btn-sm me-1">
                                         <i class="fas fa-info-circle"></i> Chi tiết
                                     </a>
-                                    <a asp-area="Admin" asp-controller="Product" asp-action="Delete" asp-route-id="@product.IdSanPham"
+                                    <a asp-area="Admin" asp-controller="Product" asp-action="Delete" 
+                                       asp-route-IdSanPham="@product.IdSanPham" asp-route-IdCuaHang="@Model.IdCuaHang"
                                        class="btn btn-danger btn-sm">
                                         <i class="fas fa-trash-alt"></i> Xóa
                                     </a>

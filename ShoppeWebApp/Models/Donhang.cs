@@ -6,32 +6,35 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ShoppeWebApp.Models;
 
-[Table("donhang")]
-[Index("IdLienHe", Name = "IdLienHe")]
-public partial class Donhang
+[Table("DonHang")]
+public partial class DonHang
 {
     [Key]
     [StringLength(10)]
+    [Unicode(false)]
     public string IdDonHang { get; set; } = null!;
 
     [StringLength(10)]
+    [Unicode(false)]
     public string IdLienHe { get; set; } = null!;
 
-    [Precision(18, 2)]
-    public decimal TongTien { get; set; }
+    public int TongTien { get; set; }
 
     public int TrangThai { get; set; }
 
     [Column(TypeName = "datetime")]
-    public DateTime? ThoiGianTao { get; set; }
+    public DateTime ThoiGianTao { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? ThoiGianGiao { get; set; }
 
     [InverseProperty("IdDonHangNavigation")]
-    public virtual ICollection<Chitietdonhang> Chitietdonhangs { get; set; } = new List<Chitietdonhang>();
+    public virtual ICollection<ChiTietDonHang> ChiTietDonHangs { get; set; } = new List<ChiTietDonHang>();
 
     [ForeignKey("IdLienHe")]
-    [InverseProperty("Donhangs")]
-    public virtual Thongtinlienhe IdLienHeNavigation { get; set; } = null!;
+    [InverseProperty("DonHangs")]
+    public virtual ThongTinLienHe IdLienHeNavigation { get; set; } = null!;
+
+    [InverseProperty("IdDonHangNavigation")]
+    public virtual ICollection<ThanhToan> ThanhToans { get; set; } = new List<ThanhToan>();
 }

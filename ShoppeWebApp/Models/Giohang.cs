@@ -6,26 +6,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ShoppeWebApp.Models;
 
-[PrimaryKey("IdNguoiDung", "IdSanPham")]
-[Table("giohang")]
-[Index("IdSanPham", Name = "IdSanPham")]
-public partial class Giohang
+[Keyless]
+[Table("GioHang")]
+public partial class GioHang
 {
-    [Key]
     [StringLength(10)]
+    [Unicode(false)]
     public string IdNguoiDung { get; set; } = null!;
 
-    [Key]
     [StringLength(10)]
+    [Unicode(false)]
     public string IdSanPham { get; set; } = null!;
 
     public int SoLuong { get; set; }
 
     [ForeignKey("IdNguoiDung")]
-    [InverseProperty("Giohangs")]
-    public virtual Nguoidung IdNguoiDungNavigation { get; set; } = null!;
+    public virtual NguoiDung IdNguoiDungNavigation { get; set; } = null!;
 
     [ForeignKey("IdSanPham")]
-    [InverseProperty("Giohangs")]
-    public virtual Sanpham IdSanPhamNavigation { get; set; } = null!;
+    public virtual SanPham IdSanPhamNavigation { get; set; } = null!;
 }

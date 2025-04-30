@@ -11,9 +11,9 @@ namespace ShoppeWebApp.Areas.Admin.Controllers
     [Area("Admin")]
     public class DashboardController : Controller
     {
-        private readonly ShoppeWebAppDbContext _context;
+        private readonly ShoppeWebAppContext _context;
 
-        public DashboardController(ShoppeWebAppDbContext context)
+        public DashboardController(ShoppeWebAppContext context)
         {
             _context = context;
         }
@@ -23,10 +23,10 @@ namespace ShoppeWebApp.Areas.Admin.Controllers
             // Lấy dữ liệu từ cơ sở dữ liệu
             var model = new HomeViewModel
             {
-                TotalUsers = _context.Nguoidungs.Count(nd => nd.VaiTro == 1), 
-                TotalSellers = _context.Nguoidungs.Count(nd => nd.VaiTro == 2), 
-                TotalOrders = _context.Donhangs.Count(), 
-                TotalProducts = _context.Sanphams.Count() 
+                TotalUsers = _context.NguoiDungs.Count(nd => nd.VaiTro == 1), 
+                TotalSellers = _context.NguoiDungs.Count(nd => nd.VaiTro == 2), 
+                TotalOrders = _context.DonHangs.Count(), 
+                TotalProducts = _context.SanPhams.Count() 
             };
 
             return View(model);

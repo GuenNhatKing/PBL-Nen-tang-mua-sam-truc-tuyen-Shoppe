@@ -6,15 +6,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ShoppeWebApp.Models;
 
-[Table("thongtinlienhe")]
-[Index("IdNguoiDung", Name = "IdNguoiDung")]
-public partial class Thongtinlienhe
+[Table("ThongTinLienHe")]
+public partial class ThongTinLienHe
 {
     [Key]
     [StringLength(10)]
+    [Unicode(false)]
     public string IdLienHe { get; set; } = null!;
 
     [StringLength(10)]
+    [Unicode(false)]
     public string IdNguoiDung { get; set; } = null!;
 
     [StringLength(50)]
@@ -22,15 +23,16 @@ public partial class Thongtinlienhe
 
     [Column("SDT")]
     [StringLength(10)]
+    [Unicode(false)]
     public string Sdt { get; set; } = null!;
 
-    [StringLength(1000)]
+    [StringLength(255)]
     public string DiaChi { get; set; } = null!;
 
     [InverseProperty("IdLienHeNavigation")]
-    public virtual ICollection<Donhang> Donhangs { get; set; } = new List<Donhang>();
+    public virtual ICollection<DonHang> DonHangs { get; set; } = new List<DonHang>();
 
     [ForeignKey("IdNguoiDung")]
-    [InverseProperty("Thongtinlienhes")]
-    public virtual Nguoidung IdNguoiDungNavigation { get; set; } = null!;
+    [InverseProperty("ThongTinLienHes")]
+    public virtual NguoiDung IdNguoiDungNavigation { get; set; } = null!;
 }

@@ -11,10 +11,10 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
     [Area("Seller")]
     public class AccountController : Controller
     {
-        private readonly ShoppeWebAppDbContext _context;
+        private readonly ShoppeWebAppContext _context;
         private readonly ILogger<AccountController> _logger;
 
-        public AccountController(ShoppeWebAppDbContext context, ILogger<AccountController> logger)
+        public AccountController(ShoppeWebAppContext context, ILogger<AccountController> logger)
         {
             _context = context;
             _logger = logger;
@@ -32,7 +32,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
             if (ModelState.IsValid)
             {
                 // Check the username and password against the database
-                var account = _context.Taikhoans
+                var account = _context.TaiKhoans
                     .FirstOrDefault(a => a.Username == model.Username && a.Password == model.Password);
 
                 if (account != null)
@@ -77,7 +77,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
             {
                 try
                 {
-                    var account = _context.Taikhoans
+                    var account = _context.TaiKhoans
                         .FirstOrDefault(a => a.Username == model.Username && a.IdNguoiDungNavigation.Sdt == model.PhoneNumber);
 
                     if (account != null)
@@ -117,7 +117,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                 // Check if the new password and confirm password fields match
                 if (model.NewPassword == model.ConfirmPassword)
                 {
-                    var account = await _context.Taikhoans.FirstOrDefaultAsync(a => a.Username == model.Username);
+                    var account = await _context.TaiKhoans.FirstOrDefaultAsync(a => a.Username == model.Username);
                     if (account != null)
                     {
                         account.Password = model.NewPassword;
@@ -180,7 +180,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
             }
 
             // Kiểm tra email đã tồn tại
-            var existingEmail = _context.Nguoidungs.FirstOrDefault(u => u.Email == model.Email);
+            var existingEmail = _context.NguoiDungs.FirstOrDefault(u => u.Email == model.Email);
             if (existingEmail != null)
             {
                 ModelState.AddModelError(nameof(model.Email), "Email đã được sử dụng.");
@@ -188,7 +188,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
             }
 
             // Kiểm tra số điện thoại đã tồn tại
-            var existingPhone = _context.Nguoidungs.FirstOrDefault(u => u.Sdt == model.Sdt);
+            var existingPhone = _context.NguoiDungs.FirstOrDefault(u => u.Sdt == model.Sdt);
             if (existingPhone != null)
             {
                 ModelState.AddModelError(nameof(model.Sdt), "Số điện thoại đã được sử dụng.");
@@ -203,14 +203,14 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
             }
 
             // Tạo ID cho người bán
-            var maxId = _context.Nguoidungs
+            var maxId = _context.NguoiDungs
                 .OrderByDescending(u => u.IdNguoiDung)
                 .Select(u => u.IdNguoiDung)
                 .FirstOrDefault();
 
             string newId = string.IsNullOrEmpty(maxId) ? "0000000001" : (long.Parse(maxId) + 1).ToString("D10");
 
-            var Nguoidung = new Nguoidung
+            var nguoiDung = new NguoiDung
             {
                 IdNguoiDung = newId,
                 HoVaTen = model.HoVaTen,
@@ -223,7 +223,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                 ThoiGianTao = DateTime.Now
             };
 
-            var Taikhoan = new Taikhoan
+            var taiKhoan = new TaiKhoan
             {
                 Username = model.TenDangNhap,
                 Password = model.MatKhau,
@@ -232,8 +232,8 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
 
             try
             {
-                _context.Nguoidungs.Add(Nguoidung);
-                _context.Taikhoans.Add(Taikhoan);
+                _context.NguoiDungs.Add(nguoiDung);
+                _context.TaiKhoans.Add(taiKhoan);
                 _context.SaveChanges();
 
                 TempData["SuccessMessage"] = "Đăng ký thành công! Vui lòng đăng nhập.";
