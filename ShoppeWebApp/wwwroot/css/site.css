@@ -25,7 +25,7 @@ ul {
 .tab-link {
     text-decoration: none;
     align-items: center;
-    color: var(--color-fground-secondary)
+    color: var(--color-fground-secondary);
 }
 
     .tab-link:hover {

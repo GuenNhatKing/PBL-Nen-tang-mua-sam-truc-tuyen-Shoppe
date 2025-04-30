@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using ShoppeWebApp.Data;
 using ShoppeWebApp.Models;
 using ShoppeWebApp.ViewModels.Customer;
+using ShoppeWebApp.Services;
 
 namespace ShoppeWebApp.Areas.Customer.Controllers
 {
@@ -22,6 +23,21 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             AllProductInfo products = new AllProductInfo();
             products.categories = await _context.Danhmucs.ToListAsync();
             products.danhMuc = IdDanhMuc;
+
+            int totalProducts = IdDanhMuc == null ?
+                await _context.Sanphams.CountAsync()
+                : await _context.Sanphams.CountAsync(i => i.IdDanhMuc == IdDanhMuc);
+
+            int totalPage = totalProducts % Constants.PAGINATION_SIZE == 0?
+                totalProducts / Constants.PAGINATION_SIZE
+                :totalProducts / Constants.PAGINATION_SIZE + 1;
+            Console.WriteLine($"Total products: {totalProducts}");
+            Console.WriteLine($"Total pages: {totalPage}");
+            if (totalPage != 0 && (page < 1 || page > totalPage))
+            {
+                return NotFound();
+            }
+
             var pros = IdDanhMuc == null?
                 await _context.Sanphams
                 .OrderBy(i => i.IdSanPham)
@@ -31,10 +47,8 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                 .OrderBy(i => i.IdSanPham)
                 .Skip((page - 1) * Constants.PAGINATION_SIZE)
                 .Take(Constants.PAGINATION_SIZE).ToListAsync();
-            int count = 0;
             foreach (var i in pros)
             {
-                ++count;
                 products.productInfos.Add(new ItemInfo
                 {
                     IdSanPham = i.IdSanPham,
@@ -45,7 +59,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                     SoLuongBan = AllProductInfo.ProcessQuantity(i.SoLuongBan),
                 });
             }
-            ViewBag.TotalPage = count;
+            ViewBag.PagingInfo = PagingLoad.GetPaging(totalPage, page);
             ViewBag.Page = page;
             return View(products);
         }

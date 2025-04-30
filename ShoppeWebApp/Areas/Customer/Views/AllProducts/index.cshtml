@@ -1,8 +1,6 @@
 ﻿@model AllProductInfo;
 @{
     ViewData["Title"] = "Tất cả sản phẩm";
-    int totalPage = ViewBag.TotalPage;
-    int page = ViewBag.Page;
 }
 <div class="template-2">
     <div class="container-2">
@@ -52,7 +50,7 @@
                         {
                             <li>
                                 <div class="zoom-wrapper d-flex flex-column border-rounded overflow-hidden bg-white my-card">
-                                    <a href="#" class="tab-link-2">
+                                    <a asp-controller="Product" asp-action="index" asp-route-id="@item.IdSanPham" class="tab-link-2">
                                         <div class="graphic-cover">
                                             <img src="~/@item.UrlAnh" />
                                         </div>
@@ -77,16 +75,37 @@
                         }
                     </ul>
                 </div>
-                <div>
-                    @if (ViewBag.Page > 1)
+                <div class="d-flex justify-content-center gap-3">
+                    @foreach (var i in ViewBag.PagingInfo)
                     {
-                        @Html.ActionLink("← Trang trước", "Index", new { page = ViewBag.Page - 1, IdDanhMuc = Model.danhMuc })
-                    }
-
-                    @Html.Raw(" | ")
-                    @if (ViewBag.Page < totalPage)
-                    {
-                        @Html.ActionLink("Trang tiếp →", "Index", new { page = ViewBag.Page + 1, IdDanhMuc = Model.danhMuc })
+                        if (@i.Value != null)
+                        {
+                            if (i.Value != null && ViewBag.Page == i.Value)
+                            {
+                                <strong>
+                                    <a asp-area="Customer" asp-controller="AllProducts" 
+                                    asp-action="Index" 
+                                    asp-route-page="@i.Value" 
+                                    asp-route-IdDanhMuc="@Model.danhMuc"
+                                    class="tab-link">
+                                        <div>@i.Name</div>
+                                    </a>
+                                </strong>
+                            }
+                            else
+                            {
+                                <a asp-area="Customer" asp-controller="AllProducts"
+                                asp-action="Index" asp-route-page="@i.Value" 
+                                asp-route-IdDanhMuc="@Model.danhMuc"
+                                class="tab-link">
+                                   <div>@i.Name</div>
+                               </a>
+                            }
+                        }
+                        else
+                        {
+                            <a>...</a>
+                        }
                     }
                 </div>
             </div>

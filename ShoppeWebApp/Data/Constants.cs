@@ -7,6 +7,7 @@
         public const int SELLER_ROLE = 2;
         public const int COOKIE_EXPIRY_DAYS = 3;
         public const int PAGINATION_SIZE = 16;
+        public const int PAGINATION_DELTA = 2;
         public static string[] DANH_SACH_TINH = {
             "Tuyên Quang",
             "Lào Cai",
