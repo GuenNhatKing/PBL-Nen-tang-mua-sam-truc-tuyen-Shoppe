@@ -1,0 +1,149 @@
+﻿@using ShoppeWebApp.ViewModels.Customer
+@model LoginViewModel
+
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+
+<div class="login-container">
+    <h1>Đăng nhập vào Shoppe</h1>
+    <p>Sử dung Nickname để đăng nhập vào ứng dụng</p>
+
+    <div class="new-account">
+        <span>🔔 New here? <a asp-area="Customer" asp-controller="Account" asp-action="Register">Tạo tài khoản</a></span>
+    </div>
+
+    <div class="validation-summary">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    </div>
+
+    <form asp-area="Customer" asp-controller="Account" asp-action="Login" method="post">
+        <div class="form-group">
+            <label asp-for="Username">Tên đăng nhập</label>
+            <input asp-for="Username" class="form-control" placeholder="Tên đăng nhập" />
+            <span asp-validation-for="Username" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Password">Mật khẩu</label>
+            <input asp-for="Password" type="password" class="form-control" placeholder="Mật khẩu" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+            <a asp-area="Customer" asp-controller="Account" asp-action="ForgotPassword" class="forgot-password">Quên mật khẩu?</a>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">ĐĂNG NHẬP</button>
+        </div>
+    </form>
+
+    <div class="footer">
+        <p>Bạn là chủ Shop? <a asp-area="Seller" asp-controller="Account" asp-action="Login"> Đăng nhập tại đây</a></p>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<style>
+    .login-container {
+        max-width: 500px;
+        margin: 0 auto;
+        text-align: center;
+        font-family: 'Calibri', sans-serif;
+    }
+
+        .login-container h1 {
+            font-size: 3.5em;
+            margin-bottom: 0.5em;
+        }
+
+        .login-container p {
+            margin-bottom: 1em;
+        }
+
+    .new-account a {
+        text-decoration: underline;
+        text-decoration-color: black;
+        color: black;
+        font-weight: bold;
+    }
+
+    .new-account {
+        background-color: #f8f9fa;
+        padding: 0.25em;
+        margin-bottom: 0.25em;
+        border-radius: 5px;
+        width: 50%;
+        margin: 0 auto 0.25em auto;
+    }
+
+    .form-group a {
+        text-decoration: underline;
+        text-decoration-color: black;
+        color: black;
+        font-weight: bold;
+    }
+
+    .form-group {
+        width: 100%;
+        margin-bottom: 0.5em;
+        text-align: left;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 1em;
+        margin-top: 0.5em;
+        box-sizing: border-box;
+    }
+
+    .forgot-password {
+        float: right;
+        font-size: 0.9em;
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 0.75em;
+        background-color: #000;
+        color: #fff;
+        border: none;
+        border-radius: 1px;
+        font-size: 1em;
+        margin-top: 1em;
+        box-sizing: border-box;
+        text-align: center; 
+        line-height: normal; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+    }
+
+    .footer {
+        margin-top: 1em;
+    }
+
+        .footer p {
+            font-size: 0.9em;
+        }
+
+        .footer a {
+            text-decoration: underline;
+            text-decoration-color: black;
+            color: black;
+            font-weight: bold;
+        }
+
+    .validation-summary {
+        margin-top: 1em;
+        color: red;
+        text-align: left;
+    }
+
+        .validation-summary ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+</style>

@@ -1,0 +1,95 @@
+﻿@model AllProductInfo;
+@{
+    ViewData["Title"] = "Tất cả sản phẩm";
+    int totalPage = ViewBag.TotalPage;
+    int page = ViewBag.Page;
+}
+<div class="template-2">
+    <div class="container-2">
+        <div class="gh-grid">
+            <div class="sidebar">
+                <div class="bg-white d-flex flex-column overflow-hidden border-rounded">
+                    <div class="bg-white flex-column container-3">
+                        <div class="tab-header">Tất cả danh mục</div>
+                        <ul class="nostyle-ul">
+                            @foreach(var i in Model.categories)
+                            {
+                                <li>
+                                    <a asp-area="Customer" asp-controller="AllProducts" asp-action="Index" asp-route-IdDanhMuc="@i.IdDanhMuc" class="tab-link">
+                                        <div class="truncate">
+                                            @if (Model.danhMuc == i.IdDanhMuc)
+                                            {
+                                                <div class="fw-bold"> @i.TenDanhMuc </div>
+                                            }
+                                            else {
+                                                @i.TenDanhMuc
+                                            }
+                                        </div>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="bg-white flex-column container-3">
+                        <div class="tab-header">Nơi bán</div>
+                        <ul class="nostyle-ul">
+                            @foreach (var i in Constants.DANH_SACH_TINH)
+                            {
+                                <li>
+                                    <a href="#" class="tab-link">
+                                        <div>@i</div>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="products-container">
+                <div>
+                    <ul class="products-list nostyle-ul">
+                        @foreach(var item in Model.productInfos)
+                        {
+                            <li>
+                                <div class="zoom-wrapper d-flex flex-column border-rounded overflow-hidden bg-white my-card">
+                                    <a href="#" class="tab-link-2">
+                                        <div class="graphic-cover">
+                                            <img src="~/@item.UrlAnh" />
+                                        </div>
+                                        <div class="d-flex flex-column box-padding-10 row-gap-1">
+                                            <div class="break-word line-clamp-2">
+                                                @item.TenSanPham
+                                            </div>
+                                            <div class="d-flex">
+                                                <div class="truncate min-width-1 text-style-2">
+                                                    @string.Format("{0:#,##0} ₫", item.GiaBan)
+                                                </div>
+                                                <div class="ms-auto d-flex flex-column justify-content-center">
+                                                    <div class="truncate min-width-1 text-style-3 text-end">
+                                                        @string.Format("Đã bán {0}", item.SoLuongBan)
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <div>
+                    @if (ViewBag.Page > 1)
+                    {
+                        @Html.ActionLink("← Trang trước", "Index", new { page = ViewBag.Page - 1, IdDanhMuc = Model.danhMuc })
+                    }
+
+                    @Html.Raw(" | ")
+                    @if (ViewBag.Page < totalPage)
+                    {
+                        @Html.ActionLink("Trang tiếp →", "Index", new { page = ViewBag.Page + 1, IdDanhMuc = Model.danhMuc })
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

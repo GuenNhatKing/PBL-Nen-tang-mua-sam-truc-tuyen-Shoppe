@@ -1,0 +1,185 @@
+@using ShoppeWebApp.ViewModels.Seller
+@model RegisterViewModel
+
+@{
+    ViewData["Title"] = "Đăng ký tài khoản";
+}
+
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        background-color: #f5f6f7;
+    }
+
+    .form-wrapper {
+        width: 100%;
+        max-width: 500px;
+        background-color: #fff;
+        border-radius: 12px;
+        padding: 40px 30px;
+        margin: 60px auto;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        font-family: "Segoe UI", sans-serif;
+    }
+
+    .form-title {
+        font-size: 28px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .form-control {
+        font-size: 16px;
+        padding: 10px;
+        width: 100%;
+        margin-bottom: 8px;
+        box-sizing: border-box;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
+    .text-danger {
+        font-size: 13px;
+        color: #d9534f;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .btn-custom, .btn-outline {
+        font-size: 16px;
+        font-weight: bold;
+        height: 45px;
+        width: 100%;
+        border-radius: 6px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    .btn-custom {
+        background-color: #333;
+        color: white;
+        border: 2px solid #333;
+    }
+
+    .btn-outline {
+        background-color: white;
+        color: #333;
+        border: 2px solid #333;
+        text-decoration: none;
+    }
+
+        .btn-outline:hover {
+            background-color: #333;
+            color: white;
+        }
+
+    .policy-text {
+        font-size: 14px;
+        color: #444;
+        margin-top: 20px;
+        text-align: center;
+    }
+
+        .policy-text a {
+            color: #333;
+            text-decoration: underline;
+        }
+
+    .form-footer {
+        text-align: center;
+        margin-top: 25px;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+    }
+    .customer-note {
+        text-align: center;
+        font-size: 14px;
+        margin-bottom: 25px;
+        color: #333;
+    }
+</style>
+
+<div class="form-wrapper">
+    <div class="form-title">Đăng ký tài khoản người bán</div>
+
+    <div class="customer-note">
+        Nếu bạn là <strong>người dùng</strong>, hãy <a asp-area="Customer" asp-controller="Account" asp-action="Register">đăng ký tại đây</a>.
+    </div>
+
+    <form asp-area="Seller" asp-controller="Account" asp-action="Register" method="post">
+
+        <div>
+            <label asp-for="HoVaTen" class="form-label"></label>
+            <input asp-for="HoVaTen" class="form-control" />
+            <span asp-validation-for="HoVaTen" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label asp-for="TenDangNhap" class="form-label"></label>
+            <input asp-for="TenDangNhap" class="form-control" />
+            <span asp-validation-for="TenDangNhap" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label asp-for="Sdt" class="form-label"></label>
+            <input asp-for="Sdt" class="form-control" />
+            <span asp-validation-for="Sdt" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label asp-for="Cccd" class="form-label">CCCD *</label>
+            <input asp-for="Cccd" class="form-control" />
+            <span asp-validation-for="Cccd" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label asp-for="MatKhau" class="form-label"></label>
+            <input asp-for="MatKhau" class="form-control" />
+            <span asp-validation-for="MatKhau" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label asp-for="XacNhanMatKhau" class="form-label"></label>
+            <input asp-for="XacNhanMatKhau" class="form-control" />
+            <span asp-validation-for="XacNhanMatKhau" class="text-danger"></span>
+        </div>
+
+        <div class="policy-text">
+            Khi nhấn nút <strong>ĐĂNG KÝ</strong> là bạn đã đồng ý và cam kết tuân thủ<br />
+            <a href="#">Thỏa thuận người dùng</a> của chúng tôi.
+        </div>
+
+        <div class="button-group">
+            <a asp-area="Seller" asp-controller="Account" asp-action="Login" class="btn btn-outline">Quay lại</a>
+            <button type="submit" class="btn btn-custom">Đăng ký</button>
+        </div>
+    </form>
+
+    <div class="form-footer">
+        <p>Bạn đã có tài khoản? <a asp-area="Seller" asp-controller="Account" asp-action="Login" class="fw-bold text-primary">Đăng nhập</a></p>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

@@ -1,0 +1,92 @@
+@model ShoppeWebApp.ViewModels.Admin.ShopViewModel
+
+@{
+    Layout = "~/Areas/Admin/Shared/_Layout.cshtml"; 
+    ViewData["Title"] = "Chi tiết cửa hàng";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm border-0 rounded-3">
+        <!-- Tiêu đề -->
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 10px;">
+                Chi tiết cửa hàng
+            </h2>
+        </div>
+
+        <!-- Tên cửa hàng và nút chỉnh sửa -->
+        <div class="d-flex align-items-center justify-content-between mt-4 px-4">
+            <h2 class="fw-bold text-warning text-center flex-grow-1 display-5">@Model.TenCuaHang</h2>
+            <a asp-area="Admin" asp-controller="Shop" asp-action="Edit" asp-route-id="@Model.IdCuaHang"
+               class="btn btn-warning btn-sm">
+                <i class="fas fa-edit"></i> Chỉnh sửa
+            </a>
+        </div>
+
+        <!-- Nội dung chi tiết -->
+        <div class="card-body">
+            <div class="row">
+                <!-- Hình ảnh -->
+                <div class="col-md-4 text-center">
+                    <img src="@Url.Content(Model.UrlAnh)" alt="Ảnh đại diện cửa hàng"
+                         class="img-fluid rounded" style="max-height: 200px; object-fit: cover;" />
+                </div>
+
+                <!-- Thông tin -->
+                <div class="col-md-8">
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <th class="text-start pe-3" style="width: 40%;">ID Cửa hàng:</th>
+                                <td class="text-start">@Model.IdCuaHang</td>
+                            </tr>
+                            <tr>
+                                <th class="text-start pe-3">ID Chủ sở hữu:</th>
+                                <td class="text-start">@Model.IdSeller</td>
+                            </tr>
+                            <tr>
+                                <th class="text-start pe-3">Tên Chủ sở hữu:</th>
+                                <td class="text-start">@Model.TenSeller</td>
+                            </tr>
+                            <tr>
+                                <th class="text-start pe-3">Số điện thoại:</th>
+                                <td class="text-start">@Model.Sdt</td>
+                            </tr>
+                            <tr>
+                                <th class="text-start pe-3">Địa chỉ:</th>
+                                <td class="text-start">@Model.DiaChi</td>
+                            </tr>
+                            <tr>
+                                <th class="text-start pe-3">Mô tả:</th>
+                                <td class="text-start">@Model.MoTa</td>
+                            </tr>
+                            <tr>
+                                <th class="text-start pe-3">Ngày tạo:</th>
+                                <td class="text-start">@Model.ThoiGianTao?.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                            <tr>
+                                <th class="text-start pe-3">Số sản phẩm:</th>
+                                <td class="text-start">@Model.SoSanPham</td>
+                            </tr>
+                            <tr>
+                                <th class="text-start pe-3">Số đơn hàng:</th>
+                                <td class="text-start">@Model.SoDonHang</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer text-center">
+            <a asp-area="Admin" asp-controller="Shop" asp-action="Index" class="btn btn-secondary me-2">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+            <a asp-area="Admin" asp-controller="Product" asp-action="Index" asp-route-id="@Model.IdCuaHang"
+               class="btn btn-primary">
+                <i class="fas fa-box"></i> Xem chi tiết sản phẩm
+            </a>
+        </div>
+    </div>
+</div>

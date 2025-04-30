@@ -1,13 +1,18 @@
-﻿
+﻿@{
+    var result = await HttpContextAccessor.HttpContext.AuthenticateAsync("SellerSchema");
+    var sellerPrincipal = result.Principal;
+    bool isSeller = sellerPrincipal?.IsInRole("Seller") ?? false;
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/x-icon" href="~/icons/shoppe_logo32.ico" />
+    <link rel="icon" type="image/x-icon" href="~/shoppe_logo32.ico" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Shoppe | Nền tảng mua sắm & bán hàng online</title>
+    <title>@ViewData["Title"] - Shoppe Kênh người bán | Nền tảng mua sắm & bán hàng online</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
 </head>
 <body>
     <div class="header-section">
@@ -15,28 +20,26 @@
             <div class="navbar-expand">
                 <div class="container" id="globalheader">
                     <div class="column-container d-flex justify-content-between">
-                        <a asp-area="" asp-controller="Home" asp-action="Index" title="Shoppe Shop" class="header-logo-link">
+                        <a asp-area="Seller" asp-controller="Home" asp-action="Index" title="Shoppe Shop" class="header-logo-link">
                             <div class="header-logo">
                                 <img class="logo" src="~/Images/Icons/shoppe_logo128.png"/>
                                 <span class="fw-bold">Shoppe</span>
                             </div>
                         </a>
                         <nav class="d-flex">
-                            <a asp-area="Customer" asp-controller="AllProducts" asp-action="Index" class="tab-link">Tất cả sản phẩm</a>
-                            <a asp-area="Customer" asp-controller="ShoppingCart" asp-action="Index" class="tab-link">Giỏ hàng</a>
-                            <a asp-area="Seller" asp-controller="Home" asp-action="Index" class="tab-link">Kênh người bán</a>
-                            <a asp-area="" asp-controller="Home" asp-action="Contact" class="tab-link">Liên hệ</a>
+                            <a asp-area="Seller" asp-controller="AllShops" asp-action="Index" class="tab-link">Tất cả cửa hàng</a>
+                            <a asp-area="" asp-controller="Home" asp-action="Index" class="tab-link">Kênh người mua</a>
                         </nav>
                         <div class="d-flex auth-cart gap-3">
-                            @if (User.IsInRole("Customer") || User.IsInRole("Admin"))
+                            @if (isSeller)
                             {
-                                <form asp-area="Customer" asp-controller="Account" asp-action="Logout" method="post">
+                                <form asp-area="Seller" asp-controller="Account" asp-action="Logout" method="post">
                                     <button type="submit" class="invisible-button align-content-center tab-link">Đăng xuất</button>
                                 </form>
                             }
                             else {
-                                <a asp-area="Customer" asp-controller="Account" asp-action="Login" class="tab-link align-content-center">Đăng nhập</a>
-                                <a asp-area="Customer" asp-controller="Account" asp-action="Register" class="tab-link align-content-center">Đăng ký</a>
+                                <a asp-area="Seller" asp-controller="Account" asp-action="Login" class="tab-link align-content-center">Đăng nhập</a>
+                                <a asp-area="Seller" asp-controller="Account" asp-action="Register" class="tab-link align-content-center">Đăng ký</a>
                             }
                         </div>
                     </div>
@@ -46,7 +49,7 @@
     </div>
 
     <div class="view-container">
-        <main role="main">
+        <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>

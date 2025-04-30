@@ -1,0 +1,157 @@
+@model IEnumerable<ShoppeWebApp.ViewModels.Admin.UserViewModel>
+
+@{
+    Layout = "~/Areas/Admin/Shared/_Layout.cshtml";  
+}
+
+<head>
+    <title>Quản lý người dùng</title>
+</head>
+
+<div class="container-fluid">
+    <!-- Nội dung chính -->
+    <div class="container mt-4">
+        <div class="p-5 border border-success rounded" style="background-color: #fdfdfd; min-height: 80vh;">
+            <!-- Tiêu đề Quản lý người dùng -->
+            <div class="text-center mb-4">
+                <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 10px;">
+                    Quản lý người dùng
+                </h2>
+            </div>
+
+            <!-- Hiển thị thông báo thành công -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <!-- Form tìm kiếm -->
+            <form method="get" asp-area="Admin" asp-controller="Account" asp-action="Index" class="mb-4">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label for="searchQuery" class="form-label fw-bold">Tìm kiếm</label>
+                        <input type="text" id="searchQuery" name="searchQuery" class="form-control" placeholder="Nhập ID, tên người dùng, CCCD, Email hoặc địa chỉ..." />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="role" class="form-label fw-bold">Lọc theo vai trò</label>
+                        <select id="role" name="role" class="form-select">
+                            <option value="">Tất cả vai trò</option>
+                            <option value="Khách hàng">Khách hàng</option>
+                            <option value="Chủ Shop">Chủ Shop</option>
+                            <option value="Admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search me-1"></i> Tìm kiếm
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <a asp-area="Admin" asp-controller="Account" asp-action="Index" class="btn btn-secondary w-100">
+                            <i class="fas fa-undo me-1"></i> Xóa tìm kiếm
+                        </a>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Tổng số người dùng và nút thêm tài khoản -->
+            <div class="mb-3 d-flex justify-content-between align-items-center">
+                <div class="fw-bold" style="font-size: 1.5rem;">
+                    Tổng số người dùng: @Model?.Count()
+                </div>
+
+                <a asp-area="Admin" asp-controller="Account" asp-action="Create" class="btn btn-success">Thêm tài khoản</a>
+            </div>
+
+            <!-- Bảng danh sách người dùng -->
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>STT</th>
+                        <th>ID</th>
+                        <th>Tên người dùng</th>
+                        <th>Email</th>
+                        <th>CCCD</th>
+                        <th>Địa chỉ</th>
+                        <th>Vai trò</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        int index = 1;
+                        foreach (var user in Model)
+                        {
+                            <tr>
+                                <td>@index</td>
+                                <td>@user.Id</td>
+                                <td>@user.Name</td>
+                                <td>@user.Email</td>
+                                <td>@user.Cccd</td>
+                                <td>@user.Address</td>
+                                <td>@user.Role</td>
+                                <td>
+                                    <a asp-area="Admin" asp-controller="Account" asp-action="Edit" asp-route-id="@user.Id" class="btn btn-warning btn-sm">Sửa</a>
+                                    <a asp-area="Admin" asp-controller="Account" asp-action="Delete" asp-route-id="@user.Id" class="btn btn-danger btn-sm">Xóa</a>
+                                </td>
+                            </tr>
+                            index++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center">Không có người dùng nào.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <!-- Phân trang -->
+            <div class="d-flex justify-content-center mt-4">
+                <nav>
+                    <ul class="pagination">
+                        @{
+                            int currentPage = Convert.ToInt32(ViewData["CurrentPage"]);
+                            int totalPages = Convert.ToInt32(ViewData["TotalPages"]);
+                            string searchId = ViewData["SearchId"]?.ToString() ?? string.Empty;
+                            string searchName = ViewData["SearchName"]?.ToString() ?? string.Empty;
+                            string searchCccd = ViewData["SearchCccd"]?.ToString() ?? string.Empty;
+                            string searchEmail = ViewData["SearchEmail"]?.ToString() ?? string.Empty;
+                            string searchAddress = ViewData["SearchAddress"]?.ToString() ?? string.Empty;
+                            string role = ViewData["Role"]?.ToString() ?? string.Empty;
+                        }
+
+                        <!-- Nút về trang đầu -->
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1&searchId=@searchId&searchName=@searchName&searchCccd=@searchCccd&searchEmail=@searchEmail&searchAddress=@searchAddress&role=@role">Đầu</a>
+                        </li>
+                        <!-- Nút trang trước -->
+                        <li class="page-item">
+                            <a class="page-link" href="?page=@(currentPage > 1 ? currentPage - 1 : 1)&searchId=@searchId&searchName=@searchName&searchCccd=@searchCccd&searchEmail=@searchEmail&searchAddress=@searchAddress&role=@role">Trước</a>
+                        </li>
+                        <!-- Hiển thị các trang -->
+                        @for (int i = 1; i <= totalPages; i++)
+                        {
+                            <li class="page-item @(currentPage == i ? "active" : "")">
+                                <a class="page-link" href="?page=@i&searchId=@searchId&searchName=@searchName&searchCccd=@searchCccd&searchEmail=@searchEmail&searchAddress=@searchAddress&role=@role">@i</a>
+                            </li>
+                        }
+                        <!-- Nút trang tiếp -->
+                        <li class="page-item">
+                            <a class="page-link" href="?page=@(currentPage < totalPages ? currentPage + 1 : totalPages)&searchId=@searchId&searchName=@searchName&searchCccd=@searchCccd&searchEmail=@searchEmail&searchAddress=@searchAddress&role=@role">Tiếp</a>
+                        </li>
+                        <!-- Nút về trang cuối -->
+                        <li class="page-item">
+                            <a class="page-link" href="?page=@(totalPages)&searchId=@searchId&searchName=@searchName&searchCccd=@searchCccd&searchEmail=@searchEmail&searchAddress=@searchAddress&role=@role">Cuối</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>

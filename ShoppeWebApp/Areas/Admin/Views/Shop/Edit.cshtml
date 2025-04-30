@@ -1,0 +1,81 @@
+@model ShoppeWebApp.ViewModels.Admin.EditShopViewModel
+
+@{
+    Layout = "~/Areas/Admin/Shared/_Layout.cshtml"; 
+    ViewData["Title"] = "Chỉnh sửa cửa hàng";
+}
+
+<div class="container mt-5">
+    <!-- Tiêu đề -->
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-white p-3" style="background-color: #ffc107; border-radius: 10px;">
+            Chỉnh sửa cửa hàng
+        </h2>
+    </div>
+
+    <!-- Hiển thị thông báo thành công -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Form chỉnh sửa cửa hàng -->
+    <div class="p-4 border border-warning rounded" style="background-color: #fdfdfd;">
+        <form asp-area="Admin" asp-controller="Shop" asp-action="Edit" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row">
+                <!-- Cột ảnh -->
+                <div class="col-md-4 text-center">
+                    <label class="form-label fw-bold">Ảnh cửa hàng</label>
+                    <div>
+                        <img src="@Model.UrlAnhHienTai" alt="Ảnh cửa hàng" class="img-thumbnail mb-3" style="width: 200px; height: 200px; object-fit: cover;" />
+                    </div>
+                    <input type="file" class="form-control" id="UrlAnhMoi" name="UrlAnhMoi" />
+                    <span asp-validation-for="UrlAnhMoi" class="text-danger"></span>
+                </div>
+
+                <!-- Cột thông tin -->
+                <div class="col-md-8">
+                    <div class="mb-3">
+                        <label for="IdCuaHang" class="form-label fw-bold">ID cửa hàng</label>
+                        <input type="text" class="form-control" id="IdCuaHang" name="IdCuaHang" value="@Model.IdCuaHang" readonly style="background-color: #e9ecef;" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="TenCuaHang" class="form-label fw-bold">Tên cửa hàng</label>
+                        <input type="text" class="form-control" id="TenCuaHang" name="TenCuaHang" value="@Model.TenCuaHang" />
+                        <span asp-validation-for="TenCuaHang" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="IdSeller" class="form-label fw-bold">ID chủ sở hữu</label>
+                        <input type="text" class="form-control" id="IdSeller" name="IdSeller" value="@Model.IdSeller" readonly style="background-color: #e9ecef;" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="Sdt" class="form-label fw-bold">Số điện thoại</label>
+                        <input type="text" class="form-control" id="Sdt" name="Sdt" value="@Model.Sdt" />
+                        <span asp-validation-for="Sdt" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="DiaChi" class="form-label fw-bold">Địa chỉ</label>
+                        <input type="text" class="form-control" id="DiaChi" name="DiaChi" value="@Model.DiaChi" />
+                        <span asp-validation-for="DiaChi" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="MoTa" class="form-label fw-bold">Mô tả</label>
+                        <textarea class="form-control" id="MoTa" name="MoTa">@Model.MoTa</textarea>
+                        <span asp-validation-for="MoTa" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nút hành động -->
+            <div class="text-end">
+                <button type="submit" class="btn btn-warning">Lưu thay đổi</button>
+                <a asp-area="Admin" asp-controller="Shop" asp-action="Index" class="btn btn-secondary">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>

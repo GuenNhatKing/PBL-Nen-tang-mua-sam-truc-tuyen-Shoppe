@@ -1,0 +1,124 @@
+@model ShoppeWebApp.ViewModels.Admin.EditAccountViewModel
+
+@{
+    Layout = "~/Areas/Admin/Shared/_Layout.cshtml"; 
+}
+
+<div class="container mt-5">
+    <!-- Tiêu đề chỉnh sửa tài khoản -->
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 10px;">
+            Chỉnh sửa tài khoản
+        </h2>
+    </div>
+
+    <!-- Hiển thị thông báo thành công -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Form chỉnh sửa tài khoản -->
+    <div class="p-4 border border-success rounded" style="background-color: #fdfdfd;">
+        <form asp-area="Admin" asp-controller="Account" asp-action="Edit" method="post" enctype="multipart/form-data">
+            <!-- Hiển thị lỗi tổng quát -->
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row">
+                <!-- Cột bên trái: Ảnh đại diện -->
+                <div class="col-md-4 text-center">
+                    <label class="form-label fw-bold">Ảnh đại diện</label>
+                    <div>
+                        <img src="@Model.AvatarUrl" alt="Avatar" class="img-thumbnail mb-3" style="width: 200px; height: 200px; object-fit: cover;" />
+                    </div>
+                    <input type="file" class="form-control" id="Avatar" name="Avatar" />
+                </div>
+
+                <!-- Cột bên phải: Các trường thông tin -->
+                <div class="col-md-8">
+                    <div class="mb-3">
+                        <label for="Id" class="form-label fw-bold">ID Người dùng</label>
+                        <input type="text" class="form-control" id="Id" name="Id" value="@Model.Id" readonly style="background-color: #e9ecef; cursor: not-allowed;" />
+                        <small class="text-muted">Trường này chỉ đọc và không thể chỉnh sửa</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Username" class="form-label fw-bold">Tên đăng nhập</label>
+                        <input type="text" class="form-control" id="Username" name="Username" value="@Model.Username" placeholder="Nhập tên đăng nhập" />
+                        <span asp-validation-for="Username" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Name" class="form-label fw-bold">Tên người dùng</label>
+                        <input type="text" class="form-control" id="Name" name="Name" value="@Model.Name" placeholder="Nhập tên người dùng" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Email" class="form-label fw-bold">Email</label>
+                        <input type="email" class="form-control" id="Email" name="Email" value="@Model.Email" placeholder="Nhập email" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Cccd" class="form-label fw-bold">CCCD</label>
+                        <input type="text" class="form-control" id="Cccd" name="Cccd" value="@Model.Cccd" placeholder="Nhập CCCD" />
+                        <span asp-validation-for="Cccd" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <hr />
+
+            <!-- Các trường bên dưới -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="Sdt" class="form-label fw-bold">Số điện thoại</label>
+                        <input type="text" class="form-control" id="Sdt" name="Sdt" value="@Model.Sdt" placeholder="Nhập số điện thoại" />
+                        <span asp-validation-for="Sdt" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="Address" class="form-label fw-bold">Địa chỉ</label>
+                        <input type="text" class="form-control" id="Address" name="Address" value="@Model.Address" placeholder="Nhập địa chỉ" />
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="Role" class="form-label fw-bold">Vai trò</label>
+                <select class="form-select" id="Role" name="Role">
+                    <option value="1" selected="@(Model.Role == 1)">Khách hàng</option>
+                    <option value="2" selected="@(Model.Role == 2)">Chủ Shop</option>
+                    <option value="0" selected="@(Model.Role == 0)">Admin</option>
+                </select>
+                <span asp-validation-for="Role" class="text-danger"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="Password" class="form-label fw-bold">Mật khẩu</label>
+                        <input type="password" class="form-control" id="Password" name="Password" placeholder="Nhập mật khẩu mới" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="ConfirmPassword" class="form-label fw-bold">Xác nhận mật khẩu</label>
+                        <input type="password" class="form-control" id="ConfirmPassword" name="ConfirmPassword" placeholder="Nhập lại mật khẩu" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nút hành động -->
+            <div class="text-end">
+                <button type="submit" class="btn btn-success">Lưu thay đổi</button>
+                <a asp-area="Admin" asp-controller="Account" asp-action="Index" class="btn btn-secondary">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>

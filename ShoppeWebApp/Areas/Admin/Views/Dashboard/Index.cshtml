@@ -1,0 +1,101 @@
+@using ShoppeWebApp.ViewModels.Admin
+@model HomeViewModel
+
+@{
+    Layout = "~/Areas/Admin/Shared/_Layout.cshtml";  
+}
+
+<!-- Nội dung chính -->
+<div class="col-md-9">
+    <div class="container mt-4">
+        <div class="row g-4">
+            <!-- Hàng 1 -->
+            <div class="col-md-6">
+                <div class="card text-center shadow-sm border-0 rounded-3" style="background-color: #d1e7ff;">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary fs-4">
+                            <i class="fas fa-user"></i> Khách hàng
+                        </h5>
+                        <p class="card-text fs-1 fw-bold">@Model.TotalUsers</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card text-center shadow-sm border-0 rounded-3" style="background-color: #d4edda;">
+                    <div class="card-body">
+                        <h5 class="card-title text-success fs-4">
+                            <i class="fas fa-user-tie"></i> Người bán
+                        </h5>
+                        <p class="card-text fs-1 fw-bold">@Model.TotalSellers</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hàng 2 -->
+            <div class="col-md-6">
+                <div class="card text-center shadow-sm border-0 rounded-3" style="background-color: #fff3cd;">
+                    <div class="card-body">
+                        <h5 class="card-title text-warning fs-4">
+                            <i class="fas fa-shopping-cart"></i> Đơn hàng
+                        </h5>
+                        <p class="card-text fs-1 fw-bold">@Model.TotalOrders</p>
+                    </div>
+                </div>
+            </div>
+
+                    <div class="col-md-6">
+                        <div class="card text-center shadow-sm border-0 rounded-3 card-large bg-lightred">
+                            <div class="card-body">
+                                <h5 class="card-title text-danger fs-4">
+                                    <i class="fas fa-box"></i> Sản phẩm
+                                </h5>
+                                <p class="card-text fs-1 fw-bold">@Model.TotalProducts</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        font-family: "Segoe UI", sans-serif;
+        background-color: #f5f6f7;
+        margin: 0;
+        padding: 0;
+    }
+
+    .bg-lightblue {
+        background-color: #cce5ff; /* Màu xanh nhạt */
+    }
+    .bg-lightgreen {
+        background-color: #d4edda; /* Màu xanh lá nhạt */
+    }
+    .bg-lightyellow {
+        background-color: #fff3cd; /* Màu vàng nhạt */
+    }
+    .bg-lightred {
+        background-color: #f8d7da; /* Màu đỏ nhạt */
+    }
+    .card-large {
+        height: 200px; /* Chiều cao cố định */
+    }
+    .card-large .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .btn-outline-light {
+        font-size: 16px;
+        font-weight: bold;
+        text-align: left;
+    }
+    .btn-outline-light i {
+        margin-right: 10px;
+    }
+</style>
+>>>>>>> 9dcd7652754f1e4332a32b9f13b1d4c4ffbc9c55
+
