@@ -16,9 +16,6 @@ public partial class Danhmuc
     [StringLength(100)]
     public string TenDanhMuc { get; set; } = null!;
 
-    [StringLength(1000)]
-    public string MoTa { get; set; } = null!;
-
     [InverseProperty("IdDanhMucNavigation")]
     public virtual ICollection<Sanpham> Sanphams { get; set; } = new List<Sanpham>();
 }

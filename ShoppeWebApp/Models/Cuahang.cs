@@ -23,7 +23,7 @@ public partial class Cuahang
     [StringLength(100)]
     public string UrlAnh { get; set; } = null!;
 
-    [StringLength(1000)]
+    [Column(TypeName ="longtext")]
     public string? MoTa { get; set; }
 
     [Column("SDT")]
