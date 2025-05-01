@@ -508,15 +508,15 @@ ul {
     }
 
 .product-main-info-label {
-    font-size: 1rem;
+    font-size: 1.15rem;
     font-weight: 500;
-    color: #555;
+    color: #222;
 }
 
 .product-main-info-value {
     font-size: 1rem;
-    font-weight: 600;
-    color: #222;
+    font-weight: 400;
+    color: #555;
 }
 
 .gray-box {
@@ -594,13 +594,13 @@ ul {
     margin-top: 10px;
 }
 
-    .product-main-info-store img {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        border: 1.5px solid grey;
-        object-fit: cover;
-    }
+.circle-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 1.5px solid grey;
+    object-fit: cover;
+}
 
 .product-main-info-store-name {
     font-size: 1.2rem;
@@ -612,27 +612,14 @@ ul {
     margin-top: 6px;
 }
 
-.product-main-info-review {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #ddd;
-}
+    .product-main-info-stat td:nth-child(2n) {
+        padding-left: 1.5rem;
+    }
 
 .product-main-info-review-item {
-    margin-bottom: 16px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #eee;
-}
-
-.product-main-info-review-meta {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.9rem;
-    color: #777;
-    margin-bottom: 6px;
-}
-
-.product-main-info-review-content {
-    font-size: 1rem;
-    line-height: 1.4;
+    background-color: #fafafa;
+    padding: 20px;
+    margin-top: 20px;
+    border: 1px solid grey;
+    border-radius: 5px;
 }

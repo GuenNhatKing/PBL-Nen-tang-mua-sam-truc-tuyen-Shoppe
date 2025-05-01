@@ -72,19 +72,24 @@
 		<div class="bg-white box-padding-20 border-rounded product-main-info-store">
 			<div class="d-flex gap-4">
 				<div class="box-padding-15">
-					<img src="@Model.UrlAnhCuaHang">
+					<img src="@Model.UrlAnhCuaHang" class="circle-img">
 				</div>
 				<div>
 					<div class="product-main-info-store-name">@Model.TenCuaHang</div>
-					<div class="product-main-info-stat">
-						Sản phẩm đang bán: @Model.SoSanPhamDangBan
-					</div>
-					<div class="product-main-info-stat">
-						Đã tham gia vào: @Model.ThoiGianThamGia?.ToString("dd/MM/yyyy")
-					</div>
-					<div class="product-main-info-stat">
-						Địa chỉ: @Model.DiaChiCuaHang
-					</div>
+					<table class="product-main-info-stat">
+						<tr>
+							<td>Sản phẩm đang bán:</td>
+							<td>@Model.SoSanPhamDangBan</td>
+						</tr>
+						<tr>
+							<td>Đã tham gia vào:</td>
+							<td>@Model.ThoiGianThamGia?.ToString("dd/MM/yyyy")</td>
+						</tr>
+						<tr>
+							<td>Địa chỉ cửa hàng:</td>
+							<td>@Model.DiaChiCuaHang</td>
+						</tr>
+					</table>
 				</div>
 			</div>
 			<div class="btn-buy">Xem Cửa Hàng</div>
@@ -93,35 +98,71 @@
 		<!-- PHẦN CHI TIẾT SẢN PHẨM -->
 		<div class="bg-white box-padding-20 border-rounded">
 			<h2>Chi tiết sản phẩm</h2>
-			<div class="product-main-info-label">Danh mục:</div>
-			<div class="product-main-info-value">@Model.TenDanhMuc</div>
-			<div class="product-main-info-label">Số lượng còn lại:</div>
-			<div class="product-main-info-value">@Model.SoLuongKho</div>
+			<table class="product-main-info-stat">
+				<tr>
+					<td class="product-main-info-label">Danh mục:</td>
+					<td class="product-main-info-value">@Model.TenDanhMuc</td>
+				</tr>
+				<tr>
+					<td class="product-main-info-label">Số lượng còn lại:</td>
+					<td class="product-main-info-value">@Model.SoLuongKho</td>
+				</tr>
+			</table>
 			<div class="product-main-info-label">Mô tả sản phẩm:</div>
-			<div class="product-main-info-value">@Model.MoTa</div>
+			<div class="product-main-info-value" style="white-space: pre-line">@Model.MoTa</div>
 		</div>
 
 		<!-- PHẦN ĐÁNH GIÁ -->
 		<div class="bg-white box-padding-20 border-rounded product-main-info-review">
 			<h2>Đánh giá sản phẩm</h2>
-			<div>
-				@((double)Model.TongDiemDanhGia / Model.SoLuongDanhGia) Sao
+			<span class="product-main-info-bold">
+				@diemDanhGiaDouble
+				@for (int i = 0; i < 5; i++)
+				{
+					if (i < diemDanhGiaInt)
+					{
+						<span class="fa fa-star star-checked"></span>
+					}
+					else
+					{
+						<span class="fa fa-star"></span>
+					}
+				}
+			</span>
+			<span class="border-left product-main-info-bold">@Model.SoLuongDanhGia đánh giá</span>
+			<div class="d-flex flex-column">
+				@foreach (var i in Model.DanhSachDanhGia)
+				{
+					<div class="product-main-info-review-item d-flex gap-3">
+						<div class="box-padding-15">
+							<img src="@Model.UrlAnhCuaHang" class="circle-img">
+						</div>
+						<div>
+							<div class="product-main-info-review-meta">
+								<div><strong>@i.TenNguoiDung</strong></div>
+								<div class="product-main-info-bold">
+									@i.DiemDanhGia
+									@for (int j = 0; j < 5; j++)
+									{
+										if (j < i.DiemDanhGia)
+										{
+											<span class="fa fa-star star-checked"></span>
+										}
+										else
+										{
+											<span class="fa fa-star"></span>
+										}
+									}
+								</div>
+								<div>@i.ThoiGianDg?.ToString("dd/MM/yyyy HH:mm")</div>
+							</div>
+							<div class="product-main-info-review-content">
+								@i.NoiDung
+							</div>
+						</div>
+					</div>
+				}
 			</div>
-
-			@foreach (var i in Model.DanhSachDanhGia)
-			{
-				<div class="product-main-info-review-item">
-					<div class="product-main-info-review-meta">
-						<span>Tên người đánh giá</span>
-						<span>Điểm</span>
-						<span>Thời gian</span>
-					</div>
-					<div class="product-main-info-review-content">
-						@i
-					</div>
-				</div>
-			}
 		</div>
-
 	</div>
 </div>

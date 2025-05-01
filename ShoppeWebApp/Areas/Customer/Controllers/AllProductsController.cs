@@ -55,7 +55,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                     TenSanPham = i.TenSanPham,
                     UrlAnh = i.UrlAnh,
                     GiaBan = i.GiaBan,
-                    DiemDanhGia = i.TongDiemDanhGia / i.SoLuongDanhGia,
+                    DiemDanhGia = i.SoLuongDanhGia > 0? i.TongDiemDanhGia / i.SoLuongDanhGia: 0,
                     SoLuongBan = AllProductInfo.ProcessQuantity(i.SoLuongBan),
                 });
             }
