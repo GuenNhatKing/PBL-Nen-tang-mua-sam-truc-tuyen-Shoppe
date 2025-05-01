@@ -62,7 +62,7 @@
                             </tr>
                             <tr>
                                 <th class="text-start pe-3">Ngày tạo:</th>
-                                <td class="text-start">@Model.ThoiGianTao?.ToString("dd/MM/yyyy")</td>
+                                <td class="text-start">@Model.ThoiGianTao</td>
                             </tr>
                             <tr>
                                 <th class="text-start pe-3">Số sản phẩm:</th>
@@ -83,8 +83,7 @@
             <a asp-area="Admin" asp-controller="Shop" asp-action="Index" class="btn btn-secondary me-2">
                 <i class="fas fa-arrow-left"></i> Quay lại
             </a>
-            <a asp-area="Admin" asp-controller="Product" asp-action="Index" asp-route-id="@Model.IdCuaHang"
-               class="btn btn-primary">
+            <a asp-area="Admin" asp-controller="Product" asp-action="Index" asp-route-IdCuaHang="@Model.IdCuaHang" class="btn btn-primary">
                 <i class="fas fa-box"></i> Xem chi tiết sản phẩm
             </a>
         </div>
