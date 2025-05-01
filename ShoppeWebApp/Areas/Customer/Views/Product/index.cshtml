@@ -50,11 +50,14 @@
 					<div class="chossing-section d-flex gap-3 align-items-center">
 						<div class="product-main-text"><strong>Số lượng</strong></div>
 						<div class="d-flex border-rounded border-style-3 overflow-hidden">
-							<button class="counting-box">-</button>
-							<input type="text" class="counting-input" value="1">
-							<button class="counting-box">+</button>
+							<button class="counting-box decrease">-</button>
+							<input type="text" class="counting-input quantity-input" value="1">
+							<button class="counting-box increase">+</button>
 						</div>
-						<div class="product-main-text">@Model.SoLuongKho sản phẩm có sẵn</div>
+						<div class="product-main-text">
+							<span id="So-Luong-Kho">@Model.SoLuongKho</span>
+							<span>sản phẩm có sẵn</span>
+						</div>
 					</div>
 
 					<div class="d-flex gap-3 mt-3">
