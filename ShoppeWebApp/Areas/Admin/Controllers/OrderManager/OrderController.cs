@@ -27,25 +27,22 @@ namespace ShoppeWebApp.Areas.Admin.Controllers
                     o.TrangThai
                 });
 
-            // Áp dụng bộ lọc tìm kiếm nếu có từ khóa
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 query = query.Where(o => o.IdDonHang.Contains(searchTerm) || 
-                                         _context.Thongtinlienhes
-                                             .Where(t => t.IdLienHe == o.IdLienHe)
-                                             .Select(t => t.HoVaTen)
-                                             .FirstOrDefault()
-                                             .Contains(searchTerm));
+                    _context.Thongtinlienhes
+                        .Where(t => t.IdLienHe == o.IdLienHe)
+                        .Select(t => t.HoVaTen)
+                        .FirstOrDefault()
+                        .Contains(searchTerm));
             }
 
-            // Tổng số đơn hàng sau khi lọc
             var totalItems = query.Count();
 
-            // Phân trang
             var orders = query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .ToList() // Thực thi truy vấn trước
+                .ToList() 
                 .Select(o => new OrderViewModel
                 {
                     MaDonHang = o.IdDonHang,
@@ -66,7 +63,6 @@ namespace ShoppeWebApp.Areas.Admin.Controllers
                 })
                 .ToList();
 
-            // Truyền dữ liệu vào ViewData để sử dụng trong giao diện
             ViewData["CurrentPage"] = page;
             ViewData["TotalPages"] = (int)Math.Ceiling((double)totalItems / pageSize);
             ViewData["SearchTerm"] = searchTerm;
@@ -81,7 +77,6 @@ namespace ShoppeWebApp.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            // Lấy thông tin đơn hàng
             var order = _context.Donhangs
                 .Where(o => o.IdDonHang == id)
                 .Select(o => new OrderDetailsViewModel
@@ -118,7 +113,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers
                                 .Select(s => s.UrlAnh)
                                 .FirstOrDefault(),
                             DanhGia = _context.Danhgia
-                                .Where(d => d.IdSanPham == c.IdSanPham)
+                                .Where(d => d.IdSanPham == c.IdSanPham && c.IdDonHang == o.IdDonHang)
                                 .Select(d => new DanhGiaViewModel
                                 {
                                     TenNguoiDung = _context.Nguoidungs
@@ -129,7 +124,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers
                                     NoiDung = d.NoiDung,
                                     ThoiGianDG = d.ThoiGianDg.HasValue 
                                         ? d.ThoiGianDg.Value.ToString("dd/MM/yyyy HH:mm") 
-                                        : "Không xác định" // Giá trị mặc định nếu null
+                                        : "Không xác định" 
                                 })
                                 .ToList()
                         })
@@ -143,6 +138,93 @@ namespace ShoppeWebApp.Areas.Admin.Controllers
             }
 
             return View(order);
+        }
+
+        public IActionResult Cancel(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return NotFound();
+            }
+            var order = _context.Donhangs
+                .Where(o => o.IdDonHang == id)
+                .Select(o => new OrderDetailsViewModel
+                {
+                    MaDonHang = o.IdDonHang,
+                    NgayDat = o.ThoiGianTao ?? DateTime.MinValue,
+                    TongTien = o.TongTien,
+                    TrangThai = o.TrangThai == Constants.HUY_DON_HANG ? "Đã hủy" :
+                                o.TrangThai == Constants.CHO_XAC_NHAN ? "Chờ xác nhận" :
+                                o.TrangThai == Constants.DA_XAC_NHAN ? "Đã xác nhận" :
+                                o.TrangThai == Constants.DA_GIAO ? "Đã giao" : "Không xác định",
+                    ThongTinLienHe = _context.Thongtinlienhes
+                        .Where(t => t.IdLienHe == o.IdLienHe)
+                        .Select(t => new ThongTinLienHeViewModel
+                        {
+                            HoVaTen = t.HoVaTen,
+                            SoDienThoai = t.Sdt,
+                            DiaChi = t.DiaChi
+                        })
+                        .FirstOrDefault(),
+                    SanPham = _context.Chitietdonhangs
+                        .Where(c => c.IdDonHang == o.IdDonHang)
+                        .Select(c => new SanPhamViewModel
+                        {
+                            TenSanPham = _context.Sanphams
+                                .Where(s => s.IdSanPham == c.IdSanPham)
+                                .Select(s => s.TenSanPham)
+                                .FirstOrDefault(),
+                            SoLuong = c.SoLuong,
+                            DonGia = c.DonGia,
+                            ThanhTien = c.SoLuong * c.DonGia,
+                            UrlAnh = _context.Sanphams
+                                .Where(s => s.IdSanPham == c.IdSanPham)
+                                .Select(s => s.UrlAnh)
+                                .FirstOrDefault()
+                        })
+                        .ToList()
+                })
+                .FirstOrDefault();
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            if (order.TrangThai == "Đã xác nhận" || order.TrangThai == "Đã giao" || order.TrangThai == "Đã hủy")
+            {
+                TempData["ErrorMessage"] = "Không thể hủy đơn hàng đã được xác nhận hoặc đã giao.";
+                return RedirectToAction("Index");
+            }
+
+            return View(order); 
+        }
+
+        [HttpPost]
+        public IActionResult ConfirmCancel(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return NotFound();
+            }
+
+            var order = _context.Donhangs.FirstOrDefault(o => o.IdDonHang == id);
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            if (order.TrangThai == Constants.DA_XAC_NHAN || order.TrangThai == Constants.DA_GIAO)
+            {
+                TempData["ErrorMessage"] = "Không thể hủy đơn hàng đã được xác nhận hoặc đã giao.";
+                return RedirectToAction("Index");
+            }
+
+            order.TrangThai = Constants.HUY_DON_HANG;
+            _context.SaveChanges();
+
+            TempData["SuccessMessage"] = "Đơn hàng đã được hủy thành công.";
+            return RedirectToAction("Index");
         }
     }
 }

@@ -7,14 +7,12 @@
 <div class="container mt-4">
     <div class="p-5 border border-success rounded" style="background-color: #fdfdfd; min-height: 80vh;">
 
-        <!-- Tiêu đề -->
         <div class="text-center mb-4">
             <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 7px;">
                 Quản lý đơn hàng
             </h2>
         </div>
 
-        <!-- Hiển thị thông báo thành công -->
         @if (TempData["SuccessMessage"] != null)
         {
             <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
@@ -23,7 +21,6 @@
             </div>
         }
 
-        <!-- Form tìm kiếm -->
         <form method="get" asp-area="Admin" asp-controller="Order" asp-action="Index" class="mb-4">
             <div class="row g-3 align-items-end">
                 <div class="col-md-8">
@@ -43,14 +40,12 @@
             </div>
         </form>
 
-        <!-- Tổng số đơn hàng -->
         <div class="mb-3 d-flex justify-content-between align-items-center">
             <div class="fw-bold" style="font-size: 1.5rem;">
                 Tổng số đơn hàng: @Model?.Count()
             </div>
         </div>
 
-        <!-- Danh sách đơn hàng -->
         <div class="table-responsive">
             <table class="table table-bordered table-hover">
                 <thead class="table-success text-center">
@@ -78,9 +73,12 @@
                                     <a asp-area="Admin" asp-controller="Order" asp-action="Details" asp-route-id="@order.MaDonHang" class="btn btn-dark btn-sm me-1">
                                         <i class="fas fa-info-circle"></i> Chi tiết
                                     </a>
-                                    <a asp-area="Admin" asp-controller="Order" asp-action="Cancel" asp-route-id="@order.MaDonHang" class="btn btn-danger btn-sm">
-                                        <i class="fas fa-trash-alt"></i> Huỷ
-                                    </a>
+                                    @if (order.TrangThai != "Đã hủy" && order.TrangThai != "Đã xác nhận" && order.TrangThai != "Đã giao")
+                                        {
+                                            <a asp-area="Admin" asp-controller="Order" asp-action="Cancel" asp-route-id="@order.MaDonHang" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-trash-alt"></i> Hủy
+                                            </a>
+                                        }
                                 </td>
                             </tr>
                         }
@@ -95,7 +93,6 @@
             </table>
         </div>
 
-        <!-- Phân trang -->
         <div class="d-flex justify-content-center mt-4">
             <nav>
                 <ul class="pagination">
