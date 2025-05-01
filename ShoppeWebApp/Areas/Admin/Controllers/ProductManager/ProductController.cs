@@ -286,5 +286,125 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
         
             return View(viewModel);
         }
+
+        [HttpGet]
+        public IActionResult DeleteReview(string idDanhGia, string idSanPham, string IdCuaHang)
+        {
+            // Tìm đánh giá cần xóa
+            var danhGia = _context.Danhgia.FirstOrDefault(d => d.IdDanhGia == idDanhGia);
+        
+            if (danhGia != null)
+            {
+                // Xóa đánh giá
+                _context.Danhgia.Remove(danhGia);
+                _context.SaveChanges();
+            }
+        
+            // Chuyển hướng về trang AllReviews với các tham số cần thiết
+            return RedirectToAction("AllReviews", new { idSanPham = idSanPham, IdCuaHang = IdCuaHang });
+        } 
+    
+        [HttpGet]
+        public IActionResult Edit(string idSanPham, string idCuaHang)
+        {
+            // Lấy thông tin sản phẩm từ cơ sở dữ liệu
+            var sanPham = _context.Sanphams.FirstOrDefault(sp => sp.IdSanPham == idSanPham);
+            if (sanPham == null)
+            {
+                return NotFound("Sản phẩm không tồn tại.");
+            }
+
+            Console.WriteLine($"UrlAnh: {sanPham.UrlAnh}");
+            // Lấy danh sách danh mục
+            var danhSachDanhMuc = _context.Danhmucs
+                .Select(dm => new ThongTinDanhMuc
+                {
+                    MaDanhMuc = dm.IdDanhMuc,
+                    TenDanhMuc = dm.TenDanhMuc
+                })
+                .ToList();
+
+            // Tạo ViewModel
+            var viewModel = new ChinhSuaSanPhamViewModel
+            {
+                IdSanPham = sanPham.IdSanPham,
+                IdCuaHang = idCuaHang,
+                TenSanPham = sanPham.TenSanPham,
+                GiaGoc = sanPham.GiaGoc,
+                GiaBan = sanPham.GiaBan,
+                SoLuongKho = sanPham.SoLuongKho,
+                DuongDanAnh = sanPham.UrlAnh,
+                MaDanhMucDuocChon = sanPham.IdDanhMuc,
+                DanhSachDanhMuc = danhSachDanhMuc,
+                MoTa = sanPham.MoTa,
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(ChinhSuaSanPhamViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                // Nếu dữ liệu không hợp lệ, trả về View với thông tin lỗi
+                model.DanhSachDanhMuc = _context.Danhmucs
+                    .Select(dm => new ThongTinDanhMuc
+                    {
+                        MaDanhMuc = dm.IdDanhMuc,
+                        TenDanhMuc = dm.TenDanhMuc
+                    })
+                    .ToList();
+                return View(model);
+            }
+
+            // Lấy sản phẩm từ cơ sở dữ liệu
+            var sanPham = _context.Sanphams.FirstOrDefault(sp => sp.IdSanPham == model.IdSanPham);
+            if (sanPham == null)
+            {
+                return NotFound("Sản phẩm không tồn tại.");
+            }
+
+            // Cập nhật thông tin sản phẩm
+            sanPham.TenSanPham = model.TenSanPham;
+            sanPham.GiaGoc = model.GiaGoc;
+            sanPham.GiaBan = model.GiaBan;
+            sanPham.SoLuongKho = model.SoLuongKho;
+            sanPham.IdDanhMuc = model.MaDanhMucDuocChon;
+            sanPham.MoTa = model.MoTa;
+
+            // Xử lý ảnh mới nếu có
+            if (model.AnhMoi != null)
+            {
+                // Lưu ảnh mới vào thư mục và cập nhật đường dẫn
+                var fileName = $"{Guid.NewGuid()}_{model.AnhMoi.FileName}";
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/products", fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    model.AnhMoi.CopyTo(stream);
+                }
+
+                // Xóa ảnh cũ nếu cần
+                if (!string.IsNullOrEmpty(sanPham.UrlAnh))
+                {
+                    var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", sanPham.UrlAnh);
+                    if (System.IO.File.Exists(oldImagePath))
+                    {
+                        System.IO.File.Delete(oldImagePath);
+                    }
+                }
+
+                // Cập nhật đường dẫn ảnh mới
+                sanPham.UrlAnh = $"/images/products/{fileName}";
+            }
+
+            // Lưu thay đổi vào cơ sở dữ liệu
+            _context.SaveChanges();
+
+            // Hiển thị thông báo thành công
+            TempData["SuccessMessage"] = "Cập nhật sản phẩm thành công.";
+            return RedirectToAction("Edit", new { idSanPham = model.IdSanPham, idCuaHang = model.IdCuaHang });
+        }
     }
 }
