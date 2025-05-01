@@ -51,7 +51,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                         await HttpContext.SignInAsync("SellerSchema", principal, properties);
                     }
                     // Authentication successful
-                    return RedirectToAction("Index", "Home", new {area="Seller"});
+                    return RedirectToAction("Index", "Dashboard", new {area="Seller"});
                 }
                 else
                 {

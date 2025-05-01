@@ -1,0 +1,65 @@
+@model ShoppeWebApp.ViewModels.Seller.DashboardViewModel
+
+@{
+    Layout = "~/Areas/Seller/Views/Shared/_MainLayout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2 class="fw-bold mb-4">Danh sách cần làm</h2>
+    <p class="text-muted">Những việc bạn sẽ phải làm</p>
+    <div class="row g-4">
+        <!-- Hàng 1: 4 ô -->
+        <div class="col-md-3">
+            <div class="card shadow-sm bg-light border-primary">
+                <div class="card-body text-center">
+                    <h3 class="text-primary fw-bold">@Model.DonChoXacNhan</h3>
+                    <p>Chờ Xác Nhận</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm bg-light border-success">
+                <div class="card-body text-center">
+                    <h3 class="text-success fw-bold">@Model.DonDaXacNhan</h3>
+                    <p>Đã Xác Nhận</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm bg-light border-info">
+                <div class="card-body text-center">
+                    <h3 class="text-info fw-bold">@Model.DonDaGiao</h3>
+                    <p>Đã Giao</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm bg-light border-danger">
+                <div class="card-body text-center">
+                    <h3 class="text-danger fw-bold">@Model.DonHuy</h3>
+                    <p>Đơn Hủy</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-4">
+        <!-- Hàng 2: 2 ô -->
+        <div class="col-md-6">
+            <div class="card shadow-sm bg-light border-warning">
+                <div class="card-body text-center">
+                    <h3 class="text-warning fw-bold">@Model.SanPhamTamKhoa</h3>
+                    <p>Sản Phẩm Tạm Khóa</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm bg-light border-secondary">
+                <div class="card-body text-center">
+                    <h3 class="text-secondary fw-bold">@Model.SanPhamHetHang</h3>
+                    <p>Sản Phẩm Hết Hàng</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
