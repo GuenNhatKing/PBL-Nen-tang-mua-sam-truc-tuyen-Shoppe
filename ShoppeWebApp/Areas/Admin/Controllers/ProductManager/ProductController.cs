@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using ShoppeWebApp.ViewModels.Admin;
 using ShoppeWebApp.Data;
+using ShoppeWebApp.Models; 
 using System.Linq;
-using ShoppeWebApp.Models;
 
 namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
 {
@@ -19,12 +19,12 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
         }
 
         [HttpGet]
-        public IActionResult Index(string IdCuaHang, string IdDanhMuc, string searchQuery, int page = 1, int pageSize = 12) 
-        { 
+        public IActionResult Index(string IdCuaHang, string IdDanhMuc, string searchQuery, int page = 1, int pageSize = 12)
+        {
             // Lấy thông tin cửa hàng theo IdCuaHang
             var cuaHang = _context.Cuahangs.FirstOrDefault(ch => ch.IdCuaHang == IdCuaHang);
 
-            
+        
             // Lấy danh sách danh mục chỉ thuộc về các sản phẩm trong cửa hàng
             var categories = _context.Sanphams
                 .Where(p => p.IdCuaHang == IdCuaHang && !string.IsNullOrEmpty(p.IdDanhMuc)) // Lọc theo IdCuaHang
@@ -46,14 +46,15 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
                     categories = new List<CategoryInfo>(), // Danh sách danh mục rỗng
                     danhMuc = null,
                     IdCuaHang = IdCuaHang,
-                    TenCuaHang = cuaHang?.TenCuaHang,
-                    DiaChi = cuaHang?.DiaChi,
-                    SoDienThoai = cuaHang?.Sdt,
-                    UrlAnhCuaHang = cuaHang?.UrlAnh
+                    TenCuaHang = cuaHang.TenCuaHang,
+                    DiaChi = cuaHang.DiaChi,
+                    SoDienThoai = cuaHang.Sdt,
+                    UrlAnhCuaHang = cuaHang.UrlAnh
                 };
-
+            
                 return View(emptyViewModel);
             }
+        
             // Lấy danh sách sản phẩm theo danh mục, tìm kiếm và IdCuaHang
             var query = _context.Sanphams.Where(p => p.IdCuaHang == IdCuaHang).AsQueryable();
             if (!string.IsNullOrEmpty(IdDanhMuc))
@@ -75,8 +76,8 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
                 {
                     IdSanPham = p.IdSanPham,
                     TenSanPham = p.TenSanPham,
-                    GiaGoc = p.GiaGoc, 
-                    GiaBan = p.GiaBan, 
+                    GiaGoc = p.GiaGoc,
+                    GiaBan = p.GiaBan,
                     TyLeGiamGia = p.GiaGoc > 0 ? (int)((1 - (p.GiaBan / p.GiaGoc)) * 100) : 0, // Tính tỷ lệ giảm giá
                     SoLuongBan = p.SoLuongBan,
                     UrlAnh = p.UrlAnh
@@ -90,10 +91,10 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
                 categories = categories,
                 danhMuc = IdDanhMuc,
                 IdCuaHang = IdCuaHang,
-                TenCuaHang = cuaHang?.TenCuaHang,
-                DiaChi = cuaHang?.DiaChi,
-                SoDienThoai = cuaHang?.Sdt,
-                UrlAnhCuaHang = cuaHang?.UrlAnh
+                TenCuaHang = cuaHang.TenCuaHang,
+                DiaChi = cuaHang.DiaChi,
+                SoDienThoai = cuaHang.Sdt,
+                UrlAnhCuaHang = cuaHang.UrlAnh
             };
         
             // Truyền thông tin phân trang qua ViewData
@@ -102,7 +103,8 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
         
             return View(viewModel);
         }
-         [HttpGet]
+    
+        [HttpGet]
         public IActionResult Create(string IdCuaHang)
         {
             var model = new CreateProductViewModel
@@ -110,17 +112,17 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
                 IdCuaHang = IdCuaHang
             };
             Console.WriteLine($"IdCuaHang: {IdCuaHang}");
-
+        
             // Lấy danh sách danh mục để hiển thị trong dropdown
             var categories = _context.Danhmucs
                 .Select(c => new { c.IdDanhMuc, c.TenDanhMuc })
                 .ToList();
-
+        
             ViewBag.Categories = categories;
-
+        
             return View(model);
         }
-
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(CreateProductViewModel model)
@@ -131,11 +133,11 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
                 ViewBag.Categories = _context.Danhmucs
                     .Select(c => new { c.IdDanhMuc, c.TenDanhMuc })
                     .ToList();
-
+        
                 // Trả về View với lỗi
                 return View(model);
             }
-
+        
             // Tải ảnh lên nếu có
             string? imagePath = null;
             if (model.UrlAnh != null)
@@ -153,13 +155,13 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
                 }
                 imagePath = $"Images/Products/{fileName}";
             }
-
+        
             // Tạo ID sản phẩm mới bằng cách tìm ID lớn nhất hiện tại và tăng lên
             var maxId = _context.Sanphams
                 .OrderByDescending(p => p.IdSanPham)
                 .Select(p => p.IdSanPham)
                 .FirstOrDefault();
-
+        
             string newId;
             if (string.IsNullOrEmpty(maxId))
             {
@@ -169,7 +171,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
             {
                 newId = (long.Parse(maxId) + 1).ToString("D10"); // Tăng ID lên 1 và định dạng thành 10 chữ số
             }
-
+        
             // Tạo sản phẩm mới
             var product = new Sanpham
             {
@@ -185,12 +187,12 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
                 TrangThai = 1, // Mặc định là hoạt động
                 ThoiGianTao = DateTime.Now
             };
-
+        
             _context.Sanphams.Add(product);
             _context.SaveChanges();
-
+        
             TempData["SuccessMessage"] = "Thêm sản phẩm thành công!";
-
+            
             return RedirectToAction("Index", new { IdCuaHang = model.IdCuaHang });
         }
 
@@ -203,10 +205,10 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
             {
                 return NotFound();
             }
-
+        
             // Lấy thông tin danh mục
             var danhMuc = _context.Danhmucs.FirstOrDefault(dm => dm.IdDanhMuc == product.IdDanhMuc);
-
+        
             // Lấy danh sách đánh giá
             var danhGias = _context.Danhgia
                 .Where(dg => dg.IdSanPham == IdSanPham)
@@ -223,11 +225,11 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
                     ThoiGianDG = dg.ThoiGianDg
                 })
                 .ToList();
-
+        
             // Tính tổng điểm đánh giá và số lượt đánh giá
             int tongDiemDG = danhGias.Sum(dg => dg.DiemDanhGia);
             int soLuotDG = danhGias.Count;
-
+        
             // Tạo ViewModel
             var viewModel = new DetailsProductViewModel
             {
@@ -247,7 +249,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
                 ThoiGianTao = product.ThoiGianTao,
                 DanhGias = danhGias
             };
-
+        
             return View(viewModel);
         }
     }

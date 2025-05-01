@@ -1,7 +1,7 @@
-﻿@model ShoppeWebApp.ViewModels.Admin.EditAccountViewModel
+@model ShoppeWebApp.ViewModels.Admin.EditAccountViewModel
 
 @{
-    Layout = "~/Areas/Admin/Shared/_Layout.cshtml";
+    Layout = "~/Areas/Admin/Shared/_Layout.cshtml"; 
 }
 
 <div class="container mt-5">
@@ -27,11 +27,11 @@
             <div class="col-md-8">
                 <div class="mb-3">
                     <label class="form-label fw-bold">ID Người dùng</label>
-                    <p class="form-control-plaintext " readonly style="background-color: #e9ecef; cursor: not-allowed;">@Model.Id </p>
+                    <p class="form-control-plaintext " readonly style="background-color: #e9ecef; cursor: not-allowed;" >@Model.Id </p>
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-bold">Tên đăng nhập</label>
-                    <p class="form-control-plaintext" readonly style="background-color: #e9ecef; cursor: not-allowed;">@Model.Username</p>
+                    <p class="form-control-plaintext"readonly style="background-color: #e9ecef; cursor: not-allowed;" >@Model.Username</p>
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-bold">Tên người dùng</label>
