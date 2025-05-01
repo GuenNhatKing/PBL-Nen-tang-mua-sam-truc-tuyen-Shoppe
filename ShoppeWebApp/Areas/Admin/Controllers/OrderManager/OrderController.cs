@@ -74,62 +74,6 @@ namespace ShoppeWebApp.Areas.Admin.Controllers
             return View(orders);
         }
 
-        // public IActionResult Details(string id)
-        // {
-        //     if (string.IsNullOrEmpty(id))
-        //     {
-        //         return NotFound();
-        //     }
-        
-        //     // Lấy thông tin đơn hàng
-        //     var order = _context.Donhangs
-        //         .Where(o => o.IdDonHang == id)
-        //         .Select(o => new OrderDetailsViewModel
-        //         {
-        //             MaDonHang = o.IdDonHang,
-        //             NgayDat = o.ThoiGianTao ?? DateTime.MinValue,
-        //             TongTien = o.TongTien,
-        //             TrangThai = o.TrangThai == Constants.HUY_DON_HANG ? "Đã hủy" :
-        //                         o.TrangThai == Constants.CHO_XAC_NHAN ? "Chờ xác nhận" :
-        //                         o.TrangThai == Constants.DA_XAC_NHAN ? "Đã xác nhận" :
-        //                         o.TrangThai == Constants.DA_GIAO ? "Đã giao" : "Không xác định",
-        //             ThongTinLienHe = _context.Thongtinlienhes
-        //                 .Where(t => t.IdLienHe == o.IdLienHe)
-        //                 .Select(t => new ThongTinLienHeViewModel
-        //                 {
-        //                     HoVaTen = t.HoVaTen,
-        //                     SoDienThoai = t.Sdt,
-        //                     DiaChi = t.DiaChi
-        //                 })
-        //                 .FirstOrDefault(),
-        //             SanPham = _context.Chitietdonhangs
-        //                 .Where(c => c.IdDonHang == o.IdDonHang)
-        //                 .Select(c => new SanPhamViewModel
-        //                 {
-        //                     TenSanPham = _context.Sanphams
-        //                         .Where(s => s.IdSanPham == c.IdSanPham)
-        //                         .Select(s => s.TenSanPham)
-        //                         .FirstOrDefault(),
-        //                     SoLuong = c.SoLuong,
-        //                     DonGia = c.DonGia,
-        //                     ThanhTien = c.SoLuong * c.DonGia,
-        //                     UrlAnh = _context.Sanphams
-        //                         .Where(s => s.IdSanPham == c.IdSanPham)
-        //                         .Select(s => s.UrlAnh)
-        //                         .FirstOrDefault(), 
-        //                 })
-        //                 .ToList()
-        //         })
-        //         .FirstOrDefault();
-        
-        //     if (order == null)
-        //     {
-        //         return NotFound();
-        //     }
-        
-        //     return View(order);
-        // }
-
         public IActionResult Details(string id)
         {
             if (string.IsNullOrEmpty(id))
