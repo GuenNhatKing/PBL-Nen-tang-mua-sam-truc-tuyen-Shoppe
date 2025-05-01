@@ -1,0 +1,127 @@
+@model IEnumerable<ShoppeWebApp.ViewModels.Admin.OrderViewModel>
+@{
+    Layout = "~/Areas/Admin/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Quản lý đơn hàng";
+}
+
+<div class="container mt-4">
+    <div class="p-5 border border-success rounded" style="background-color: #fdfdfd; min-height: 80vh;">
+
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 7px;">
+                Quản lý đơn hàng
+            </h2>
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <form method="get" asp-area="Admin" asp-controller="Order" asp-action="Index" class="mb-4">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-8">
+                    <label class="form-label fw-bold">Tìm kiếm</label>
+                    <input type="text" name="searchTerm" class="form-control" placeholder="Nhập mã đơn hàng, tên khách hàng hoặc trạng thái..." value="@ViewData["SearchTerm"]" />
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-1"></i> Tìm kiếm
+                    </button>
+                </div>
+                <div class="col-md-2">
+                    <a asp-area="Admin" asp-controller="Order" asp-action="Index" class="btn btn-secondary w-100">
+                        <i class="fas fa-undo me-1"></i> Xóa tìm kiếm
+                    </a>
+                </div>
+            </div>
+        </form>
+
+        <div class="mb-3 d-flex justify-content-between align-items-center">
+            <div class="fw-bold" style="font-size: 1.5rem;">
+                Tổng số đơn hàng: @Model?.Count()
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-success text-center">
+                    <tr>
+                        <th>Mã đơn hàng</th>
+                        <th>Tên khách hàng</th>
+                        <th>Ngày đặt</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var order in Model)
+                        {
+                            <tr>
+                                <td class="text-center">@order.MaDonHang</td>
+                                <td class="text-center">@order.TenKhachHang</td>
+                                <td class="text-center">@order.NgayDat.ToString("dd/MM/yyyy")</td>
+                                <td class="text-end text-danger fw-bold">@string.Format("{0:#,##0} ₫", order.TongTien)</td>
+                                <td class="text-center">@order.TrangThai</td>
+                                <td class="text-center">
+                                    <a asp-area="Admin" asp-controller="Order" asp-action="Details" asp-route-id="@order.MaDonHang" class="btn btn-dark btn-sm me-1">
+                                        <i class="fas fa-info-circle"></i> Chi tiết
+                                    </a>
+                                    @if (order.TrangThai != "Đã hủy" && order.TrangThai != "Đã xác nhận" && order.TrangThai != "Đã giao")
+                                        {
+                                            <a asp-area="Admin" asp-controller="Order" asp-action="Cancel" asp-route-id="@order.MaDonHang" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-trash-alt"></i> Hủy
+                                            </a>
+                                        }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">Không có đơn hàng nào phù hợp.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination">
+                    @{
+                        int currentPage = Convert.ToInt32(ViewData["CurrentPage"]);
+                        int totalPages = Convert.ToInt32(ViewData["TotalPages"]);
+                        string searchTerm = ViewData["SearchTerm"]?.ToString();
+                    }
+
+                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" href="?page=1&searchTerm=@searchTerm">Đầu</a>
+                    </li>
+                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" href="?page=@(currentPage - 1)&searchTerm=@searchTerm">Trước</a>
+                    </li>
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        <li class="page-item @(currentPage == i ? "active" : "")">
+                            <a class="page-link" href="?page=@i&searchTerm=@searchTerm">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                        <a class="page-link" href="?page=@(currentPage + 1)&searchTerm=@searchTerm">Tiếp</a>
+                    </li>
+                    <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                        <a class="page-link" href="?page=@totalPages&searchTerm=@searchTerm">Cuối</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>

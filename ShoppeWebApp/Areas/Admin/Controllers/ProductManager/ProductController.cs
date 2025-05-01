@@ -180,7 +180,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
                 IdDanhMuc = model.IdDanhMuc,
                 TenSanPham = model.TenSanPham,
                 UrlAnh = imagePath,
-                MoTa = model.MoTa,
+                MoTa = string.IsNullOrWhiteSpace(model.MoTa) ? "Chưa cập nhật" : model.MoTa,
                 SoLuongKho = model.SoLuongKho ?? 0,
                 GiaGoc = model.GiaGoc ?? 0,
                 GiaBan = model.GiaBan ?? 0,
@@ -208,29 +208,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
         
             // Lấy thông tin danh mục
             var danhMuc = _context.Danhmucs.FirstOrDefault(dm => dm.IdDanhMuc == product.IdDanhMuc);
-        
-            // Lấy danh sách đánh giá
-            var danhGias = _context.Danhgia
-                .Where(dg => dg.IdSanPham == IdSanPham)
-                .Select(dg => new DetailsProductViewModel.DanhGiaInfo
-                {
-                    IdDanhGia = dg.IdDanhGia,
-                    IdNguoiDung = dg.IdNguoiDung,
-                    TenNguoiDung = _context.Nguoidungs
-                        .Where(nd => nd.IdNguoiDung == dg.IdNguoiDung)
-                        .Select(nd => nd.HoVaTen)
-                        .FirstOrDefault(),
-                    DiemDanhGia = dg.DiemDanhGia,
-                    NoiDung = dg.NoiDung,
-                    ThoiGianDG = dg.ThoiGianDg
-                })
-                .ToList();
-        
-            // Tính tổng điểm đánh giá và số lượt đánh giá
-            int tongDiemDG = danhGias.Sum(dg => dg.DiemDanhGia);
-            int soLuotDG = danhGias.Count;
-        
-            // Tạo ViewModel
+
             var viewModel = new DetailsProductViewModel
             {
                 IdSanPham = product.IdSanPham,
@@ -243,11 +221,67 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
                 GiaGoc = product.GiaGoc,
                 GiaBan = product.GiaBan,
                 TrangThai = product.TrangThai,
-                TongDiemDG = tongDiemDG,
-                SoLuotDG = soLuotDG,
                 SoLuongBan = product.SoLuongBan,
-                ThoiGianTao = product.ThoiGianTao,
-                DanhGias = danhGias
+                ThoiGianTao = product.ThoiGianTao
+            };
+        
+            return View(viewModel);
+        }
+        
+        [HttpGet]
+        public IActionResult AllReviews(string idSanPham, string IdCuaHang, string? searchByIdDanhGia, string? searchByIdNguoiDung, string? filterByStars)
+        {
+            var danhGiasQuery = _context.Danhgia.AsQueryable();
+        
+            // Lọc theo ID sản phẩm
+            if (!string.IsNullOrEmpty(idSanPham))
+            {
+                danhGiasQuery = danhGiasQuery.Where(d => d.IdSanPham == idSanPham);
+            }
+        
+            // Lọc theo ID đánh giá
+            if (!string.IsNullOrEmpty(searchByIdDanhGia))
+            {
+                danhGiasQuery = danhGiasQuery.Where(d => d.IdDanhGia.Contains(searchByIdDanhGia));
+            }
+        
+            // Lọc theo ID người dùng
+            if (!string.IsNullOrEmpty(searchByIdNguoiDung))
+            {
+                danhGiasQuery = danhGiasQuery.Where(d => d.IdNguoiDung.Contains(searchByIdNguoiDung));
+            }
+        
+            // Lọc theo số sao
+            if (!string.IsNullOrEmpty(filterByStars) && int.TryParse(filterByStars, out int stars))
+            {
+                danhGiasQuery = danhGiasQuery.Where(d => d.DiemDanhGia == stars);
+            }
+        
+            // Thực hiện join sau khi lọc
+            var danhGias = danhGiasQuery
+                .Join(
+                    _context.Nguoidungs,
+                    danhGia => danhGia.IdNguoiDung,
+                    nguoiDung => nguoiDung.IdNguoiDung,
+                    (danhGia, nguoiDung) => new AllReviewsViewModel.ReviewViewModel
+                    {
+                        IdDanhGia = danhGia.IdDanhGia,
+                        IdNguoiDung = danhGia.IdNguoiDung,
+                        TenNguoiDung = nguoiDung.HoVaTen,
+                        DiemDanhGia = danhGia.DiemDanhGia,
+                        NoiDung = danhGia.NoiDung,
+                        ThoiGianDG = danhGia.ThoiGianDg
+                    }
+                )
+                .ToList();
+        
+            // Tạo ViewModel
+            var viewModel = new AllReviewsViewModel
+            {
+                IdSanPham = idSanPham,
+                IdCuaHang = IdCuaHang,
+                FilterByStars = filterByStars, 
+                DanhSachDanhGia = danhGias
             };
         
             return View(viewModel);

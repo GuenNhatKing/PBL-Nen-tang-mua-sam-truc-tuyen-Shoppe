@@ -23,7 +23,7 @@ public partial class Danhgia
 
     public int DiemDanhGia { get; set; }
 
-    [StringLength(1000)]
+    [Column(TypeName ="longtext")]
     public string? NoiDung { get; set; }
 
     [Column("ThoiGianDG", TypeName = "datetime")]
