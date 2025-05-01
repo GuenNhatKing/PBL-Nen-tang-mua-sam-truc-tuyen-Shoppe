@@ -402,3 +402,6 @@ FodyWeavers.xsd
 
 # Development
 *.Development.json
+
+# wwwroot/lib/
+*/wwwroot/lib/
