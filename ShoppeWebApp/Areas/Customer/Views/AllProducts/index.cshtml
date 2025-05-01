@@ -51,11 +51,11 @@
                             <li>
                                 <div class="zoom-wrapper d-flex flex-column border-rounded overflow-hidden bg-white my-card">
                                     <a asp-controller="Product" asp-action="index" asp-route-id="@item.IdSanPham" class="tab-link-2">
-                                        <div class="graphic-cover">
+                                        <div class="graphic-cover border-style-3">
                                             <img src="~/@item.UrlAnh" />
                                         </div>
                                         <div class="d-flex flex-column box-padding-10 row-gap-1">
-                                            <div class="break-word line-clamp-2">
+                                            <div class="break-word line-clamp-2 min-height-3">
                                                 @item.TenSanPham
                                             </div>
                                             <div class="d-flex">

@@ -1,6 +1,6 @@
 ﻿@model ProductPageInfo
 @{
-	double diemDanhGiaDouble = (double)Model.TongDiemDanhGia / Model.SoLuongDanhGia;
+	double diemDanhGiaDouble = Model.SoLuongDanhGia == 0? 0: (double)Model.TongDiemDanhGia / Model.SoLuongDanhGia;
 	int diemDanhGiaInt = (int)diemDanhGiaDouble;
 	double giamGia = (double)((Model.GiaGoc - Model.GiaBan) / Model.GiaGoc * 100);
 }
@@ -134,10 +134,10 @@
 				@foreach (var i in Model.DanhSachDanhGia)
 				{
 					<div class="product-main-info-review-item d-flex gap-3">
-						<div class="box-padding-15">
+						<div class="box-padding-10">
 							<img src="@Model.UrlAnhCuaHang" class="circle-img">
 						</div>
-						<div>
+						<div class="box-padding-10 width-100">
 							<div class="product-main-info-review-meta">
 								<div><strong>@i.TenNguoiDung</strong></div>
 								<div class="product-main-info-bold">
