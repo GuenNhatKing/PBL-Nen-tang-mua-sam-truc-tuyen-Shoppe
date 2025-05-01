@@ -1,4 +1,4 @@
-﻿@model ShoppeWebApp.ViewModels.Admin.CreateProductViewModel
+@model ShoppeWebApp.ViewModels.Admin.CreateProductViewModel
 
 <!DOCTYPE html>
 <html>
@@ -64,7 +64,7 @@
                     <textarea asp-for="MoTa" class="form-control" placeholder="Nhập mô tả sản phẩm" style="white-space: pre-line;"></textarea>
                     <span asp-validation-for="MoTa" class="text-danger"></span>
                 </div>
-
+                
                 <div class="mb-3">
                     <label asp-for="UrlAnh" class="form-label fw-bold">Tải lên ảnh</label>
                     <input asp-for="UrlAnh" type="file" class="form-control" accept="image/*" />

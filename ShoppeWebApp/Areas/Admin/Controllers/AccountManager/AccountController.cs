@@ -26,7 +26,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
             // Đảm bảo giá trị hợp lệ cho page và pageSize
             page = page < 1 ? 1 : page;
             pageSize = pageSize < 1 ? 10 : pageSize;
-
+        
             // Khởi tạo truy vấn
             var query = _context.Nguoidungs.AsQueryable();
         
@@ -313,7 +313,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
                 ModelState.AddModelError("", "Đã xảy ra lỗi khi cập nhật tài khoản: " + ex.Message);
                 return View(model);
             }
-        }     
+        }  
 
         [HttpGet]
         public IActionResult Details(string id)
@@ -324,14 +324,14 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
             {
                 return NotFound();
             }
-
+        
             // Tìm tài khoản liên kết với người dùng
             var account = _context.Taikhoans.FirstOrDefault(a => a.IdNguoiDung == id);
             if (account == null)
             {
                 return NotFound();
             }
-
+        
             // Tạo ViewModel với dữ liệu từ cơ sở dữ liệu
             var model = new EditAccountViewModel
             {
@@ -347,11 +347,11 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
                 Password = account.Password, // Mật khẩu hiện tại
                 ConfirmPassword = account.Password // Xác nhận mật khẩu
             };
-
+        
             return View(model);
         }
-    
-        [HttpGet]
+   
+         [HttpGet]
         public IActionResult Delete(string id)
         {
             // Tìm người dùng theo ID
