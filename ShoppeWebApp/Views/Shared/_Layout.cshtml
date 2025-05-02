@@ -28,7 +28,7 @@
                             <a asp-area="Seller" asp-controller="Home" asp-action="Index" class="tab-link">Kênh người bán</a>
                             <a asp-area="" asp-controller="Home" asp-action="Contact" class="tab-link">Liên hệ</a>
                         </nav>
-                        <div class="d-flex auth-cart gap-3">
+                        <div class="d-flex auth-cart gap-3 center-content">
                             @if (User.IsInRole("Customer") || User.IsInRole("Admin"))
                             {
                                 <form asp-area="Customer" asp-controller="Account" asp-action="Logout" method="post">

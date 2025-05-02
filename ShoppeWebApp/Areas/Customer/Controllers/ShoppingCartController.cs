@@ -6,7 +6,7 @@ using ShoppeWebApp.Models;
 
 namespace ShoppeWebApp.Areas.Customer.Controllers
 {
-    [Authorize("Customer")]
+    [Authorize(Roles = "Customer, Admin")]
     [Area("Customer")]
     public class ShoppingCartController : Controller
     {
