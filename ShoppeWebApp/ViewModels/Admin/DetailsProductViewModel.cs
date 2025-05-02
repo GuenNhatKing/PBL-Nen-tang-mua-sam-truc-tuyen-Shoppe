@@ -20,18 +20,5 @@ namespace ShoppeWebApp.ViewModels.Admin
         public int SoLuotDG { get; set; }
         public int SoLuongBan { get; set; }
         public DateTime? ThoiGianTao { get; set; }
-
-        // Danh sách đánh giá
-        public List<DanhGiaInfo> DanhGias { get; set; } = new List<DanhGiaInfo>();
-
-        public class DanhGiaInfo
-        {
-            public string? IdDanhGia { get; set; }
-            public string? IdNguoiDung { get; set; }
-            public string? TenNguoiDung { get; set; }   
-            public int DiemDanhGia { get; set; }
-            public string? NoiDung { get; set; }
-            public DateTime? ThoiGianDG { get; set; }
-        }
     }
 }
