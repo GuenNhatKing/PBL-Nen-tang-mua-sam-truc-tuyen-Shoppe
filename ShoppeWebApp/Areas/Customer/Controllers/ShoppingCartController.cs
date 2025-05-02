@@ -41,11 +41,8 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                     TenCuaHang = (await _context.Cuahangs.FirstOrDefaultAsync(j => j.IdCuaHang == i))?.TenCuaHang
                 });
             }
-            Console.WriteLine("-------------------------");
             foreach(var i in shoppingCart.danhSachCuaHang)
             {
-                Console.WriteLine(i.IdCuaHang);
-                Console.WriteLine(i.TenCuaHang);
                 i.danhSachSanPham = await _context.Giohangs
                 .Include(j => j.IdSanPhamNavigation)
                 .Where(j => j.IdSanPhamNavigation.IdCuaHang == i.IdCuaHang)
@@ -57,11 +54,54 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                     GiaBan = j.IdSanPhamNavigation.GiaBan,
                     GiaGoc = j.IdSanPhamNavigation.GiaGoc,
                     SoLuong = j.SoLuong,
+                    SoLuongKho = j.IdSanPhamNavigation.SoLuongKho,
                 })
                 .ToListAsync();
             }
-            Console.WriteLine("-------------------------");
             return View(shoppingCart);
+        }
+
+        public async Task<JsonResult> UpdateQuantity(string? IdSanPham, int? SoLuong)
+        {
+            if (IdSanPham == null || SoLuong == null)
+            {
+                return Json(new JSResult(false, null));
+            }
+            var IdNguoiDung = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (IdNguoiDung == null)
+            {
+                return Json(new JSResult(false, null));
+            }
+            var sanPham = await _context.Sanphams.FirstOrDefaultAsync(i => i.IdSanPham == IdSanPham);
+            var nguoiDung = await _context.Nguoidungs.FirstOrDefaultAsync(i => i.IdNguoiDung == IdNguoiDung);
+            if(sanPham == null || nguoiDung == null)
+            {
+                return Json(new JSResult(false, null));
+            }
+            var gioHang = await _context.Giohangs.FirstOrDefaultAsync(i => i.IdSanPham == sanPham.IdSanPham && i.IdNguoiDung == nguoiDung.IdNguoiDung);
+            if(gioHang == null)
+            {
+                return Json(new JSResult(true, null));
+            }
+            else
+            {
+                int SoLuongMoi = SoLuong ?? 0;
+                if(SoLuongMoi < 0 || SoLuongMoi > sanPham.SoLuongKho)
+                {
+                    return Json(new JSResult(false, null, "Số lượng không hợp lệ"));
+                }
+                gioHang.SoLuong = SoLuongMoi;
+                try
+                {
+                    _context.Giohangs.Update(gioHang);
+                    await _context.SaveChangesAsync();
+                }
+                catch(Exception)
+                {
+                    return Json(new JSResult(false, null));
+                }
+            }
+            return Json(new JSResult(true, null));
         }
     }
 }

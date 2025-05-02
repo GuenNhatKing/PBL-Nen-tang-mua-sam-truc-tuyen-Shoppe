@@ -675,3 +675,42 @@ ul {
     padding-left: 10px;
     padding-right: 10px;
 }
+
+.delete-product-shopcart-button {
+    color: #e63946;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+    .delete-product-shopcart-button:hover {
+        opacity: 0.7;
+    }
+
+    .delete-product-shopcart-button:active {
+        opacity: 0.5;
+    }
+
+.old-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 14px;
+    margin-right: 8px;
+}
+
+.new-price {
+    color: orange;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.total-price {
+    color: #555;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+.text-highlight {
+    font-weight: 500;
+    color: orangered;
+}

@@ -49,7 +49,7 @@
 				<div class="mt-auto">
 					<div class="chossing-section d-flex gap-3 align-items-center">
 						<div class="product-main-text"><strong>Số lượng</strong></div>
-						<div class="d-flex border-rounded border-style-3 overflow-hidden">
+						<div class="d-inline-flex border-rounded border-style-3 overflow-hidden">
 							<button class="counting-box decrease">-</button>
 							<input type="text" class="counting-input quantity-input" value="1">
 							<button class="counting-box increase">+</button>
@@ -176,6 +176,46 @@
 </div>
 
 <script>
+	const decreaseBtn = document.querySelector('.decrease');
+	const increaseBtn = document.querySelector('.increase');
+	const quantityInput = document.querySelector('.quantity-input');
+
+	increaseBtn.addEventListener('click', () => {
+		let currentValue = parseInt(quantityInput.value) || 0;
+		quantityInput.value = currentValue + 1;
+		let soLuongKho = parseInt(document.getElementById('So-Luong-Kho').textContent) || 0;
+		if (quantityInput.value < 1) {
+			quantityInput.value = 1
+		}
+		if (quantityInput.value > soLuongKho) {
+			quantityInput.value = soLuongKho
+		}
+	});
+
+	decreaseBtn.addEventListener('click', () => {
+		let currentValue = parseInt(quantityInput.value) || 0;
+		if (currentValue > 1) {
+			quantityInput.value = currentValue - 1;
+		}
+		let soLuongKho = parseInt(document.getElementById('So-Luong-Kho').textContent) || 0;
+		if (quantityInput.value < 1) {
+			quantityInput.value = 1
+		}
+		if (quantityInput.value > soLuongKho) {
+			quantityInput.value = soLuongKho
+		}
+	});
+
+	quantityInput.addEventListener('input', () => {
+		quantityInput.value = quantityInput.value.replace(/[^0-9]/g, '');
+		let soLuongKho = parseInt(document.getElementById('So-Luong-Kho').textContent) || 0;
+		if (quantityInput.value < 1) {
+			quantityInput.value = 1
+		}
+		if (quantityInput.value > soLuongKho) {
+			quantityInput.value = soLuongKho
+		}
+	});
 	function AddToShoppingCart() {
 		$.ajax({
 			url: '@Url.Action("AddProductToShoppingCart", "Product")',
@@ -192,7 +232,6 @@
 				alert("Lỗi kết nối server!");
 			}
 		})
-
 	}
 	function BuyNow() {
 		var redirect = '@Url.Action("Index", "ShoppingCart")';

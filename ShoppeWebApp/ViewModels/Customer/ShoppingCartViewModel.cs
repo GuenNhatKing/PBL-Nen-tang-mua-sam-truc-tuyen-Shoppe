@@ -18,5 +18,6 @@
         public decimal GiaGoc { get; set; }
         public decimal GiaBan { get; set; }
         public int SoLuong { get; set; }
+        public int SoLuongKho { get; set; }
     }
 }

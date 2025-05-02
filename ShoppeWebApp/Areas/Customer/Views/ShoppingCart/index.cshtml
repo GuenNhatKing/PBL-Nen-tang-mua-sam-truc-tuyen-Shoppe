@@ -5,7 +5,7 @@
 <div class="template-2">
 	<div class="container-2 d-flex flex-column gap-4">
 		<div class="bg-white box-padding-15 border-rounded box-padding-left-30">
-			<div class="d-flex box-padding-left-right-10 gap-3">
+			<div class="d-flex box-padding-left-right-10 gap-3 text-highlight">
 				<div class="width-2">
 					<input type="checkbox" class="allCheck" />
 				</div>
@@ -46,6 +46,7 @@
 								<input type="checkbox" class="itemCheck" data-group="@i.IdCuaHang" />
 							</div>
 							<div class="width-50 d-flex gap-3">
+								<div class="IdSanPham" name="@j.IdSanPham" style="display:none">@j.IdSanPham</div>
 								<div class="width-height-80px graphic-cover-2">
 									<img src="/@j.UrlAnh" />
 								</div>
@@ -54,21 +55,28 @@
 								</div>
 							</div>
 							<div class="width-12 text-center">
-								<div>
+								<div class="old-price">
 									@string.Format("{0:#,##0} ₫", j.GiaGoc)
 								</div>
-								<div>
+								<div class="new-price" name="@j.IdSanPham">
 									@string.Format("{0:#,##0} ₫", j.GiaBan)
 								</div>
 							</div>
 							<div class="width-12 text-center">
-								@j.SoLuong
+								<div class="text-center d-inline-flex border-rounded border-style-3 overflow-hidden">
+									<button class="counting-box decrease" name="@j.IdSanPham">-</button>
+									<input type="text" class="counting-input quantity-input" name="@j.IdSanPham" value="@j.SoLuong">
+									<button class="counting-box increase" name="@j.IdSanPham">+</button>
+									<div class="SoLuongKho" name="@j.IdSanPham" style="display:none">@j.SoLuongKho</div>
+								</div>
 							</div>
-							<div class="width-12 text-center">
+							<div class="width-12 text-center total-price Product-Total-Price" name="@j.IdSanPham">
 								@string.Format("{0:#,##0} ₫", j.GiaBan * j.SoLuong)
 							</div>
-							<div class="width-12 text-center">
-								<button>Xoá</button>
+							<div class="width-12">
+								<div class="d-flex justify-content-center">
+									<button class="invisible-button delete-product-shopcart-button">Xoá</button>
+								</div>
 							</div>
 						</div>
 					}
@@ -83,7 +91,7 @@
 					Chọn tất cả
 				</div>
 				<div>
-					<button>Xoá</button>
+					<button class="invisible-button  delete-product-shopcart-button">Xoá</button>
 				</div>
 				<div class="d-flex gap-3 ms-auto">
 					<div>
@@ -156,5 +164,80 @@
 			const group = this.dataset.group;
 			updateShopCheckbox(group);
 		});
+	}
+
+	const decreaseBtn = document.querySelectorAll('.decrease');
+	const increaseBtn = document.querySelectorAll('.increase');
+	const quantityInput = document.querySelectorAll('.quantity-input');
+
+	function updateQuantityDb(IdSanPham, SoLuong) {
+		$.ajax({
+			url: '@Url.Action("UpdateQuantity", "ShoppingCart")',
+			type: 'POST',
+			data: { IdSanPham: IdSanPham, SoLuong: SoLuong },
+			dataType: "json",
+		})
+	}
+	function updateTotalPrice(name) {
+		let total = document.querySelector(`[name="${name}"].Product-Total-Price`);
+		let soLuong = parseInt(document.querySelector(`[name="${name}"].quantity-input`).value.replace(/[^0-9]/g, '')) || 0;
+		let donGia = parseInt(document.querySelector(`[name="${name}"].new-price`).textContent.replace(/[^0-9]/g, '')) || 0;
+		total.textContent = formatCurrency(soLuong * donGia);
+	}
+
+	for (let btn of increaseBtn) {
+		btn.addEventListener('click', function () {
+			let name = this.name;
+			let quantity = document.querySelector(`[name="${name}"].quantity-input`);
+			let soLuong = parseInt(quantity.value) || 0;
+			let soLuongKho = parseInt(document.querySelector(`[name="${name}"].SoLuongKho`).textContent) || 0;
+			quantity.value = soLuong + 1;
+			if (quantity.value < 1) {
+				quantity.value = 1
+			}
+			if (quantity.value > soLuongKho) {
+				quantity.value = soLuongKho
+			}
+			let id = document.querySelector(`[name="${name}"].IdSanPham`).textContent;
+			updateQuantityDb(id, quantity.value);
+			updateTotalPrice(name);
+		})
+	}
+
+	for (let btn of decreaseBtn) {
+		btn.addEventListener('click', function () {
+			let name = this.name;
+			let quantity = document.querySelector(`[name="${name}"].quantity-input`);
+			let soLuong = parseInt(quantity.value) || 0;
+			let soLuongKho = parseInt(document.querySelector(`[name="${name}"].SoLuongKho`).textContent) || 0;
+			quantity.value = soLuong - 1;
+			if (quantity.value < 1) {
+				quantity.value = 1
+			}
+			if (quantity.value > soLuongKho) {
+				quantity.value = soLuongKho
+			}
+			let id = document.querySelector(`[name="${name}"].IdSanPham`).textContent;
+			updateQuantityDb(id, quantity.value);
+			updateTotalPrice(name);
+		})
+	}
+
+	for (let btn of quantityInput) {
+		btn.addEventListener('input', function () {
+			let name = this.name;
+			let quantity = document.querySelector(`[name="${name}"].quantity-input`);
+			quantity.value = quantity.value.replace(/[^0-9]/g, '');
+			let soLuongKho = parseInt(document.querySelector(`[name="${name}"].SoLuongKho`).textContent) || 0;
+			if (quantity.value < 1) {
+				quantity.value = 1
+			}
+			if (quantity.value > soLuongKho) {
+				quantity.value = soLuongKho
+			}
+			let id = document.querySelector(`[name="${name}"].IdSanPham`).textContent;
+			updateQuantityDb(id, quantity.value);
+			updateTotalPrice(name);
+		})
 	}
 </script>
