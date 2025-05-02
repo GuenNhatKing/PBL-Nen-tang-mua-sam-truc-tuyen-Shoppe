@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShoppeWebApp.Data;
 using ShoppeWebApp.Models;
+using ShoppeWebApp.ViewModels.Customer;
 
 namespace ShoppeWebApp.Areas.Customer.Controllers
 {
@@ -17,7 +19,49 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            return View();
+            string? userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return NotFound();
+            }
+            var allShops = await _context.Giohangs
+            .Include(i => i.IdSanPhamNavigation)
+            .GroupBy(i => new
+            {
+                IdCuaHang = i.IdSanPhamNavigation.IdCuaHang,
+            })
+            .Select(i => i.Key.IdCuaHang)
+            .ToListAsync();
+            var shoppingCart = new ShoppingCartViewModel();
+            foreach (var i in allShops)
+            {
+                shoppingCart.danhSachCuaHang.Add(new ShoppingCartShopProducts
+                {
+                    IdCuaHang = i,
+                    TenCuaHang = (await _context.Cuahangs.FirstOrDefaultAsync(j => j.IdCuaHang == i))?.TenCuaHang
+                });
+            }
+            Console.WriteLine("-------------------------");
+            foreach(var i in shoppingCart.danhSachCuaHang)
+            {
+                Console.WriteLine(i.IdCuaHang);
+                Console.WriteLine(i.TenCuaHang);
+                i.danhSachSanPham = await _context.Giohangs
+                .Include(j => j.IdSanPhamNavigation)
+                .Where(j => j.IdSanPhamNavigation.IdCuaHang == i.IdCuaHang)
+                .Select(j => new ShoppingCartProductInfo
+                {
+                    IdSanPham = j.IdSanPham,
+                    TenSanPham = j.IdSanPhamNavigation.TenSanPham,
+                    UrlAnh = j.IdSanPhamNavigation.UrlAnh,
+                    GiaBan = j.IdSanPhamNavigation.GiaBan,
+                    GiaGoc = j.IdSanPhamNavigation.GiaGoc,
+                    SoLuong = j.SoLuong,
+                })
+                .ToListAsync();
+            }
+            Console.WriteLine("-------------------------");
+            return View(shoppingCart);
         }
     }
 }

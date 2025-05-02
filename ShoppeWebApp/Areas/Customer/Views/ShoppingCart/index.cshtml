@@ -1,64 +1,160 @@
-﻿@{
-    ViewData["Title"] = "Giỏ hàng";
+﻿@model ShoppingCartViewModel
+@{
+	ViewData["Title"] = "Giỏ hàng";
 }
 <div class="template-2">
 	<div class="container-2 d-flex flex-column gap-4">
-		<div class="bg-white box-padding-15 border-rounded product-main-info-review">
-			<div class="d-flex">
-				<div>
-					<input type="checkbox"/>
+		<div class="bg-white box-padding-15 border-rounded box-padding-left-30">
+			<div class="d-flex box-padding-left-right-10 gap-3">
+				<div class="width-2">
+					<input type="checkbox" class="allCheck" />
 				</div>
-				<div>
+				<div class="width-50">
 					Sản phẩm
 				</div>
-				<div>
+				<div class="width-12 text-center">
 					Đơn giá
 				</div>
-				<div>
+				<div class="width-12 text-center">
 					Số lượng
 				</div>
-				<div>
+				<div class="width-12 text-center">
 					Số tiền
+				</div>
+				<div class="width-12 text-center">
+					Thao tác
 				</div>
 			</div>
 		</div>
-		<div class="bg-white box-padding-15 border-rounded product-main-info-review">
-			<div class="d-flex">
-				<div>
-					<input type="checkbox" />
-				</div>
-				<div>
-					Sản phẩm
-				</div>
-				<div>
-					Đơn giá
-				</div>
-				<div>
-					Số lượng
-				</div>
-				<div>
-					Số tiền
-				</div>
-			</div>
+		<div class="bg-white box-padding-15 border-rounded box-padding-left-30">
+			@if (Model.danhSachCuaHang != null)
+				foreach (var i in Model.danhSachCuaHang)
+				{
+					<div class="d-flex border-bottom-style-1 width-100 box-padding-10">
+						<div class="width-2">
+							<input type="checkbox" class="shopCheck" data-group="@i.IdCuaHang" />
+						</div>
+						<div>
+							@i.TenCuaHang
+						</div>
+					</div>
+
+					foreach (var j in i.danhSachSanPham)
+					{
+						<div class="d-flex box-padding-10 gap-3 border-bottom-style-1">
+							<div>
+								<input type="checkbox" class="itemCheck" data-group="@i.IdCuaHang" />
+							</div>
+							<div class="width-50 d-flex gap-3">
+								<div class="width-height-80px graphic-cover-2">
+									<img src="/@j.UrlAnh" />
+								</div>
+								<div>
+									@j.TenSanPham
+								</div>
+							</div>
+							<div class="width-12 text-center">
+								<div>
+									@string.Format("{0:#,##0} ₫", j.GiaGoc)
+								</div>
+								<div>
+									@string.Format("{0:#,##0} ₫", j.GiaBan)
+								</div>
+							</div>
+							<div class="width-12 text-center">
+								@j.SoLuong
+							</div>
+							<div class="width-12 text-center">
+								@string.Format("{0:#,##0} ₫", j.GiaBan * j.SoLuong)
+							</div>
+							<div class="width-12 text-center">
+								<button>Xoá</button>
+							</div>
+						</div>
+					}
+				}
 		</div>
-		<div class="bg-white box-padding-15 border-rounded product-main-info-review">
-			<div class="d-flex">
-				<div>
-					<input type="checkbox" />
+		<div class="bg-white box-padding-15 border-rounded box-padding-left-30">
+			<div class="d-flex box-padding-left-right-10 gap-3">
+				<div class="width-2">
+					<input type="checkbox" class="allCheck" />
 				</div>
 				<div>
-					Sản phẩm
+					Chọn tất cả
 				</div>
 				<div>
-					Đơn giá
+					<button>Xoá</button>
 				</div>
-				<div>
-					Số lượng
-				</div>
-				<div>
-					Số tiền
+				<div class="d-flex gap-3 ms-auto">
+					<div>
+						Tổng cộng(x sản phẩm): y đ
+					</div>
+					<div>
+						<button>
+							Mua hàng
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
+
+<script>
+	const allCheckbox = document.getElementsByClassName('allCheck');
+	const shopCheckbox = document.getElementsByClassName('shopCheck');
+	const itemCheckbox = document.getElementsByClassName('itemCheck');
+	function updateAllCheckbox() {
+		let IsAllChecked = true;
+		for(let i of itemCheckbox) {
+			if(i.checked === false) IsAllChecked = false;
+		}
+		for(let i of allCheckbox) {
+			i.checked = IsAllChecked;
+		}
+	}
+	function updateShopCheckbox(group) {
+		let IsAllChecked = true;
+		const shopCheckboxes = document.querySelectorAll(`[data-group="${group}"]`);
+		let shop = document.querySelector(`[data-group="${group}"].shopCheck`);
+		for(let i of shopCheckboxes) {
+			if(i.className === 'itemCheck' && i.checked === false)
+				IsAllChecked = false;
+		}
+		shop.checked = IsAllChecked;
+		updateAllCheckbox();
+	}
+
+	for (let checkbox of allCheckbox) {
+		checkbox.addEventListener('change', function() {
+			const isChecked = this.checked;
+			for(let i of allCheckbox) {
+				i.checked = isChecked;
+			}
+			for(let i of shopCheckbox) {
+				i.checked = isChecked;
+			}
+			for(let i of itemCheckbox) {
+				i.checked = isChecked;
+			}
+		});
+	}
+	for(let checkbox of shopCheckbox) {
+		checkbox.addEventListener('change', function() {
+			const isChecked = this.checked;
+			const group = this.dataset.group;
+			const shopCheckboxes = document.querySelectorAll(`[data-group="${group}"]`)
+			for(let i of shopCheckboxes) {
+				i.checked = isChecked;
+			}
+			updateAllCheckbox();
+		});
+	}
+	for(let checkbox of itemCheckbox) {
+		checkbox.addEventListener('change', function() {
+			const isChecked = this.checked;
+			const group = this.dataset.group;
+			updateShopCheckbox(group);
+		});
+	}
+</script>
