@@ -1,0 +1,151 @@
+@model ShoppeWebApp.ViewModels.Admin.AllReviewsViewModel
+@{
+    Layout = "~/Areas/Admin/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Đánh giá sản phẩm";
+}
+<div class="container mt-4 border border-success rounded p-4">
+
+
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 10px;">
+            Đánh giá sản phẩm
+        </h2>
+    </div>    
+    
+    <!-- Nút quay lại -->
+    <div class="text-start mb-3">
+        <a asp-area="Admin" asp-controller="Product" asp-action="DetailsProduct" 
+           asp-route-idSanPham="@Model.IdSanPham" 
+           asp-route-IdCuaHang="@Model.IdCuaHang"
+           class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+
+    <!-- Tìm kiếm -->
+    <form method="get" asp-action="AllReviews" asp-controller="Product" asp-area="Admin" class="mb-4">
+        <div class="row">
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Tìm kiếm theo ID đánh giá</label>
+                <input type="text" name="searchByIdDanhGia" class="form-control" placeholder="Nhập ID đánh giá..." value="@ViewContext.HttpContext.Request.Query["searchByIdDanhGia"]" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Tìm kiếm theo ID người dùng</label>
+                <input type="text" name="searchByIdNguoiDung" class="form-control" placeholder="Nhập ID người dùng..." value="@ViewContext.HttpContext.Request.Query["searchByIdNguoiDung"]" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold">Lọc theo số sao</label>
+                    <select name="filterByStars" class="form-select">
+                        <option value="">Tất cả</option>
+                        @{
+                            var isSelected5Stars = Model.FilterByStars == "5" ? "selected" : "";
+                        }
+                        <option value="5" selected="@isSelected5Stars">5 sao</option>
+                        @{
+                            var isSelected4Stars = Model.FilterByStars == "4" ? "selected" : "";
+                        }
+                        <option value="4" selected="@(Model.FilterByStars == "4")">4 sao</option>
+                        @{
+                            var isSelected3Stars = Model.FilterByStars == "3" ? "selected" : "";
+                        }
+                        <option value="3" selected="@(Model.FilterByStars == "3")">3 sao</option>
+                        @{
+                            var isSelected2Stars = Model.FilterByStars == "2" ? "selected" : "";
+                        }
+                        <option value="2" selected="@(Model.FilterByStars == "2")">2 sao</option>
+                        @{
+                            var isSelected1Stars = Model.FilterByStars == "1" ? "selected" : "";
+                        }
+                        <option value="1" selected="@(Model.FilterByStars == "1")">1 sao</option>
+                    </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search me-1"></i> Tìm kiếm
+                </button>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <a asp-area="Admin" asp-controller="Product" asp-action="AllReviews" 
+                   asp-route-idSanPham="@Model.IdSanPham" 
+                   asp-route-IdCuaHang="@Model.IdCuaHang" 
+                   class="btn btn-secondary w-100">
+                    <i class="fas fa-undo me-1"></i> Xóa lọc
+                </a>
+            </div>
+        </div>
+    </form>
+
+    <div id="danhGiaContainer">
+        @if (Model.DanhSachDanhGia.Any())
+        {
+            @foreach (var danhGia in Model.DanhSachDanhGia)
+            {
+                <div class="card mb-4 border-success shadow-sm" style="padding: 15px;">
+                    <!-- Phần tên người dùng và nút xóa -->
+                    <div class="d-flex justify-content-between align-items-center" style="background-color: #cdf8ba; padding: 10px; border-radius: 5px;">
+                        <p class="mb-0">
+                            <strong class="text-success">@danhGia.TenNguoiDung</strong> 
+                            <span class="text-muted">(@danhGia.IdNguoiDung)</span>
+                        </p>
+                        <!-- Modal Xác nhận xóa -->
+                        <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="confirmDeleteModalLabel">Xác nhận xóa</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Bạn có chắc chắn muốn xóa đánh giá này?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                        <a id="confirmDeleteButton" href="#" class="btn btn-danger">Xóa</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="javascript:void(0);" 
+                           class="btn btn-danger btn-sm" 
+                           data-bs-toggle="modal" 
+                           data-bs-target="#confirmDeleteModal" 
+                           onclick="setDeleteUrl('@Url.Action("DeleteReview", "Product", new { area = "Admin", idDanhGia = danhGia.IdDanhGia, idSanPham = Model.IdSanPham, IdCuaHang = Model.IdCuaHang })')">
+                            <i class="fas fa-trash-alt"></i> Xóa
+                        </a>
+                        <script>
+                            function setDeleteUrl(url) {
+                                document.getElementById('confirmDeleteButton').setAttribute('href', url);
+                            }
+                        </script>
+                    </div>
+                    <hr class="my-2" style="border-top: 1px solid #28a745;">
+                
+                    <!-- Phần điểm và nội dung đánh giá -->
+                    <div>
+                        <p class="mt-2"><strong class="text-danger">Điểm:</strong> @danhGia.DiemDanhGia / 5</p>
+                        <p><strong class="text-primary">Nội dung:</strong> @danhGia.NoiDung</p>
+                    </div>
+                    <hr>
+                
+                    <!-- Phần ID đánh giá và thời gian đánh giá -->
+                    <div class="d-flex justify-content-between align-items-center" style="background-color: #f8f9fa; padding: 10px; border-radius: 5px;">
+                        <p class="mb-0 text-center" style="flex: 1;">
+                            <strong class="text-dark" style="font-size: 1.2rem;">ID: @danhGia.IdDanhGia</strong>
+                        </p>
+                        <p class="mb-0 text-end" style="flex: 0;">
+                            <small class="d-inline-block text-nowrap text-end">
+                                <i class="fas fa-clock"></i> @danhGia.ThoiGianDGFormatted
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info text-center">Chưa có đánh giá nào cho sản phẩm này.</div>
+        }
+    </div>
+</div>

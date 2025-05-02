@@ -1,0 +1,110 @@
+@model ShoppeWebApp.ViewModels.Admin.ChinhSuaSanPhamViewModel
+
+@{
+    Layout = "~/Areas/Admin/Shared/_Layout.cshtml"; 
+}
+
+<div class="container mt-5">
+    <!-- Tiêu đề chỉnh sửa sản phẩm -->
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 10px;">
+            Chỉnh sửa sản phẩm
+        </h2>
+    </div>
+
+    <!-- Hiển thị thông báo thành công -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Form chỉnh sửa sản phẩm -->
+    <div class="p-4 border border-success rounded" style="background-color: #fdfdfd;">
+        <form asp-area="Admin" asp-controller="Product" asp-action="Edit" method="post" enctype="multipart/form-data">
+            <!-- Hiển thị lỗi tổng quát -->
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row">
+                <!-- Cột bên trái: Ảnh sản phẩm -->
+                <div class="col-md-4 text-center">
+                    <label class="form-label fw-bold">Ảnh sản phẩm</label>
+                    <div>
+                        <img src="@Url.Content("~/" + Model.DuongDanAnh)" alt="Ảnh sản phẩm" 
+                             class="img-thumbnail mb-3 shadow-sm" 
+                             style="width: 300px; height: 300px; object-fit: cover;" />
+                    </div>
+                    <input type="file" class="form-control" id="AnhMoi" name="AnhMoi" />
+                </div>
+
+                <input type="hidden" id="IdCuaHang" name="IdCuaHang" value="@Model.IdCuaHang" />
+                <!-- Cột bên phải: Các trường thông tin -->
+                <div class="col-md-8">
+                    <div class="mb-3">
+                        <label for="IdSanPham" class="form-label fw-bold">ID Sản phẩm</label>
+                        <input type="text" class="form-control" id="IdSanPham" name="IdSanPham" value="@Model.IdSanPham" readonly style="background-color: #e9ecef; cursor: not-allowed;" />
+                        <small class="text-muted">Trường này chỉ đọc và không thể chỉnh sửa</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="TenSanPham" class="form-label fw-bold">Tên sản phẩm</label>
+                        <input type="text" class="form-control" id="TenSanPham" name="TenSanPham" value="@Model.TenSanPham" placeholder="Nhập tên sản phẩm" />
+                        <span asp-validation-for="TenSanPham" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="GiaGoc" class="form-label fw-bold">Giá gốc</label>
+                        <input type="number" class="form-control" id="GiaGoc" name="GiaGoc" value="@Model.GiaGoc" placeholder="Nhập giá gốc" />
+                        <span asp-validation-for="GiaGoc" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="GiaBan" class="form-label fw-bold">Giá bán</label>
+                        <input type="number" class="form-control" id="GiaBan" name="GiaBan" value="@Model.GiaBan" placeholder="Nhập giá bán" />
+                        <span asp-validation-for="GiaBan" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="SoLuongKho" class="form-label fw-bold">Số lượng kho</label>
+                        <input type="number" class="form-control" id="SoLuongKho" name="SoLuongKho" value="@Model.SoLuongKho" placeholder="Nhập số lượng kho" />
+                        <span asp-validation-for="SoLuongKho" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <hr />
+
+            <!-- Các trường bên dưới -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="MaDanhMucDuocChon" class="form-label fw-bold">Danh mục</label>
+                        <select class="form-select" id="MaDanhMucDuocChon" name="MaDanhMucDuocChon">
+                            @foreach (var danhMuc in Model.DanhSachDanhMuc)
+                            {
+                                <option value="@danhMuc.MaDanhMuc" selected="@(Model.MaDanhMucDuocChon == danhMuc.MaDanhMuc ? "selected" : null)">
+                                    @danhMuc.TenDanhMuc
+                                </option>
+                            }
+                        </select>
+                        <span asp-validation-for="MaDanhMucDuocChon" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="mb-3">
+                        <label for="MoTa" class="form-label fw-bold">Mô tả</label>
+                        <textarea class="form-control" id="MoTa" name="MoTa" rows="4" placeholder="Nhập mô tả sản phẩm">@Model.MoTa</textarea>
+                        <span asp-validation-for="MoTa" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nút hành động -->
+            <div class="text-end">
+                <button type="submit" class="btn btn-success">Lưu thay đổi</button>
+                <a asp-area="Admin" asp-controller="Product" asp-action="Index" asp-route-id="@Model.IdSanPham" asp-route-IdCuaHang="@Model.IdCuaHang" class="btn btn-secondary">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>
