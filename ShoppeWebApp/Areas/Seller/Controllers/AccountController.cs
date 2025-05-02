@@ -26,43 +26,107 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
             return View();
         }
 
+        // [HttpPost]
+        // public async Task<IActionResult> Login(ViewModels.Seller.LoginViewModel model)
+        // {
+        //     if (ModelState.IsValid)
+        //     {
+        //         // Check the username and password against the database
+        //         var account = _context.Taikhoans
+        //             .FirstOrDefault(a => a.Username == model.Username && a.Password == model.Password);
+
+        //         if (account != null)
+        //         {
+        //             _context.Entry(account).Reference(i => i.IdNguoiDungNavigation).Load();
+        //             if (account.IdNguoiDungNavigation.VaiTro == Constants.SELLER_ROLE)
+        //             {
+        //                 Console.WriteLine($"Dang nhap cho seller, id={account.IdNguoiDung}");
+        //                 var identity = ViewModels.Authentication.AuthenticationInfo.CreateSellerIdentity(account.IdNguoiDung, account.Username);
+        //                 var principal = new ClaimsPrincipal(identity);
+        //                 var properties = new AuthenticationProperties
+        //                 {
+        //                     IsPersistent = true,
+        //                     ExpiresUtc = DateTimeOffset.UtcNow.AddDays(Constants.COOKIE_EXPIRY_DAYS), // 3 days
+        //                 };
+        //                 await HttpContext.SignInAsync("SellerSchema", principal, properties);
+        //             }
+        //             // Authentication successful
+        //             return RedirectToAction("Index", "Dashboard", new {area="Seller"});
+        //         }
+        //         else
+        //         {
+        //             // Authentication failed
+        //             ModelState.AddModelError(string.Empty, "Nhập sai mật khẩu hoặc tài khoản.");
+        //         }
+        //     }
+
+        //     // return View("SellerLogin", model);
+        //     return View(model);
+        // }
+
         [HttpPost]
         public async Task<IActionResult> Login(ViewModels.Seller.LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
-                // Check the username and password against the database
+                // Kiểm tra tài khoản và mật khẩu
                 var account = _context.Taikhoans
+                    .Include(a => a.IdNguoiDungNavigation) // Tải thông tin người dùng liên kết
                     .FirstOrDefault(a => a.Username == model.Username && a.Password == model.Password);
-
+        
                 if (account != null)
                 {
-                    _context.Entry(account).Reference(i => i.IdNguoiDungNavigation).Load();
+                    // Kiểm tra vai trò người dùng
                     if (account.IdNguoiDungNavigation.VaiTro == Constants.SELLER_ROLE)
                     {
-                        Console.WriteLine($"Dang nhap cho seller, id={account.IdNguoiDung}");
-                        var identity = ViewModels.Authentication.AuthenticationInfo.CreateSellerIdentity(account.IdNguoiDung, account.Username);
+                        Console.WriteLine($"Đăng nhập cho seller, id={account.IdNguoiDung}");
+        
+                        // Kiểm tra xem người dùng có cửa hàng hay không
+                        var shop = _context.Cuahangs.FirstOrDefault(c => c.IdNguoiDung == account.IdNguoiDung);
+                        if (shop == null)
+                        {
+                            TempData["ErrorMessage"] = "Bạn chưa có cửa hàng. Vui lòng tạo cửa hàng mới.";
+                            return RedirectToAction("Create", "Shop");
+                        }
+        
+                        // Tạo Claims để lưu thông tin đăng nhập
+                        var identity = new ClaimsIdentity(new[]
+                        {
+                            new Claim("IdNguoiDung", account.IdNguoiDung),
+                            new Claim("IdCuaHang", shop.IdCuaHang), // Lưu IdCuaHang vào Claims
+                            new Claim("TenCuaHang", shop.TenCuaHang), // Lưu tên cửa hàng vào Claims
+                            new Claim(ClaimTypes.Name, account.Username),
+                            new Claim(ClaimTypes.Role, "Seller")
+                        }, "SellerSchema");
+                        
                         var principal = new ClaimsPrincipal(identity);
                         var properties = new AuthenticationProperties
                         {
                             IsPersistent = true,
-                            ExpiresUtc = DateTimeOffset.UtcNow.AddDays(Constants.COOKIE_EXPIRY_DAYS), // 3 days
+                            ExpiresUtc = DateTimeOffset.UtcNow.AddDays(Constants.COOKIE_EXPIRY_DAYS)
                         };
+                    
+                        // Đăng nhập
                         await HttpContext.SignInAsync("SellerSchema", principal, properties);
+        
+                        // Chuyển hướng đến Dashboard
+                        return RedirectToAction("Index", "Dashboard", new { area = "Seller" });
                     }
-                    // Authentication successful
-                    return RedirectToAction("Index", "Home", new {area="Seller"});
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Tài khoản không có quyền truy cập vào kênh người bán.");
+                    }
                 }
                 else
                 {
-                    // Authentication failed
-                    ModelState.AddModelError(string.Empty, "Nhập sai mật khẩu hoặc tài khoản.");
+                    ModelState.AddModelError(string.Empty, "Tên đăng nhập hoặc mật khẩu không đúng.");
                 }
             }
-
-            // return View("SellerLogin", model);
+        
             return View(model);
         }
+
+
 
         [HttpGet]
         public IActionResult ForgotPassword()
@@ -249,7 +313,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync("SellerSchema");
-            return RedirectToAction("Index", "Home", new { area = "Seller" });
+            return RedirectToAction("Login", "Account", new { area = "Seller" });
         }
     }
 }

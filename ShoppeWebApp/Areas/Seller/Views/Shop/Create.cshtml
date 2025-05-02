@@ -1,0 +1,68 @@
+@model ShoppeWebApp.ViewModels.Admin.CreateShopViewModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Thêm cửa hàng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <!-- Tiêu đề -->
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 10px;">
+                Thêm cửa hàng
+            </h2>
+        </div>
+
+        <!-- Form thêm cửa hàng -->
+        <div class="p-4 border border-success rounded" style="background-color: #fdfdfd;">
+            <form asp-area="Admin" asp-controller="Shop" asp-action="Create" method="post" enctype="multipart/form-data">
+                <!-- Hiển thị lỗi tổng quát -->
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none" role="alert"></div>
+
+                <div class="mb-3">
+                    <label for="TenCuaHang" class="form-label fw-bold">Tên cửa hàng</label>
+                    <input type="text" class="form-control" id="TenCuaHang" name="TenCuaHang" placeholder="Nhập tên cửa hàng" />
+                    <span asp-validation-for="TenCuaHang" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label for="IdSeller" class="form-label fw-bold">ID chủ sở hữu</label>
+                    <input type="text" class="form-control" id="IdSeller" name="IdSeller" placeholder="Nhập ID chủ sở hữu" />
+                    <span asp-validation-for="IdSeller" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label for="Sdt" class="form-label fw-bold">Số điện thoại</label>
+                    <input type="text" class="form-control" id="Sdt" name="Sdt" placeholder="Nhập số điện thoại" />
+                    <span asp-validation-for="Sdt" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label for="DiaChi" class="form-label fw-bold">Địa chỉ</label>
+                    <input type="text" class="form-control" id="DiaChi" name="DiaChi" placeholder="Nhập địa chỉ" />
+                    <span asp-validation-for="DiaChi" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label for="MoTa" class="form-label fw-bold">Mô tả</label>
+                    <textarea class="form-control" id="MoTa" name="MoTa" placeholder="Nhập mô tả cửa hàng"></textarea>
+                    <span asp-validation-for="MoTa" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label for="UrlAnh" class="form-label fw-bold">Tải lên ảnh</label>
+                    <input type="file" class="form-control" id="UrlAnh" name="UrlAnh" accept="image/*" />
+                    <span asp-validation-for="UrlAnh" class="text-danger"></span>
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-success">Thêm cửa hàng</button>
+                    <a asp-area="Admin" asp-controller="Shop" asp-action="Index" class="btn btn-secondary">Hủy</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

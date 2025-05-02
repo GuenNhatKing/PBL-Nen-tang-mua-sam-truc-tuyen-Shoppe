@@ -1,0 +1,177 @@
+@model ShoppeWebApp.ViewModels.Seller.ProductViewModel
+
+@{
+    Layout = "~/Areas/Seller/Views/Shared/_MainLayout.cshtml";
+    ViewData["Title"] = "Quản lý sản phẩm";
+
+    // Lấy thông tin phân trang từ ViewData
+    int currentPage = ViewData["CurrentPage"] != null ? (int)ViewData["CurrentPage"] : 1;
+    int totalPages = ViewData["TotalPages"] != null ? (int)ViewData["TotalPages"] : 1;
+}
+
+<div class="container mt-4">
+    <div class="p-4 border border-success rounded" style="background-color: #fdfdfd; min-height: 80vh;">
+
+        <!-- Thông tin cửa hàng -->
+        <div class="mb-4 p-4 bg-white border border-primary rounded shadow-lg">
+            <div class="d-flex align-items-center">
+                <!-- Ảnh cửa hàng -->
+                <div class="me-4">
+                    @if (!string.IsNullOrEmpty(Model.UrlAnhCuaHang))
+                    {
+                        <img src="@Url.Content(Model.UrlAnhCuaHang)" alt="Ảnh cửa hàng"
+                             class="rounded-circle shadow-sm"
+                             style="width: 100px; height: 100px; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <img src="/images/default-shop.png" alt="Ảnh cửa hàng"
+                             class="rounded-circle shadow-sm"
+                             style="width: 100px; height: 100px; object-fit: cover;" />
+                    }
+                </div>
+
+                <!-- Thông tin chi tiết -->
+                <div>
+                    <h3 class="fw-bold text-dark">@Model.TenCuaHang</h3>
+                    <p class="mb-1"><strong>Địa chỉ:</strong> @Model.DiaChi</p>
+                    <p class="mb-0"><strong>Số điện thoại:</strong> @Model.SoDienThoai</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tiêu đề -->
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 7px;">
+                Quản lý sản phẩm
+            </h2>
+        </div>
+
+        <!-- Hiển thị thông báo thành công -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <!-- Thanh tìm kiếm -->
+        <form method="get" class="mb-4">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-8">
+                    <input type="text" name="searchQuery" class="form-control" placeholder="Nhập tên sản phẩm..." value="@Context.Request.Query["searchQuery"]" />
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-1"></i> Tìm kiếm
+                    </button>
+                </div>
+                <div class="col-md-2">
+                    <a href="@Url.Action("Index", "Product", new { area = "Seller" })" class="btn btn-secondary w-100">
+                        <i class="fas fa-undo me-1"></i> Xóa tìm kiếm
+                    </a>
+                </div>
+            </div>
+        </form>
+
+        <!-- Nút thêm sản phẩm -->
+        <div class="mb-3 text-end">
+            <a asp-action="Create" asp-route-IdCuaHang="@Model.IdCuaHang" class="btn btn-success">
+                <i class="fas fa-plus me-1"></i> Thêm sản phẩm
+            </a>
+        </div>
+
+        <!-- Danh sách sản phẩm -->
+        <div class="row">
+            @if (Model.Products.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                    @foreach (var product in Model.Products)
+                    {
+                        <div class="col">
+                            <div class="card h-100 shadow-sm">
+                                <!-- Ảnh sản phẩm -->
+                                <img src="@Url.Content($"~/{product.UrlAnh}")" alt="Ảnh sản phẩm"
+                                     class="card-img-top"
+                                     style="width: 100%; height: 200px; object-fit: cover;" />
+
+                                <!-- Nội dung sản phẩm -->
+                                <div class="card-body">
+                                    <h6 class="text-center fw-bold line-clamp-2">@product.TenSanPham</h6>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-danger fw-bold">
+                                            @string.Format("{0:#,##0} ₫", product.GiaBan)
+                                        </span>
+                                        @if (product.GiaBan != product.GiaGoc)
+                                        {
+                                            <span class="text-muted" style="text-decoration: line-through;">
+                                                @string.Format("{0:#,##0} ₫", product.GiaGoc)
+                                            </span>
+                                        }
+                                    </div>
+                                    <p class="mb-0 text-muted"><strong>Đã bán:</strong> @product.SoLuongBan</p>
+                                </div>
+
+                                <!-- Footer với các nút -->
+                                <div class="card-footer bg-transparent text-center">
+                                    <a asp-action="DetailsProduct" asp-route-IdSanPham="@product.IdSanPham"
+                                       class="btn btn-dark btn-sm me-1">
+                                        <i class="fas fa-info-circle"></i> Chi tiết
+                                    </a>
+                                    <a asp-action="Delete" asp-route-IdSanPham="@product.IdSanPham"
+                                       class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash-alt"></i> Xóa
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center" role="alert">
+                    Không có sản phẩm nào.
+                </div>
+            }
+        </div>
+
+        <!-- Phân trang -->
+        <div class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" href="?page=1">Đầu</a>
+                    </li>
+                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" href="?page=@(currentPage - 1)">Trước</a>
+                    </li>
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        <li class="page-item @(currentPage == i ? "active" : "")">
+                            <a class="page-link" href="?page=@i">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                        <a class="page-link" href="?page=@(currentPage + 1)">Tiếp</a>
+                    </li>
+                    <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                        <a class="page-link" href="?page=@totalPages">Cuối</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2; 
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-align: center;
+        word-wrap: break-word;
+    }
+</style>

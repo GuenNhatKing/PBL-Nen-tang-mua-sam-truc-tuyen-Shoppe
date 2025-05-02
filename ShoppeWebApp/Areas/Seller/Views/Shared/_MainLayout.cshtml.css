@@ -1,0 +1,29 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.nav-link {
+    font-size: 16px;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.nav-link:hover {
+    background-color: #495057;
+    text-decoration: none;
+}
+
+.nav-link.active {
+    background-color: #343a40;
+    font-weight: bold;
+}
+
+.logo {
+    display: block;
+    margin: 0 auto;
+}
+
+header h1 {
+    color: #333;
+}
