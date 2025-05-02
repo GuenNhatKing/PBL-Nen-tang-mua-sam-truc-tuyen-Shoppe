@@ -61,15 +61,15 @@
 					</div>
 
 					<div class="d-flex gap-3 mt-3">
-						<button type="submit" class="invisible-button" onclick="AddToShoppingCart()">
+						<button class="invisible-button" onclick="AddToShoppingCart()">
 							<div class="btn-add-shopping-cart">
 								<i class="fa fa-shopping-cart"></i>
 								Thêm vào giỏ hàng
 							</div>
 						</button>
-						<form>
+						<button class="invisible-button" onclick="BuyNow()">
 							<div class="btn-buy">Mua Ngay</div>
-						</form>
+						</button>
 					</div>
 				</div>
 			</div>
@@ -177,7 +177,6 @@
 
 <script>
 	function AddToShoppingCart() {
-
 		$.ajax({
 			url: '@Url.Action("AddProductToShoppingCart", "Product")',
 			type: 'POST',
@@ -194,5 +193,25 @@
 			}
 		})
 
+	}
+	function BuyNow() {
+		var redirect = '@Url.Action("Index", "ShoppingCart")';
+		$.ajax({
+			url: '@Url.Action("AddProductToShoppingCart", "Product")',
+			type: 'POST',
+			data: { IdSanPham: '@Model.IdSanPham', SoLuong: parseInt(quantityInput.value) || 0 },
+			dataType: "json",
+			success: function (response) {
+				if(response.isSuccess === true) {
+					window.location.href = redirect;
+					alert("Thêm vào giỏ hàng thành công!!");
+				}
+				else
+					alert("Thêm vào giỏ hàng thất bại!!" + response.message);
+			},
+			error: function () {
+				alert("Lỗi kết nối server!");
+			}
+		})
 	}
 </script>
