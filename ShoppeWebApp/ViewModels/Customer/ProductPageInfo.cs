@@ -4,6 +4,7 @@
     {
         public string IdDanhMuc { get; set; } = null!;
         public string IdCuaHang { get; set; } = null!;
+        public string IdSanPham { get; set; } = null!;
         public string TenSanPham { get; set; } = null!;
         public string UrlAnh { get; set; } = null!;
         public string? MoTa { get; set; }
