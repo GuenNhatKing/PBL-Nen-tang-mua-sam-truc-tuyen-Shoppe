@@ -300,8 +300,8 @@ ul {
 }
 
 .invisible-button {
-    background: none;
-    border: none;
+    all: unset;
+    display: inherit;
 }
 
 .nostyle-ul {
@@ -631,3 +631,4 @@ ul {
 .width-100 {
     width: 100%;
 }
+
