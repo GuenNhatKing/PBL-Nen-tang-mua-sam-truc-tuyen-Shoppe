@@ -6,6 +6,12 @@
 }
 
 <div class="container mt-5">
+    <!-- Tiêu đề -->
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 10px;">
+            Chi tiết cửa hàng
+        </h2>
+    </div>
 
     @if (TempData["ErrorMessage"] != null)
     {
@@ -19,13 +25,7 @@
             @TempData["SuccessMessage"]
         </div>
     }
-    <!-- Tiêu đề -->
-    <div class="text-center mb-4">
-        <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 10px;">
-            Chi tiết cửa hàng
-        </h2>
-    </div>
-
+    
     <!-- Nội dung chi tiết -->
     <div class="card shadow-sm border border-success rounded-3 p-4">
         <div class="row">
