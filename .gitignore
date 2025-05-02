@@ -405,3 +405,6 @@ FodyWeavers.xsd
 
 # wwwroot/lib/
 */wwwroot/lib/
+
+# chỉ có trên Macbook, Windows làm gì có ak hihi
+.DS_Store
