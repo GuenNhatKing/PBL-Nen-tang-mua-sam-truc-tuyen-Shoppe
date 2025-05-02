@@ -6,6 +6,19 @@
 }
 
 <div class="container mt-5">
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger text-center">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success text-center">
+            @TempData["SuccessMessage"]
+        </div>
+    }
     <!-- Tiêu đề -->
     <div class="text-center mb-4">
         <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 10px;">
@@ -54,13 +67,24 @@
 
     <!-- Nút chỉnh sửa và xóa -->
     <div class="text-center mt-4">
-        <a asp-area="Seller" asp-controller="Shop" asp-action="Edit" asp-route-id="@Model.IdCuaHang"
-           class="btn btn-warning btn-sm me-2"> <!-- Thu nhỏ nút -->
-            <i class="fas fa-edit"></i> Chỉnh sửa
-        </a>
-        <a asp-area="Seller" asp-controller="Shop" asp-action="Delete" asp-route-id="@Model.IdCuaHang"
-           class="btn btn-danger btn-sm"> <!-- Thu nhỏ nút -->
-            <i class="fas fa-trash-alt"></i> Xóa
-        </a>
+        @if (Model.ThoiGianXoa == null)
+        {
+            <a asp-area="Seller" asp-controller="Shop" asp-action="Edit" asp-route-id="@Model.IdCuaHang"
+            class="btn btn-warning btn-sm me-2"> <!-- Thu nhỏ nút -->
+                <i class="fas fa-edit"></i> Chỉnh sửa
+            </a>
+            <a asp-area="Seller" asp-controller="Shop" asp-action="Delete" asp-route-id="@Model.IdCuaHang"
+            class="btn btn-danger btn-sm"> <!-- Thu nhỏ nút -->
+                <i class="fas fa-trash-alt"></i> Xóa
+            </a>
+        }
+        @if (Model.ThoiGianXoa != null)
+        {
+            <form method="post" asp-area="Seller" asp-controller="Shop" asp-action="Restore" asp-route-id="@Model.IdCuaHang" class="d-inline">
+                <button type="submit" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-cog"></i> Khôi phục
+                </button>
+            </form>
+        }
     </div>
 </div>

@@ -19,6 +19,7 @@ namespace ShoppeWebApp.ViewModels.Seller
         public string? DiaChi { get; set; }
         public string? MoTa { get; set; }
         public DateTime? ThoiGianTao { get; set; }
+        public DateTime? ThoiGianXoa { get; set; }
 
         public int SoSanPham { get; set; }
         public int SoDonHang { get; set; }

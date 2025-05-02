@@ -41,6 +41,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                     Sdt = c.Sdt,
                     UrlAnh = c.UrlAnh,
                     ThoiGianTao = c.ThoiGianTao,
+                    ThoiGianXoa = c.ThoiGianXoa,
                 })
                 .FirstOrDefault();
         
@@ -51,6 +52,37 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
             }
         
             return View(shop);
+        }
+
+        public IActionResult Restore()
+        {
+            var shopId = User.Claims.FirstOrDefault(c => c.Type == "IdCuaHang")?.Value;
+        
+            if (string.IsNullOrEmpty(shopId))
+            {
+                TempData["ErrorMessage"] = "Không thể xác định cửa hàng của bạn. Vui lòng đăng nhập lại.";
+                return RedirectToAction("Login", "Account");
+            }
+        
+            var cuaHang = _context.Cuahangs.FirstOrDefault(c => c.IdCuaHang == shopId);
+            if (cuaHang == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy cửa hàng.";
+                return RedirectToAction("Index");
+            }
+        
+            if (cuaHang.ThoiGianXoa.HasValue && (DateTime.Now - cuaHang.ThoiGianXoa.Value).TotalDays > 30)
+            {
+                TempData["ErrorMessage"] = "Cửa hàng đã bị xóa quá 30 ngày và không thể khôi phục.";
+                return RedirectToAction("Index");
+            }
+        
+            cuaHang.ThoiGianXoa = null;
+            cuaHang.TrangThai = 1; 
+            _context.SaveChanges();
+        
+            TempData["SuccessMessage"] = "Cửa hàng đã được khôi phục thành công.";
+            return RedirectToAction("Index");
         }
 
         [HttpGet]
