@@ -1,0 +1,66 @@
+@model ShoppeWebApp.ViewModels.Seller.ShopViewModel
+
+@{
+    Layout = "~/Areas/Seller/Views/Shared/_MainLayout.cshtml"; 
+    ViewData["Title"] = "Chi tiết cửa hàng";
+}
+
+<div class="container mt-5">
+    <!-- Tiêu đề -->
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 10px;">
+            Chi tiết cửa hàng
+        </h2>
+    </div>
+
+    <!-- Nội dung chi tiết -->
+    <div class="card shadow-sm border border-success rounded-3 p-4">
+        <div class="row">
+            <!-- Hình ảnh -->
+            <div class="col-md-4 text-center">
+                <img src="@Url.Content(Model.UrlAnh)" alt="Ảnh đại diện cửa hàng"
+                     class="img-fluid rounded" style="max-height: 250px; object-fit: cover;" />
+            </div>
+
+            <!-- Thông tin -->
+            <div class="col-md-8">
+                <table class="table table-borderless fs-5"> <!-- Phóng to thông tin -->
+                    <tbody>
+                        <tr>
+                            <th class="text-start pe-3">Tên cửa hàng:</th>
+                            <td class="text-start fw-bold text-dark">@Model.TenCuaHang</td> <!-- Đổi màu thành đen -->
+                        </tr>
+                        <tr>
+                            <th class="text-start pe-3">Số điện thoại:</th>
+                            <td class="text-start">@Model.Sdt</td>
+                        </tr>
+                        <tr>
+                            <th class="text-start pe-3">Địa chỉ cửa hàng:</th>
+                            <td class="text-start">@Model.DiaChi</td>
+                        </tr>
+                        <tr>
+                            <th class="text-start pe-3">Mô tả:</th>
+                            <td class="text-start">@Model.MoTa</td>
+                        </tr>
+                        <tr>
+                            <th class="text-start pe-3">Ngày tạo:</th>
+                            <td class="text-start">@Model.ThoiGianTao?.ToString("dd/MM/yyyy")</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nút chỉnh sửa và xóa -->
+    <div class="text-center mt-4">
+        <a asp-area="Seller" asp-controller="Shop" asp-action="Edit" asp-route-id="@Model.IdCuaHang"
+           class="btn btn-warning btn-sm me-2"> <!-- Thu nhỏ nút -->
+            <i class="fas fa-edit"></i> Chỉnh sửa
+        </a>
+        <a asp-area="Seller" asp-controller="Shop" asp-action="Delete" asp-route-id="@Model.IdCuaHang"
+           class="btn btn-danger btn-sm"> <!-- Thu nhỏ nút -->
+            <i class="fas fa-trash-alt"></i> Xóa
+        </a>
+    </div>
+</div>
