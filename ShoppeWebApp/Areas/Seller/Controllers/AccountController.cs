@@ -26,44 +26,6 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
             return View();
         }
 
-        // [HttpPost]
-        // public async Task<IActionResult> Login(ViewModels.Seller.LoginViewModel model)
-        // {
-        //     if (ModelState.IsValid)
-        //     {
-        //         // Check the username and password against the database
-        //         var account = _context.Taikhoans
-        //             .FirstOrDefault(a => a.Username == model.Username && a.Password == model.Password);
-
-        //         if (account != null)
-        //         {
-        //             _context.Entry(account).Reference(i => i.IdNguoiDungNavigation).Load();
-        //             if (account.IdNguoiDungNavigation.VaiTro == Constants.SELLER_ROLE)
-        //             {
-        //                 Console.WriteLine($"Dang nhap cho seller, id={account.IdNguoiDung}");
-        //                 var identity = ViewModels.Authentication.AuthenticationInfo.CreateSellerIdentity(account.IdNguoiDung, account.Username);
-        //                 var principal = new ClaimsPrincipal(identity);
-        //                 var properties = new AuthenticationProperties
-        //                 {
-        //                     IsPersistent = true,
-        //                     ExpiresUtc = DateTimeOffset.UtcNow.AddDays(Constants.COOKIE_EXPIRY_DAYS), // 3 days
-        //                 };
-        //                 await HttpContext.SignInAsync("SellerSchema", principal, properties);
-        //             }
-        //             // Authentication successful
-        //             return RedirectToAction("Index", "Dashboard", new {area="Seller"});
-        //         }
-        //         else
-        //         {
-        //             // Authentication failed
-        //             ModelState.AddModelError(string.Empty, "Nhập sai mật khẩu hoặc tài khoản.");
-        //         }
-        //     }
-
-        //     // return View("SellerLogin", model);
-        //     return View(model);
-        // }
-
         [HttpPost]
         public async Task<IActionResult> Login(ViewModels.Seller.LoginViewModel model)
         {
@@ -83,7 +45,11 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
         
                         // Kiểm tra xem người dùng có cửa hàng hay không
                         var shop = _context.Cuahangs.FirstOrDefault(c => c.IdNguoiDung == account.IdNguoiDung);
-                        if (shop == null)
+                        var shopId = _context.Cuahangs
+                            .Where(c => c.IdNguoiDung == account.IdNguoiDung)
+                            .Select(c => c.IdCuaHang)
+                            .FirstOrDefault();
+                        if (shopId == null)
                         {
                             TempData["ErrorMessage"] = "Bạn chưa có cửa hàng. Vui lòng tạo cửa hàng mới.";
                             return RedirectToAction("Create", "Shop");
@@ -294,10 +260,32 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                 IdNguoiDung = newId
             };
 
+            // Tạo ID cho cửa hàng
+            var maxShopId = _context.Cuahangs
+                .OrderByDescending(shop => shop.IdCuaHang)
+                .Select(shop => shop.IdCuaHang)
+                .FirstOrDefault();
+
+            string newShopId = string.IsNullOrEmpty(maxShopId) ? "0000000001" : (long.Parse(maxShopId) + 1).ToString("D10");
+
+            var newShop = new Cuahang
+            {
+                IdCuaHang = newShopId,
+                IdNguoiDung = newId,
+                TenCuaHang = "Cửa hàng của " + model.HoVaTen, 
+                DiaChi = "Chưa cập nhật", 
+                MoTa = "Chưa cập nhật", 
+                Sdt = model.Sdt, 
+                UrlAnh = "/images/shop-dai-dien.png", 
+                ThoiGianTao = DateTime.Now,
+                TrangThai = 1
+            };
+
             try
             {
                 _context.Nguoidungs.Add(Nguoidung);
                 _context.Taikhoans.Add(Taikhoan);
+                _context.Cuahangs.Add(newShop);
                 _context.SaveChanges();
 
                 TempData["SuccessMessage"] = "Đăng ký thành công! Vui lòng đăng nhập.";

@@ -83,125 +83,107 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
         
             TempData["SuccessMessage"] = "Cửa hàng đã được khôi phục thành công.";
             return RedirectToAction("Index");
-        }
+        }  
 
         [HttpGet]
-        public IActionResult Edit(string id)
+        public IActionResult Edit()
         {
-            // Kiểm tra nếu ID cửa hàng không hợp lệ
-            if (string.IsNullOrEmpty(id))
+            // Lấy IdCuaHang từ Claim
+            var shopId = User.Claims.FirstOrDefault(c => c.Type == "IdCuaHang")?.Value;
+
+            if (string.IsNullOrEmpty(shopId))
             {
-                TempData["ErrorMessage"] = "ID cửa hàng không hợp lệ.";
-                return RedirectToAction("Index");
+                TempData["ErrorMessage"] = "Không thể xác định cửa hàng của bạn. Vui lòng đăng nhập lại.";
+                return RedirectToAction("Login", "Account");
             }
-        
+
             // Lấy thông tin cửa hàng từ cơ sở dữ liệu
             var shop = _context.Cuahangs
-                .Where(s => s.IdCuaHang == id)
-                .Select(s => new EditShopViewModel
+                .Where(c => c.IdCuaHang == shopId)
+                .Select(c => new EditShopViewModel
                 {
-                    IdCuaHang = s.IdCuaHang,
-                    TenCuaHang = s.TenCuaHang,
-                    IdSeller = s.IdNguoiDung,
-                    Sdt = s.Sdt,
-                    DiaChi = s.DiaChi,
-                    MoTa = s.MoTa,
-                    UrlAnhHienTai = s.UrlAnh
+                    IdCuaHang = c.IdCuaHang,
+                    TenCuaHang = c.TenCuaHang,
+                    Sdt = c.Sdt,
+                    DiaChi = c.DiaChi,
+                    MoTa = c.MoTa,
+                    UrlAnhHienTai = c.UrlAnh
                 })
                 .FirstOrDefault();
-        
-            // Kiểm tra nếu không tìm thấy cửa hàng
+
             if (shop == null)
             {
                 TempData["ErrorMessage"] = "Không tìm thấy cửa hàng.";
                 return RedirectToAction("Index");
             }
-        
-            // Truyền dữ liệu vào View
+
             return View(shop);
         }
-        
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public IActionResult Edit(EditShopViewModel model)
         {
-            // Kiểm tra tính hợp lệ của Model
+            // Lấy IdCuaHang từ Claim
+            var shopId = User.Claims.FirstOrDefault(c => c.Type == "IdCuaHang")?.Value;
+
+            if (string.IsNullOrEmpty(shopId))
+            {
+                TempData["ErrorMessage"] = "Không thể xác định cửa hàng của bạn. Vui lòng đăng nhập lại.";
+                return RedirectToAction("Login", "Account");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
-        
-            // Lấy thông tin cửa hàng từ cơ sở dữ liệu
-            var shop = _context.Cuahangs.FirstOrDefault(s => s.IdCuaHang == model.IdCuaHang);
+
+            // Lấy cửa hàng từ cơ sở dữ liệu
+            var shop = _context.Cuahangs.FirstOrDefault(c => c.IdCuaHang == shopId);
             if (shop == null)
             {
                 TempData["ErrorMessage"] = "Không tìm thấy cửa hàng.";
                 return RedirectToAction("Index");
             }
-        
-            // Kiểm tra tên cửa hàng không trùng với cửa hàng khác
-            if (_context.Cuahangs.Any(s => s.TenCuaHang == model.TenCuaHang && s.IdCuaHang != model.IdCuaHang))
-            {
-                ModelState.AddModelError(nameof(model.TenCuaHang), "Tên cửa hàng đã tồn tại.");
-                return View(model);
-            }
-        
-            // Kiểm tra số điện thoại không trùng với cửa hàng khác
-            if (_context.Cuahangs.Any(s => s.Sdt == model.Sdt && s.IdCuaHang != model.IdCuaHang))
-            {
-                ModelState.AddModelError(nameof(model.Sdt), "Số điện thoại đã được sử dụng bởi cửa hàng khác.");
-                return View(model);
-            }
-        
+
+
             // Cập nhật thông tin cửa hàng
             shop.TenCuaHang = model.TenCuaHang;
             shop.Sdt = model.Sdt;
             shop.DiaChi = model.DiaChi;
             shop.MoTa = model.MoTa;
-        
+
             // Xử lý ảnh mới nếu có
-            if (model.UrlAnhMoi != null && model.UrlAnhMoi.Length > 0)
+            if (model.UrlAnhMoi != null)
             {
-                // Đường dẫn lưu tệp
-                string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Images/Shop");
-                Directory.CreateDirectory(uploadsFolder); // Tạo thư mục nếu chưa tồn tại
-        
-                string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.UrlAnhMoi.FileName);
-                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-        
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                // Tạo tên file duy nhất bằng UUID
+                var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(model.UrlAnhMoi.FileName)}";
+            
+                // Đường dẫn lưu file
+                var uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/Shop");
+                var uploadPath = Path.Combine(uploadFolder, uniqueFileName);
+            
+                // Kiểm tra và tạo thư mục nếu chưa tồn tại
+                if (!Directory.Exists(uploadFolder))
+                {
+                    Directory.CreateDirectory(uploadFolder);
+                }
+            
+                // Lưu file vào thư mục
+                using (var fileStream = new FileStream(uploadPath, FileMode.Create))
                 {
                     model.UrlAnhMoi.CopyTo(fileStream);
                 }
-        
-                // Xóa ảnh cũ nếu không phải ảnh mặc định
-                if (!string.IsNullOrEmpty(shop.UrlAnh) && shop.UrlAnh != "/Images/shop-dai-dien.png")
-                {
-                    string oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", shop.UrlAnh.TrimStart('/'));
-                    if (System.IO.File.Exists(oldFilePath))
-                    {
-                        System.IO.File.Delete(oldFilePath);
-                    }
-                }
-        
-                // Lưu đường dẫn ảnh mới vào cơ sở dữ liệu
-                shop.UrlAnh = "/Images/Shop/" + uniqueFileName;
+            
+                // Cập nhật URL ảnh mới
+                shop.UrlAnh = $"/images/Shop/{uniqueFileName}";
             }
-        
-            try
-            {
-                // Lưu thay đổi vào cơ sở dữ liệu
-                _context.Cuahangs.Update(shop);
-                _context.SaveChanges();
-        
-                TempData["SuccessMessage"] = "Cập nhật thông tin cửa hàng thành công!";
-                return RedirectToAction("Index");
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "Đã xảy ra lỗi khi cập nhật cửa hàng: " + ex.Message);
-                return View(model);
-            }
+
+            // Lưu thay đổi vào cơ sở dữ liệu
+            _context.Cuahangs.Update(shop);
+            _context.SaveChanges();
+
+            TempData["SuccessMessage"] = "Cập nhật thông tin cửa hàng thành công!";
+            return RedirectToAction("Index");
         }
 
         [HttpGet]
