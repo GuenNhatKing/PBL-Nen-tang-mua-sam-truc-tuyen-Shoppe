@@ -82,7 +82,6 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                 .OrderBy(f => f.Date)
                 .ToList();
 
-            // Tạo ViewModel
             var viewModel = new DashboardViewModel
             {
                 DonChoXacNhan = _context.Chitietdonhangs
@@ -90,7 +89,9 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                     .Where(ct => ct.IdSanPhamNavigation != null &&
                                  ct.IdSanPhamNavigation.IdCuaHang == shopId &&
                                  ct.IdDonHangNavigation != null &&
-                                 ct.IdDonHangNavigation.TrangThai == Constants.CHO_XAC_NHAN)
+                                 ct.IdDonHangNavigation.TrangThai == Constants.CHO_XAC_NHAN &&
+                                 ct.IdDonHangNavigation.ThoiGianTao >= startDate &&
+                                 ct.IdDonHangNavigation.ThoiGianTao <= endDate)
                     .Select(ct => ct.IdDonHang)
                     .Distinct()
                     .Count(),
@@ -99,7 +100,9 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                     .Where(ct => ct.IdSanPhamNavigation != null &&
                                  ct.IdSanPhamNavigation.IdCuaHang == shopId &&
                                  ct.IdDonHangNavigation != null &&
-                                 ct.IdDonHangNavigation.TrangThai == Constants.DA_XAC_NHAN)
+                                 ct.IdDonHangNavigation.TrangThai == Constants.DA_XAC_NHAN &&
+                                 ct.IdDonHangNavigation.ThoiGianTao >= startDate &&
+                                 ct.IdDonHangNavigation.ThoiGianTao <= endDate)
                     .Select(ct => ct.IdDonHang)
                     .Distinct()
                     .Count(),
@@ -108,7 +111,9 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                     .Where(ct => ct.IdSanPhamNavigation != null &&
                                  ct.IdSanPhamNavigation.IdCuaHang == shopId &&
                                  ct.IdDonHangNavigation != null &&
-                                 ct.IdDonHangNavigation.TrangThai == Constants.DA_GIAO)
+                                 ct.IdDonHangNavigation.TrangThai == Constants.DA_GIAO &&
+                                 ct.IdDonHangNavigation.ThoiGianGiao >= startDate &&
+                                 ct.IdDonHangNavigation.ThoiGianGiao <= endDate)
                     .Select(ct => ct.IdDonHang)
                     .Distinct()
                     .Count(),
@@ -117,7 +122,9 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                     .Where(ct => ct.IdSanPhamNavigation != null &&
                                  ct.IdSanPhamNavigation.IdCuaHang == shopId &&
                                  ct.IdDonHangNavigation != null &&
-                                 ct.IdDonHangNavigation.TrangThai == Constants.HUY_DON_HANG)
+                                 ct.IdDonHangNavigation.TrangThai == Constants.HUY_DON_HANG &&
+                                 ct.IdDonHangNavigation.ThoiGianTao >= startDate &&
+                                 ct.IdDonHangNavigation.ThoiGianTao <= endDate)
                     .Select(ct => ct.IdDonHang)
                     .Distinct()
                     .Count(),

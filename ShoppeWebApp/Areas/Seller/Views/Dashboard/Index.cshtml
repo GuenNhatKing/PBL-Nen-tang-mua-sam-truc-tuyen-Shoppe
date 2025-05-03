@@ -85,29 +85,34 @@
         <table class="table table-bordered table-striped">
             <thead class="table-dark">
                 <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Tên sản phẩm</th>
-                    <th scope="col">Doanh thu</th>
+                    <th scope="col" style="width: 5%; text-align: center;">#</th>
+                    <th scope="col" style="width: 60%; font-size: 1.2rem;">Tên sản phẩm</th>
+                    <th scope="col" style="width: 35%; font-size: 1.2rem; text-align: right;">Doanh thu</th>
                 </tr>
             </thead>
             <tbody>
                 @if (Model.RevenueByProduct.Any())
-                    {
-                        foreach (var product in Model.RevenueByProduct)
-                        {
-                            <tr>
-                                <td>@product.ProductName</td>
-                                <td>@product.TotalRevenue.ToString("C0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))</td>
-                            </tr>
-                        }
-                    }
-                    else
+                {
+                    int index = 1; // Biến đếm để in số thứ tự
+                    foreach (var product in Model.RevenueByProduct)
                     {
                         <tr>
-                            <td colspan="2" class="text-center">Không có dữ liệu doanh thu theo sản phẩm.</td>
+                            <td style="text-align: center;">@index</td>
+                            <td style="font-size: 1.1rem;">@product.ProductName</td>
+                            <td style="font-size: 1.1rem; text-align: right;">
+                                @product.TotalRevenue.ToString("C0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))
+                            </td>
                         </tr>
+                        index++;
                     }
-                                </tbody>
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3" class="text-center">Không có dữ liệu doanh thu theo sản phẩm.</td>
+                    </tr>
+                }
+            </tbody>
         </table>
     </div>
 
