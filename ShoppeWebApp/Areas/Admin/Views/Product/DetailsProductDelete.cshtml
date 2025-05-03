@@ -1,0 +1,117 @@
+@model ShoppeWebApp.ViewModels.Admin.DetailsProductViewModel
+
+@{
+    Layout = "~/Areas/Admin/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <!-- Tiêu đề -->
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-white p-3" style="background-color: #dc3545; border-radius: 10px;">
+            Chi tiết sản phẩm
+        </h2>
+    </div>
+
+    <!-- Thông tin sản phẩm -->
+    <div class="p-4 border border-danger rounded" style="background-color: #fdfdfd;">
+        <div class="row">
+            <!-- Ảnh sản phẩm -->
+            <div class="col-md-4 text-center">
+                <label class="form-label fw-bold">Ảnh sản phẩm</label>
+                <div>
+                    <img src="@Url.Content("~/" + Model.UrlAnh)" alt="Ảnh sản phẩm" 
+                         class="img-thumbnail mb-3 shadow-sm" 
+                         style="width: 300px; height: 300px; object-fit: cover;" />
+                </div>
+            </div>
+
+            <!-- Thông tin chi tiết -->
+            <div class="col-md-8">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">ID Sản phẩm</label>
+                    <input type="text" class="form-control" value="@Model.IdSanPham" readonly style="background-color: #e9ecef; cursor: not-allowed;" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tên sản phẩm</label>
+                    <input type="text" class="form-control" value="@Model.TenSanPham" readonly style="background-color: #e9ecef; cursor: not-allowed;" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tên danh mục</label>
+                    <input type="text" class="form-control" value="@Model.TenDanhMuc" readonly style="background-color: #e9ecef; cursor: not-allowed;" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Giá gốc</label>
+                    <input type="text" class="form-control" value="@Model.GiaGoc.ToString("C")" readonly style="background-color: #e9ecef; cursor: not-allowed;" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Giá bán</label>
+                    <input type="text" class="form-control" value="@Model.GiaBan.ToString("C")" readonly style="background-color: #e9ecef; cursor: not-allowed;" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Số lượng kho</label>
+                    <input type="text" class="form-control" value="@Model.SoLuongKho" readonly style="background-color: #e9ecef; cursor: not-allowed;" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Số lượt bán</label>
+                    <input type="text" class="form-control" value="@Model.SoLuongBan" readonly style="background-color: #e9ecef; cursor: not-allowed;" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Số sao trung bình</label>
+                    <input type="text" class="form-control" 
+                           value="@(Model.SoLuotDG > 0 ? (Model.TongDiemDG / (double)Model.SoLuotDG).ToString("0.0") : "Chưa có đánh giá")" 
+                           readonly style="background-color: #e9ecef; cursor: not-allowed;" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Mô tả</label>
+                    <textarea class="form-control" readonly style="background-color: #e9ecef; cursor: not-allowed;">@Model.MoTa</textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Thời gian tạo</label>
+                    <input type="text" class="form-control" 
+                           value="@(Model.ThoiGianTao.HasValue ? Model.ThoiGianTao.Value.ToString("dd/MM/yyyy HH:mm:ss") : "")" 
+                           readonly style="background-color: #e9ecef; cursor: not-allowed;" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Nút hành động -->
+        <div class="text-end">
+            @if (Model.TrangThai == 1)
+            {
+                <!-- Nút khôi phục -->
+                <a href="javascript:void(0);" 
+                   class="btn btn-success btn-sm" 
+                   data-bs-toggle="modal" 
+                   data-bs-target="#confirmRestoreModal">
+                    <i class="fas fa-undo"></i> Khôi phục
+                </a>
+            }
+            <a asp-area="Admin" asp-controller="Product" asp-action="Index" asp-route-IdCuaHang="@Model.IdCuaHang" class="btn btn-secondary btn-sm">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xác nhận khôi phục -->
+<div class="modal fade" id="confirmRestoreModal" tabindex="-1" aria-labelledby="confirmRestoreModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmRestoreModalLabel">Xác nhận khôi phục</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc chắn muốn khôi phục sản phẩm này?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <form asp-area="Admin" asp-controller="Product" asp-action="Restore" method="post" class="d-inline">
+                    <input type="hidden" name="IdSanPham" value="@Model.IdSanPham" />
+                    <input type="hidden" name="IdCuaHang" value="@Model.IdCuaHang" />
+                    <button type="submit" class="btn btn-success">Khôi phục</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

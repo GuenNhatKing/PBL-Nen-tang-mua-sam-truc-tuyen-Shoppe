@@ -78,6 +78,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
                     TenSanPham = p.TenSanPham,
                     GiaGoc = p.GiaGoc,
                     GiaBan = p.GiaBan,
+                    TrangThai = p.TrangThai,
                     TyLeGiamGia = p.GiaGoc > 0 ? (int)((1 - (p.GiaBan / p.GiaGoc)) * 100) : 0, // Tính tỷ lệ giảm giá
                     SoLuongBan = p.SoLuongBan,
                     UrlAnh = p.UrlAnh
@@ -484,6 +485,93 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
                 // Xử lý lỗi nếu có
                 TempData["ErrorMessage"] = $"Đã xảy ra lỗi khi cập nhật trạng thái sản phẩm: {ex.Message}";
             }
+            return RedirectToAction("Index", new { IdCuaHang = idCuaHang });
+        }
+        
+        private bool CanRestoreProduct(DateTime? thoiGianXoa)
+        {
+            if (!thoiGianXoa.HasValue)
+            {
+                return true; // Nếu chưa bị xóa, có thể khôi phục
+            }
+        
+            // Kiểm tra nếu thời gian xóa vượt quá 30 ngày
+            return (DateTime.Now - thoiGianXoa.Value).TotalDays <= 30;
+        }
+        [HttpGet]
+        public IActionResult DetailsProductDelete(string idSanPham, string idCuaHang)
+        {
+            // Tìm sản phẩm theo ID
+            var sanPham = _context.Sanphams.FirstOrDefault(sp => sp.IdSanPham == idSanPham && sp.IdCuaHang == idCuaHang);
+            if (sanPham == null)
+            {
+                TempData["ErrorMessage"] = "Sản phẩm không tồn tại.";
+                return RedirectToAction("Index", new { IdCuaHang = idCuaHang });
+            }
+        
+            // Lấy thông tin danh mục
+            var danhMuc = _context.Danhmucs.FirstOrDefault(dm => dm.IdDanhMuc == sanPham.IdDanhMuc);
+
+            // Tính lại tổng điểm đánh giá và số lượt đánh giá
+            var danhGias = _context.Danhgia.Where(dg => dg.IdSanPham == idSanPham).ToList();
+            sanPham.TongDiemDanhGia = danhGias.Sum(dg => dg.DiemDanhGia);
+            sanPham.SoLuongDanhGia = danhGias.Count;
+            // Kiểm tra xem sản phẩm có thể khôi phục hay không
+            var canRestore = CanRestoreProduct(sanPham.ThoiGianXoa);
+
+            // Tạo ViewModel để truyền dữ liệu sang View
+            var viewModel = new DetailsProductViewModel
+            {
+                IdSanPham = sanPham.IdSanPham,
+                IdCuaHang = sanPham.IdCuaHang,
+                TenSanPham = sanPham.TenSanPham,
+                TenDanhMuc = danhMuc?.TenDanhMuc,
+                UrlAnh = sanPham.UrlAnh,
+                MoTa = sanPham.MoTa,
+                SoLuongKho = sanPham.SoLuongKho,
+                GiaGoc = sanPham.GiaGoc,
+                GiaBan = sanPham.GiaBan,
+                TrangThai = canRestore ? 1 : 0, // Nếu không thể khôi phục, trạng thái là 0
+                TongDiemDG = sanPham.TongDiemDanhGia,
+                SoLuotDG = sanPham.SoLuongDanhGia,
+                SoLuongBan = sanPham.SoLuongBan,
+                ThoiGianTao = sanPham.ThoiGianTao,
+                ThoiGianXoa = sanPham.ThoiGianXoa
+            };
+        
+            return View(viewModel);
+        }    
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Restore(string idSanPham, string idCuaHang)
+        {
+            // Tìm sản phẩm cần khôi phục
+            var sanPham = _context.Sanphams.FirstOrDefault(sp => sp.IdSanPham == idSanPham && sp.IdCuaHang == idCuaHang);
+            if (sanPham == null)
+            {
+                TempData["ErrorMessage"] = "Sản phẩm không tồn tại.";
+                return RedirectToAction("Index", new { IdCuaHang = idCuaHang });
+            }
+        
+            try
+            {
+                // Cập nhật trạng thái sản phẩm thành 1 (hoạt động)
+                sanPham.TrangThai = 1;
+        
+                // Xóa thời gian xóa (nếu có)
+                sanPham.ThoiGianXoa = null;
+        
+                // Lưu thay đổi vào cơ sở dữ liệu
+                _context.SaveChanges();
+        
+                TempData["SuccessMessage"] = "Sản phẩm đã được khôi phục thành công.";
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi nếu có
+                TempData["ErrorMessage"] = $"Đã xảy ra lỗi khi khôi phục sản phẩm: {ex.Message}";
+            }
+        
             return RedirectToAction("Index", new { IdCuaHang = idCuaHang });
         }
     }

@@ -30,6 +30,7 @@ namespace ShoppeWebApp.ViewModels.Admin
         public decimal GiaBan { get; set; } // Giá bán
         public int SoLuongBan { get; set; } // Số lượng đã bán
         public string? UrlAnh { get; set; } // URL ảnh sản phẩm
+        public int TrangThai { get; set; }
         public decimal TyLeGiamGia { get; set; } // Tỷ lệ giảm giá
 
         // Thuộc tính chỉ đọc để định dạng số lượng đã bán

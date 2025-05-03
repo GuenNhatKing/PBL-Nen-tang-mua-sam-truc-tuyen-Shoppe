@@ -20,5 +20,6 @@ namespace ShoppeWebApp.ViewModels.Admin
         public int SoLuotDG { get; set; }
         public int SoLuongBan { get; set; }
         public DateTime? ThoiGianTao { get; set; }
+        public DateTime? ThoiGianXoa { get; set; }
     }
 }
