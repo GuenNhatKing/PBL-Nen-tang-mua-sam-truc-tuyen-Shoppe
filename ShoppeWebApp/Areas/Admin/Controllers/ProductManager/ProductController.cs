@@ -406,5 +406,85 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
             TempData["SuccessMessage"] = "Cập nhật sản phẩm thành công.";
             return RedirectToAction("Edit", new { idSanPham = model.IdSanPham, idCuaHang = model.IdCuaHang });
         }
+
+
+        [HttpGet]
+        public IActionResult Delete(string idSanPham, string idCuaHang)
+        {
+            // Tìm sản phẩm theo ID
+            var sanPham = _context.Sanphams.FirstOrDefault(sp => sp.IdSanPham == idSanPham && sp.IdCuaHang == idCuaHang);
+            if (sanPham == null)
+            {
+                TempData["ErrorMessage"] = "Sản phẩm không tồn tại.";
+                return RedirectToAction("Index", new { IdCuaHang = idCuaHang });
+            }
+        
+            // Lấy thông tin danh mục
+            var danhMuc = _context.Danhmucs.FirstOrDefault(dm => dm.IdDanhMuc == sanPham.IdDanhMuc);
+        
+            // Kiểm tra xem sản phẩm có liên quan đến đơn hàng hay không
+            var hasOrders = _context.Chitietdonhangs.Any(ct => ct.IdSanPham == idSanPham);
+            if (hasOrders)
+            {
+                ViewBag.WarningMessage = "Sản phẩm này đang có trong đơn hàng. Việc xóa có thể ảnh hưởng đến dữ liệu đơn hàng.";
+            }
+        
+            // Tính lại tổng điểm đánh giá và số lượt đánh giá
+            var danhGias = _context.Danhgia.Where(dg => dg.IdSanPham == idSanPham).ToList();
+            sanPham.TongDiemDanhGia = danhGias.Sum(dg => dg.DiemDanhGia);
+            sanPham.SoLuongDanhGia = danhGias.Count;
+        
+            // Tạo ViewModel để truyền dữ liệu sang View
+            var viewModel = new DetailsProductViewModel
+            {
+                IdSanPham = sanPham.IdSanPham,
+                IdCuaHang = sanPham.IdCuaHang,
+                TenSanPham = sanPham.TenSanPham,
+                TenDanhMuc = danhMuc?.TenDanhMuc,
+                UrlAnh = sanPham.UrlAnh,
+                MoTa = sanPham.MoTa,
+                SoLuongKho = sanPham.SoLuongKho,
+                GiaGoc = sanPham.GiaGoc,
+                GiaBan = sanPham.GiaBan,
+                TrangThai = sanPham.TrangThai,
+                TongDiemDG = sanPham.TongDiemDanhGia,
+                SoLuotDG = sanPham.SoLuongDanhGia,
+                SoLuongBan = sanPham.SoLuongBan,
+                ThoiGianTao = sanPham.ThoiGianTao
+            };
+        
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(string idSanPham, string idCuaHang)
+        {
+            // Tìm sản phẩm cần cập nhật trạng thái
+            var sanPham = _context.Sanphams.FirstOrDefault(sp => sp.IdSanPham == idSanPham && sp.IdCuaHang == idCuaHang);
+            if (sanPham == null)
+            {
+                TempData["ErrorMessage"] = "Sản phẩm không tồn tại.";
+                return RedirectToAction("Index", new { IdCuaHang = idCuaHang });
+            }
+        
+            try
+            {
+                // Cập nhật trạng thái sản phẩm thành 0 (không hoạt động)
+                sanPham.TrangThai = 0;
+        
+                // Ghi nhận thời gian xóa
+                sanPham.ThoiGianXoa = DateTime.Now;
+        
+                // Lưu thay đổi vào cơ sở dữ liệu
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi nếu có
+                TempData["ErrorMessage"] = $"Đã xảy ra lỗi khi cập nhật trạng thái sản phẩm: {ex.Message}";
+            }
+            return RedirectToAction("Index", new { IdCuaHang = idCuaHang });
+        }
     }
 }
