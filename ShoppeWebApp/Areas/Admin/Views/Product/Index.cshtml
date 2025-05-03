@@ -19,20 +19,11 @@
 
             <!-- Nội dung chính căn giữa -->
             <div class="d-flex justify-content-center align-items-center text-center flex-wrap mt-4">
-                <!-- Ảnh cửa hàng -->
+                <!-- Ảnh sản phẩm-->
                 <div class="me-4">
-                    @if (!string.IsNullOrEmpty(Model.UrlAnhCuaHang))
-                    {
-                        <img src="@Url.Content(Model.UrlAnhCuaHang)" alt="Ảnh cửa hàng"
+                    <img src="@Url.Content(Model.UrlAnhCuaHang)" alt="Ảnh sản phẩm"
                             class="rounded-circle shadow-sm"
                             style="width: 150px; height: 150px; object-fit: cover;" />
-                    }
-                    else
-                    {
-                        <img src="/images/default-shop.png" alt="Ảnh cửa hàng"
-                            class="rounded-circle shadow-sm"
-                            style="width: 150px; height: 150px; object-fit: cover;" />
-                    }
                 </div>
 
                 <!-- Thông tin chi tiết -->
