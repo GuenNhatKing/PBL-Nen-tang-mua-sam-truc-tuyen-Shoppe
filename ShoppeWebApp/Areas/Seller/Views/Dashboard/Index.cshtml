@@ -2,12 +2,28 @@
 
 @{
     Layout = "~/Areas/Seller/Views/Shared/_MainLayout.cshtml";
+    ViewData["Title"] = "Dashboard";
 }
 
 <div class="container mt-4">
-    <h2 class="fw-bold mb-4">Danh sách cần làm</h2>
-    <p class="text-muted">Những việc bạn sẽ phải làm</p>
-    <div class="row g-4">
+    <h2 class="fw-bold mb-4">Dashboard</h2>
+
+    <!-- Bộ lọc thời gian -->
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <label for="startDate" class="form-label">Từ ngày</label>
+            <input type="date" class="form-control" id="startDate" name="startDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-4">
+            <label for="endDate" class="form-label">Đến ngày</label>
+            <input type="date" class="form-control" id="endDate" name="endDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Lọc</button>
+        </div>
+    </form>
+
+        <div class="row g-4">
         <!-- Hàng 1: 4 ô -->
         <div class="col-md-3">
             <div class="card shadow-sm bg-light border-primary">
@@ -62,4 +78,107 @@
             </div>
         </div>
     </div>
+
+    <!-- Doanh thu theo sản phẩm -->
+    <div class="mt-5">
+        <h4 class="fw-bold">Doanh thu theo sản phẩm</h4>
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col" style="width: 5%; text-align: center;">#</th>
+                    <th scope="col" style="width: 60%; font-size: 1.2rem;">Tên sản phẩm</th>
+                    <th scope="col" style="width: 35%; font-size: 1.2rem; text-align: right;">Doanh thu</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.RevenueByProduct.Any())
+                {
+                    int index = 1; // Biến đếm để in số thứ tự
+                    foreach (var product in Model.RevenueByProduct)
+                    {
+                        <tr>
+                            <td style="text-align: center;">@index</td>
+                            <td style="font-size: 1.1rem;">@product.ProductName</td>
+                            <td style="font-size: 1.1rem; text-align: right;">
+                                @product.TotalRevenue.ToString("C0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))
+                            </td>
+                        </tr>
+                        index++;
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3" class="text-center">Không có dữ liệu doanh thu theo sản phẩm.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Biểu đồ doanh thu theo ngày -->
+    <div class="mt-5">
+        <h4 class="fw-bold">Doanh thu theo ngày</h4>
+        <canvas id="revenueByDayChart"></canvas>
+    </div>
+
+
+    <!-- Biểu đồ tần suất đặt đơn hàng -->
+    <div class="mt-5">
+        <h4 class="fw-bold">Tần suất đặt đơn hàng</h4>
+        <canvas id="orderFrequencyChart"></canvas>
+    </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Doanh thu theo ngày
+        const revenueByDayData = {
+            labels: @Html.Raw(Json.Serialize(Model.RevenueByDay.Select(r => r.Date.ToString("dd/MM/yyyy")))),
+            datasets: [{
+                label: 'Doanh thu',
+                data: @Html.Raw(Json.Serialize(Model.RevenueByDay.Select(r => r.TotalRevenue))),
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.1
+            }]
+        };
+        new Chart(document.getElementById('revenueByDayChart'), {
+            type: 'line',
+            data: revenueByDayData
+        });
+
+        // Doanh thu theo sản phẩm
+        const revenueByProductData = {
+            labels: @Html.Raw(Json.Serialize(Model.RevenueByProduct.Select(r => r.ProductName))),
+            datasets: [{
+                label: 'Doanh thu',
+                data: @Html.Raw(Json.Serialize(Model.RevenueByProduct.Select(r => r.TotalRevenue))),
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 1
+            }]
+        };
+        new Chart(document.getElementById('revenueByProductChart'), {
+            type: 'bar',
+            data: revenueByProductData
+        });
+
+        // Tần suất đặt đơn hàng
+        const orderFrequencyData = {
+            labels: @Html.Raw(Json.Serialize(Model.OrderFrequency.Select(r => r.Date.ToString("dd/MM/yyyy")))),
+            datasets: [{
+                label: 'Số đơn hàng',
+                data: @Html.Raw(Json.Serialize(Model.OrderFrequency.Select(r => r.OrderCount))),
+                backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                borderColor: 'rgba(255, 159, 64, 1)',
+                borderWidth: 1
+            }]
+        };
+        new Chart(document.getElementById('orderFrequencyChart'), {
+            type: 'bar',
+            data: orderFrequencyData
+        });
+    </script>
+}

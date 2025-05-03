@@ -49,5 +49,8 @@
         public const int CHO_XAC_NHAN = 1;
         public const int DA_XAC_NHAN = 2;
         public const int DA_GIAO = 3;  
+
+        public const int TAM_KHOA = 0; //cho sp
+        public const int CON_HANG = 1; //con hang
     }
 }
