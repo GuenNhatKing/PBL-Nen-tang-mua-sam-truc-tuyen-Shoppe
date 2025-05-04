@@ -241,5 +241,6 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
 
             return View("DetailsProduct", viewModel);
         }
+
     }
 }
