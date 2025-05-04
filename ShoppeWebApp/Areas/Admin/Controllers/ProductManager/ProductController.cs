@@ -407,9 +407,6 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
             TempData["SuccessMessage"] = "Cập nhật sản phẩm thành công.";
             return RedirectToAction("Edit", new { idSanPham = model.IdSanPham, idCuaHang = model.IdCuaHang });
         }
-<<<<<<< HEAD
-=======
-
 
         [HttpGet]
         public IActionResult Delete(string idSanPham, string idCuaHang)
@@ -576,6 +573,5 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
         
             return RedirectToAction("Index", new { IdCuaHang = idCuaHang });
         }
->>>>>>> 43cfeb8bf730d19a06fadf42ca6f4114b0272659
     }
 }
