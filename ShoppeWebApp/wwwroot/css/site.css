@@ -502,6 +502,9 @@ ul {
     .btn-add-shopping-cart:hover {
         background-color: #fff3f0;
     }
+    .btn-add-shopping-cart:active {
+        background-color: #ffe6e0;
+    }
 
 .btn-buy {
     background-color: #f7542e;
@@ -519,6 +522,10 @@ ul {
 
     .btn-buy:hover {
         background-color: #e6451a;
+    }
+
+    .btn-buy:active {
+        background-color: #b33514;
     }
 
 .product-main-info-label {
@@ -564,42 +571,6 @@ ul {
     border: none;
     outline: none;
 }
-
-.btn-add-shopping-cart {
-    border: 1px solid #f7542e;
-    color: #f7542e;
-    background-color: #fff;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-}
-
-    .btn-add-shopping-cart:hover {
-        background-color: #fff3f0;
-    }
-
-.btn-buy {
-    background-color: #f7542e;
-    color: #fff;
-    border: none;
-    padding: 10px 24px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.3s ease;
-}
-
-    .btn-buy:hover {
-        background-color: #e6451a;
-    }
 
 .product-main-info-store {
     display: flex;

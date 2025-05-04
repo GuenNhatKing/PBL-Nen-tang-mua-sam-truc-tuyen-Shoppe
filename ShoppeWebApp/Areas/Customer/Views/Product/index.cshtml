@@ -225,11 +225,6 @@
 			success: function (response) {
 				if(response.isSuccess === true)
 					alert("Thêm vào giỏ hàng thành công!!");
-				else
-					alert("Thêm vào giỏ hàng thất bại!!" + response.message);
-			},
-			error: function () {
-				alert("Lỗi kết nối server!");
 			}
 		})
 	}
@@ -241,15 +236,8 @@
 			data: { IdSanPham: '@Model.IdSanPham', SoLuong: parseInt(quantityInput.value) || 0 },
 			dataType: "json",
 			success: function (response) {
-				if(response.isSuccess === true) {
+				if(response.isSuccess === true)
 					window.location.href = redirect;
-					alert("Thêm vào giỏ hàng thành công!!");
-				}
-				else
-					alert("Thêm vào giỏ hàng thất bại!!" + response.message);
-			},
-			error: function () {
-				alert("Lỗi kết nối server!");
 			}
 		})
 	}
