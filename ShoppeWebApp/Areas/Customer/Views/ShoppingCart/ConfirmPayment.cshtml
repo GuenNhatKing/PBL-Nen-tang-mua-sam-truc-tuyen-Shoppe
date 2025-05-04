@@ -1,0 +1,89 @@
+﻿@model ShoppingCartViewModel
+@{
+	ViewData["Title"] = "Xác nhận thanh toán";
+}
+<div class="template-2">
+	<div class="container-2 d-flex flex-column gap-4">
+		<div class="bg-white box-padding-15 border-rounded box-padding-left-30">
+			<h1>Xác nhận đơn hàng</h1>
+		</div>
+		<div class="bg-white box-padding-15 border-rounded box-padding-left-30">
+			<div class="d-flex box-padding-left-right-10 gap-3 text-highlight">
+				<div class="width-50">Sản phẩm</div>
+				<div class="width-12 text-center ms-auto">Đơn giá</div>
+				<div class="width-12 text-center">Số lượng</div>
+				<div class="width-12 text-center">Thành tiền</div>
+			</div>
+		</div>
+		<div class="bg-white box-padding-15 border-rounded box-padding-left-30">
+			@if (Model.danhSachCuaHang != null)
+			{
+				foreach (var shop in Model.danhSachCuaHang)
+				{
+					<div class="d-flex border-bottom-style-1 width-100 box-padding-10 gap-3">
+						<div class="text-highlight">@shop.TenCuaHang</div>
+					</div>
+
+					foreach (var product in shop.danhSachSanPham)
+					{
+						<div class="d-flex box-padding-10 gap-3 border-bottom-style-1">
+							<div class="width-50 d-flex gap-3">
+								<div class="width-height-80px graphic-cover-2">
+									<img src="/@product.UrlAnh" />
+								</div>
+								<div>
+									<div>@product.TenSanPham</div>
+								</div>
+							</div>
+							<div class="width-12 text-center ms-auto">
+								@string.Format("{0:#,##0} ₫", product.GiaBan)
+							</div>
+							<div class="width-12 text-center">
+								@product.SoLuong
+							</div>
+							<div class="width-12 text-center">
+								@string.Format("{0:#,##0} ₫", product.GiaBan * product.SoLuong)
+							</div>
+						</div>
+					}
+				}
+			}
+		</div>
+
+		<div class="bg-white box-padding-15 border-rounded box-padding-left-30">
+			<div class="d-flex gap-3 align-items-center justify-content-between">
+				<div class="text-highlight fw-bold">Tổng tiền:</div>
+				<div class="text-highlight fw-bold fs-5 width-12 text-center">
+					@if (Model.danhSachCuaHang != null)
+					{
+						<div>
+							@string.Format("{0:#,##0} ₫", Model.danhSachCuaHang
+							.SelectMany(s => s.danhSachSanPham)
+							.Sum(p => p.GiaBan * p.SoLuong))
+						</div>
+					}
+					else
+					{
+						<div>
+							0 ₫
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+
+		<div class="d-flex justify-content-end gap-3">
+			<form action="#" method="post">
+				@if (Model.danhSachCuaHang != null)
+				@foreach (var shop in Model.danhSachCuaHang)
+				{
+					foreach (var product in shop.danhSachSanPham)
+					{
+						<input type="hidden" name="danhSachSanPham" value="@product.IdSanPham" />
+					}
+				}
+				<button type="submit" class="invisible-button btn-buy">Xác nhận đặt hàng</button>
+			</form>
+		</div>
+	</div>
+</div>

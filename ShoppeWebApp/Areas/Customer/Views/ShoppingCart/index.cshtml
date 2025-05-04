@@ -40,7 +40,7 @@
 								<span class="checkmark"></span>
 							</label>
 						</div>
-						<div>
+						<div class="text-highlight">
 							@i.TenCuaHang
 						</div>
 					</div>
@@ -110,7 +110,7 @@
 						Tổng cộng (<span id="FinalCount">0</span> sản phẩm): <span id="FinalPrice" class="text-highlight">0 ₫</span>
 					</div>
 					<div>
-						<button class="invisible-button btn-buy">
+						<button class="invisible-button btn-buy" onclick="ConfirmPayment()">
 							Mua hàng
 						</button>
 					</div>
@@ -119,6 +119,8 @@
 		</div>
 	</div>
 </div>
+<form asp-controller="ShoppingCart" asp-action="ConfirmPayment" id="confirmForm" method="get">
+</form>
 
 <script>
 	const allCheckbox = document.getElementsByClassName('allCheck');
@@ -289,5 +291,25 @@
 			updateFinalPrice();
 			updateFinalCount();
 		})
+	}
+	function ConfirmPayment() {
+		let danhSachSanPham = [];
+		const products = document.querySelectorAll(`.itemCheck`);
+		for(let i of products) {
+			if(i.checked) {
+				let name = i.name;
+				let id = document.querySelector(`[name="${name}"].IdSanPham`).textContent;
+				danhSachSanPham.push(id.toString());
+			}
+		}
+		let form = document.getElementById("confirmForm");
+		for(let i of danhSachSanPham) {
+			let input = document.createElement("input");
+			input.type = "hidden";
+			input.name = "danhSachSanPham";
+			input.value = i;
+			form.appendChild(input);
+		}
+		form.submit();
 	}
 </script>

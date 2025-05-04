@@ -26,6 +26,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             }
             var allShops = await _context.Giohangs
             .Include(i => i.IdSanPhamNavigation)
+            .Where(i => i.IdNguoiDung == userId)
             .GroupBy(i => new
             {
                 IdCuaHang = i.IdSanPhamNavigation.IdCuaHang,
@@ -45,7 +46,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             {
                 i.danhSachSanPham = await _context.Giohangs
                 .Include(j => j.IdSanPhamNavigation)
-                .Where(j => j.IdSanPhamNavigation.IdCuaHang == i.IdCuaHang)
+                .Where(j => j.IdSanPhamNavigation.IdCuaHang == i.IdCuaHang && j.IdNguoiDung == userId)
                 .Select(j => new ShoppingCartProductInfo
                 {
                     IdSanPham = j.IdSanPham,
@@ -102,6 +103,51 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                 }
             }
             return Json(new JSResult(true, null));
+        }
+
+        public async Task<IActionResult> ConfirmPayment(string[] danhSachSanPham)
+        {
+            string? userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return NotFound();
+            }
+            var allShops = await _context.Giohangs
+            .Include(i => i.IdSanPhamNavigation)
+            .Where(i => i.IdNguoiDung == userId && danhSachSanPham.Contains(i.IdSanPham))
+            .GroupBy(i => new
+            {
+                IdCuaHang = i.IdSanPhamNavigation.IdCuaHang,
+            })
+            .Select(i => i.Key.IdCuaHang)
+            .ToListAsync();
+            var shoppingCart = new ShoppingCartViewModel();
+            foreach (var i in allShops)
+            {
+                shoppingCart.danhSachCuaHang.Add(new ShoppingCartShopProducts
+                {
+                    IdCuaHang = i,
+                    TenCuaHang = (await _context.Cuahangs.FirstOrDefaultAsync(j => j.IdCuaHang == i))?.TenCuaHang
+                });
+            }
+            foreach(var i in shoppingCart.danhSachCuaHang)
+            {
+                i.danhSachSanPham = await _context.Giohangs
+                .Include(j => j.IdSanPhamNavigation)
+                .Where(j => j.IdSanPhamNavigation.IdCuaHang == i.IdCuaHang && j.IdNguoiDung == userId && danhSachSanPham.Contains(j.IdSanPham))
+                .Select(j => new ShoppingCartProductInfo
+                {
+                    IdSanPham = j.IdSanPham,
+                    TenSanPham = j.IdSanPhamNavigation.TenSanPham,
+                    UrlAnh = j.IdSanPhamNavigation.UrlAnh,
+                    GiaBan = j.IdSanPhamNavigation.GiaBan,
+                    GiaGoc = j.IdSanPhamNavigation.GiaGoc,
+                    SoLuong = j.SoLuong,
+                    SoLuongKho = j.IdSanPhamNavigation.SoLuongKho,
+                })
+                .ToListAsync();
+            }
+            return View(shoppingCart);
         }
     }
 }
