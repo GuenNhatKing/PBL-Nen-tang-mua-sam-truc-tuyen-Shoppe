@@ -4,28 +4,24 @@ namespace ShoppeWebApp.ViewModels.Seller
 {
     public class EditShopViewModel
     {
-        public string? IdCuaHang { get; set; } 
+        public string? IdCuaHang { get; set; }
 
-        [Required(ErrorMessage = "Tên cửa hàng không được để trống.")]
+        [Required(ErrorMessage = "Tên cửa hàng là bắt buộc.")]
         [StringLength(100, ErrorMessage = "Tên cửa hàng không được vượt quá 100 ký tự.")]
-        public string? TenCuaHang { get; set; } 
+        public string? TenCuaHang { get; set; }
 
-        [Required(ErrorMessage = "ID chủ sở hữu không được để trống.")]
-        public string? IdSeller { get; set; } 
-
-        [Required(ErrorMessage = "Số điện thoại không được để trống.")]
+        [Required(ErrorMessage = "Số điện thoại là bắt buộc.")]
         [Phone(ErrorMessage = "Số điện thoại không hợp lệ.")]
-        public string? Sdt { get; set; } 
+        public string? Sdt { get; set; }
 
-        [Required(ErrorMessage = "Địa chỉ không được để trống.")]
-        public string? DiaChi { get; set; } 
+        [Required(ErrorMessage = "Địa chỉ là bắt buộc.")]
+        [StringLength(200, ErrorMessage = "Địa chỉ không được vượt quá 200 ký tự.")]
+        public string? DiaChi { get; set; }
 
-        [StringLength(500, ErrorMessage = "Mô tả không được vượt quá 500 ký tự.")]
-        public string? MoTa { get; set; } 
+        public string? MoTa { get; set; }
 
-        public string? UrlAnhHienTai { get; set; } 
+        public string? UrlAnhHienTai { get; set; }
 
-        [Display(Name = "Tải lên ảnh mới")]
-        public IFormFile? UrlAnhMoi { get; set; } 
+        public IFormFile? UrlAnhMoi { get; set; }
     }
 }

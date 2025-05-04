@@ -111,13 +111,17 @@
         margin-bottom: 25px;
         color: #333;
     }
+    .link-black {
+        color: black;
+        text-decoration: underline; 
+    }
 </style>
 
 <div class="form-wrapper">
     <div class="form-title">Đăng ký tài khoản người bán</div>
 
     <div class="customer-note">
-        Nếu bạn là <strong>người dùng</strong>, hãy <a asp-area="Customer" asp-controller="Account" asp-action="Register">đăng ký tại đây</a>.
+        Nếu bạn là <strong>người dùng</strong>, hãy <a asp-area="Customer" asp-controller="Account" asp-action="Register" style="color: black;">đăng ký tại đây</a>.
     </div>
 
     <form asp-area="Seller" asp-controller="Account" asp-action="Register" method="post">
@@ -176,7 +180,7 @@
     </form>
 
     <div class="form-footer">
-        <p>Bạn đã có tài khoản? <a asp-area="Seller" asp-controller="Account" asp-action="Login" class="fw-bold text-primary">Đăng nhập</a></p>
+        <p>Bạn đã có tài khoản? <a asp-area="Seller" asp-controller="Account" asp-action="Login" class="fw-bold text-dark">Đăng nhập</a></p>
     </div>
 </div>
 
