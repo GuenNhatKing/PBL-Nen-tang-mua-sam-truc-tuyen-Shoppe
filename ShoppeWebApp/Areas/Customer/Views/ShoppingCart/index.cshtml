@@ -120,6 +120,8 @@
 		for(let i of allCheckbox) {
 			i.checked = IsAllChecked;
 		}
+		updateFinalPrice();
+		updateFinalCount();
 	}
 	function updateShopCheckbox(group) {
 		let IsAllChecked = true;
@@ -145,6 +147,8 @@
 			for(let i of itemCheckbox) {
 				i.checked = isChecked;
 			}
+			updateFinalPrice();
+			updateFinalCount();
 		});
 	}
 	for(let checkbox of shopCheckbox) {
@@ -187,14 +191,30 @@
 
 	function updateFinalPrice() {
 		const checkedFinal = document.querySelectorAll(`.itemCheck`);
+		let finalPrice = 0;
 		for(let i of checkedFinal) {
-			let name = i.Name;
-			let total = document.querySelector(`[name="${name}"].Product-Total-Price`);
+			if(i.checked) {
+				let name = i.name;
+				let total = document.querySelector(`[name="${name}"].Product-Total-Price`);
+				finalPrice += parseInt(total.textContent.replace(/[^0-9]/g, '')) || 0;
+			}
 		}
+		let finalPriceObj = document.getElementById('FinalPrice');
+		finalPriceObj.textContent = formatCurrency(finalPrice);
 	}
 
 	function updateFinalCount() {
-
+		const checkedFinal = document.querySelectorAll(`.itemCheck`);
+		let finalCount = 0;
+		for(let i of checkedFinal) {
+			if(i.checked) {
+				let name = i.name;
+				let total = document.querySelector(`[name="${name}"].quantity-input`);
+				finalCount += parseInt(total.value.replace(/[^0-9]/g, '')) || 0;
+			}
+		}
+		let finalCountObj = document.getElementById('FinalCount');
+		finalCountObj.textContent = finalCount;
 	}
 
 	for (let btn of increaseBtn) {
@@ -214,6 +234,7 @@
 			updateQuantityDb(id, quantity.value);
 			updateTotalPrice(name);
 			updateFinalPrice();
+			updateFinalCount();
 		})
 	}
 
@@ -233,6 +254,8 @@
 			let id = document.querySelector(`[name="${name}"].IdSanPham`).textContent;
 			updateQuantityDb(id, quantity.value);
 			updateTotalPrice(name);
+			updateFinalPrice();
+			updateFinalCount();
 		})
 	}
 
@@ -251,6 +274,8 @@
 			let id = document.querySelector(`[name="${name}"].IdSanPham`).textContent;
 			updateQuantityDb(id, quantity.value);
 			updateTotalPrice(name);
+			updateFinalPrice();
+			updateFinalCount();
 		})
 	}
 </script>
