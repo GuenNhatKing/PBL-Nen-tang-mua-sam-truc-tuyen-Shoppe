@@ -1,8 +1,11 @@
-﻿namespace ShoppeWebApp.ViewModels.Customer
+﻿using ShoppeWebApp.Models;
+
+namespace ShoppeWebApp.ViewModels.Customer
 {
     public class ShoppingCartViewModel
     {
         public List<ShoppingCartShopProducts> danhSachCuaHang = new List<ShoppingCartShopProducts>();
+        public List<Thongtinlienhe> ThongTinLienHe = new List<Thongtinlienhe>();
     }
     public class ShoppingCartShopProducts
     {

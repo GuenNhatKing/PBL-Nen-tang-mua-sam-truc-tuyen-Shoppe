@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using AspNetCoreGeneratedDocument;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,11 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             {
                 return NotFound();
             }
+            var nguoiDung = await _context.Nguoidungs.FirstOrDefaultAsync(i => i.IdNguoiDung == userId);
+            if (nguoiDung == null)
+            {
+                return NotFound();
+            }
             var allShops = await _context.Giohangs
             .Include(i => i.IdSanPhamNavigation)
             .Where(i => i.IdNguoiDung == userId)
@@ -42,7 +48,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                     TenCuaHang = (await _context.Cuahangs.FirstOrDefaultAsync(j => j.IdCuaHang == i))?.TenCuaHang
                 });
             }
-            foreach(var i in shoppingCart.danhSachCuaHang)
+            foreach (var i in shoppingCart.danhSachCuaHang)
             {
                 i.danhSachSanPham = await _context.Giohangs
                 .Include(j => j.IdSanPhamNavigation)
@@ -75,19 +81,19 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             }
             var sanPham = await _context.Sanphams.FirstOrDefaultAsync(i => i.IdSanPham == IdSanPham);
             var nguoiDung = await _context.Nguoidungs.FirstOrDefaultAsync(i => i.IdNguoiDung == IdNguoiDung);
-            if(sanPham == null || nguoiDung == null)
+            if (sanPham == null || nguoiDung == null)
             {
                 return Json(new JSResult(false, null));
             }
             var gioHang = await _context.Giohangs.FirstOrDefaultAsync(i => i.IdSanPham == sanPham.IdSanPham && i.IdNguoiDung == nguoiDung.IdNguoiDung);
-            if(gioHang == null)
+            if (gioHang == null)
             {
                 return Json(new JSResult(true, null));
             }
             else
             {
                 int SoLuongMoi = SoLuong ?? 0;
-                if(SoLuongMoi < 0 || SoLuongMoi > sanPham.SoLuongKho)
+                if (SoLuongMoi < 0 || SoLuongMoi > sanPham.SoLuongKho)
                 {
                     return Json(new JSResult(false, null, "Số lượng không hợp lệ"));
                 }
@@ -97,10 +103,40 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                     _context.Giohangs.Update(gioHang);
                     await _context.SaveChangesAsync();
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     return Json(new JSResult(false, null));
                 }
+            }
+            return Json(new JSResult(true, null));
+        }
+
+        public async Task<JsonResult> RemoveFromCart(string? IdSanPham)
+        {
+            if(IdSanPham == null)
+            {
+                return Json(new JSResult(false, null));
+            }
+            string? userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Json(new JSResult(false, null));
+            }
+            var nguoiDung = await _context.Nguoidungs.FirstOrDefaultAsync(i => i.IdNguoiDung == userId);
+            if (nguoiDung == null)
+            {
+                return Json(new JSResult(false, null));
+            }
+            try
+            {
+                var cart = await _context.Giohangs.FirstOrDefaultAsync(i => i.IdSanPham == IdSanPham && i.IdNguoiDung == userId);
+                if(cart == null) return Json(new JSResult(false, null));
+                _context.Giohangs.Remove(cart);
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception)
+            {
+                return Json(new JSResult(false, null));
             }
             return Json(new JSResult(true, null));
         }
@@ -109,6 +145,11 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
         {
             string? userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
+            {
+                return NotFound();
+            }
+            var nguoiDung = await _context.Nguoidungs.FirstOrDefaultAsync(i => i.IdNguoiDung == userId);
+            if (nguoiDung == null)
             {
                 return NotFound();
             }
@@ -130,7 +171,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                     TenCuaHang = (await _context.Cuahangs.FirstOrDefaultAsync(j => j.IdCuaHang == i))?.TenCuaHang
                 });
             }
-            foreach(var i in shoppingCart.danhSachCuaHang)
+            foreach (var i in shoppingCart.danhSachCuaHang)
             {
                 i.danhSachSanPham = await _context.Giohangs
                 .Include(j => j.IdSanPhamNavigation)
@@ -147,6 +188,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                 })
                 .ToListAsync();
             }
+            shoppingCart.ThongTinLienHe = await _context.Thongtinlienhes.Where(i => i.IdNguoiDung == userId).ToListAsync();
             return View(shoppingCart);
         }
     }
