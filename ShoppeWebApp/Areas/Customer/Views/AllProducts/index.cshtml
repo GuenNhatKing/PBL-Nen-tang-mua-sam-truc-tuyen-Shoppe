@@ -44,6 +44,12 @@
                 </div>
             </div>
             <div class="products-container">
+                <form asp-controller="AllProducts" asp-action="Index" method="get" class="user-search-form">
+                    <input type="text" name="searchString" value="@Context.Request.Query["searchString"]"
+                           placeholder="Tìm kiếm sản phẩm"
+                           class="user-search-input" />
+                    <button type="submit" class="user-search-button">Tìm</button>
+                </form>
                 <div>
                     <ul class="products-list nostyle-ul">
                         @foreach(var item in Model.productInfos)

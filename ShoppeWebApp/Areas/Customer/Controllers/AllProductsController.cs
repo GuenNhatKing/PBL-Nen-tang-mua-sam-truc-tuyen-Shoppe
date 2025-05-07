@@ -18,15 +18,24 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
         {
             _context = context;
         }
-        public async Task<IActionResult> Index(int page = 1, string? IdDanhMuc = null)
+        public async Task<IActionResult> Index(int page = 1, string? IdDanhMuc = null, string? searchString = null)
         {
             AllProductInfo products = new AllProductInfo();
             products.categories = await _context.Danhmucs.ToListAsync();
             products.danhMuc = IdDanhMuc;
+            var query = _context.Sanphams.AsQueryable();
 
-            int totalProducts = IdDanhMuc == null ?
-                await _context.Sanphams.CountAsync()
-                : await _context.Sanphams.CountAsync(i => i.IdDanhMuc == IdDanhMuc);
+            if(IdDanhMuc != null)
+            {
+                query = query.Where(i => i.IdDanhMuc == IdDanhMuc);
+            }
+            if(searchString != null)
+            {
+                searchString = searchString.ToUpper();
+                query = query.Where(i => i.TenSanPham.ToUpper().Contains(searchString));
+            }
+
+            int totalProducts = await query.CountAsync();
 
             int totalPage = totalProducts % Constants.PAGINATION_SIZE == 0?
                 totalProducts / Constants.PAGINATION_SIZE
@@ -36,15 +45,10 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                 return NotFound();
             }
 
-            var pros = IdDanhMuc == null?
-                await _context.Sanphams
-                .OrderBy(i => i.IdSanPham)
-                .Skip((page - 1) * Constants.PAGINATION_SIZE)
-                .Take(Constants.PAGINATION_SIZE).ToListAsync() :
-                await _context.Sanphams.Where(i => i.IdDanhMuc == IdDanhMuc)
-                .OrderBy(i => i.IdSanPham)
+            var pros = await query.OrderBy(i => i.IdSanPham)
                 .Skip((page - 1) * Constants.PAGINATION_SIZE)
                 .Take(Constants.PAGINATION_SIZE).ToListAsync();
+
             foreach (var i in pros)
             {
                 products.productInfos.Add(new ItemInfo

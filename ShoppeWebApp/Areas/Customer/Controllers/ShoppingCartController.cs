@@ -227,7 +227,6 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                     await _context.SaveChangesAsync();
                     string? maxIdDonHang = await _context.Donhangs.OrderByDescending(i => i.IdDonHang)
                         .Select(i => i.IdDonHang).FirstOrDefaultAsync();
-                    Console.WriteLine(maxIdDonHang);
                     string newIdDonHang = "";
                     if(maxIdDonHang == null)
                     {
