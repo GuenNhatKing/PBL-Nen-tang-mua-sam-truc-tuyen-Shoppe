@@ -1,15 +1,12 @@
-﻿@* @model Profiles
+﻿@model Profiles
 @{
 	ViewData["Title"] = "Chỉnh sửa thông tin cá nhân";
 }
 <div class="profiles-edit-container">
 	<form asp-action="ChangeProfiles"
-		  asp-route-username="@User.Identity?.Name"
-		  asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier)?.Value"
 		  enctype="multipart/form-data"
 		  class="profiles-edit-form">
-
-		<input type="hidden" asp-for="MaNguoiDung" />
+		<input type="hidden" asp-for="IdNguoiDung" />
 		<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 		<div class="profiles-edit-avatar-wrapper">
 			@if (Model.UrlAnhDaiDien != null)
@@ -26,12 +23,6 @@
 			<label asp-for="HoVaTen" class="profiles-label">Họ và tên</label>
 			<input asp-for="HoVaTen" class="profiles-input" />
 			<span asp-validation-for="HoVaTen" class="profiles-error"></span>
-		</div>
-
-		<div class="profiles-edit-field">
-			<label asp-for="NgaySinh" class="profiles-label">Ngày sinh</label>
-			<input asp-for="NgaySinh" type="date" class="profiles-input" />
-			<span asp-validation-for="NgaySinh" class="profiles-error"></span>
 		</div>
 
 		<div class="profiles-edit-field">
@@ -57,11 +48,8 @@
 
 		<div class="profiles-edit-actions">
 			<a asp-controller="Profiles" asp-action="Index"
-			   asp-route-username="@User.Identity?.Name"
-			   asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier)?.Value"
 			   class="profiles-cancel-button">Huỷ</a>
-			<input type="submit" value="Lưu Thay Đổi" class="profiles-save-button" />
+			<input @* type="submit" *@ value="Lưu Thay Đổi" class="profiles-save-button" />
 		</div>
 	</form>
 </div>
- *@

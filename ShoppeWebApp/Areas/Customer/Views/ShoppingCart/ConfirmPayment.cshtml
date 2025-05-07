@@ -5,7 +5,7 @@
 
 <div id="address-box" class="overlay-box" style="display: none">
 	<div class="address-box">
-		<h3>Thông tin liên hệ</h3>
+		<h4>Thông tin liên hệ</h4>
 		@{
 			bool first = true;
 			foreach(var i in Model.ThongTinLienHe)
@@ -36,8 +36,10 @@
 				</div>
 			}
 		}
-		<button id="confirmBtn">OK</button>
-		<button id="cancelBtn">Huỷ</button>
+		<div class="d-flex gap-2 mt-3 justify-content-end">
+			<button id="cancelBtn" class="invisible-button btn-cancel">Huỷ</button>
+			<button id="confirmBtn" class="invisible-button btn-confirm">OK</button>
+		</div>
 	</div>
 </div>
 

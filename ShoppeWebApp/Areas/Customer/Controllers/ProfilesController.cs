@@ -40,39 +40,24 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             };
             return View(profiles);
         }
-        //public async Task<IActionResult> ChangeProfiles(string? username, int? id)
-        //{
-        //    if (username == null || id == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    int? currUserId = GetUserId();
-        //    string? currUsername = HttpContext.User.Identity?.Name;
-        //    if (currUserId == null || currUsername == null || username != currUsername || id != currUserId)
-        //    {
-        //        return RedirectToAction("AccessDenied", "Authentication", new { area = "" });
-        //    }
-        //    var user = await _context.NguoiDungs.FirstOrDefaultAsync(i => i.MaNguoiDung == id);
-        //    if (user == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    var profiles = new Profiles
-        //    {
-        //        MaNguoiDung = user.MaNguoiDung,
-        //        Email = user.Email,
-        //        HoVaTen = user.HoVaTen,
-        //        NgaySinh = user.NgaySinh,
-        //        NgaySinhCompute = user.ThoiGianCompute,
-        //        SoDienThoai = user.SoDienThoai,
-        //        UrlAnhDaiDien = user.UrlAnhDaiDien,
-        //        SoKhoaHocDaDangKi = await _context.DangKiKhoaHocs.CountAsync(i => i.MaHocVien == user.MaNguoiDung),
-        //        SoKhoaHocDangHoc = await _context.DangKiKhoaHocs.CountAsync(i => i.MaHocVien == user.MaNguoiDung
-        //        && (_context.KhoaHocs.FirstOrDefault(j => j.MaKhoaHoc == i.MaKhoaHoc)!).ThoiGianKhaiGiang <= DateTime.Now && i.TienDo < 100),
-        //        SoKhoaHocDaHoanThanh = await _context.DangKiKhoaHocs.CountAsync(i => i.MaHocVien == user.MaNguoiDung && i.TienDo == 100),
-        //    };
-        //    return View(profiles);
-        //}
+        public async Task<IActionResult> ChangeProfiles(string? username, int? id)
+        {
+            string? currUserId = GetUserId();
+            var user = await _context.Nguoidungs.FirstOrDefaultAsync(i => i.IdNguoiDung == currUserId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            var profiles = new Profiles
+            {
+                IdNguoiDung = user.IdNguoiDung,
+                Email = user.Email,
+                HoVaTen = user.HoVaTen,
+                SoDienThoai = user.Sdt,
+                UrlAnhDaiDien = user.UrlAnh,
+            };
+            return View(profiles);
+        }
         //[HttpPost]
         //public async Task<IActionResult> ChangeProfiles(string? username, int? id, Profiles profiles, IFormFile? AnhDaiDien = null)
         //{
