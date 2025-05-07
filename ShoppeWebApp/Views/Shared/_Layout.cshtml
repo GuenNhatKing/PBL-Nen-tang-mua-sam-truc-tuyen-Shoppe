@@ -31,6 +31,7 @@
                         <div class="d-flex auth-cart gap-3 center-content">
                             @if (User.IsInRole("Customer") || User.IsInRole("Admin"))
                             {
+                                <a asp-area="Customer" asp-controller="Profiles" asp-action="Index" class="tab-link align-content-center">Hồ sơ</a>
                                 <form asp-area="Customer" asp-controller="Account" asp-action="Logout" method="post">
                                     <button type="submit" class="invisible-button align-content-center tab-link">Đăng xuất</button>
                                 </form>

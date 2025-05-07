@@ -189,9 +189,9 @@
 	}
 
 	for(let btn of removeBtn) {
-		btn.addEventListener('click', async function() {
+		btn.addEventListener('click', function() {
 			let btnName = this.name;
-			await $.ajax({
+			$.ajax({
 				url: '@Url.Action("RemoveFromCart", "ShoppingCart")',
 				type: 'POST',
 				data: { IdSanPham: btnName },
@@ -207,17 +207,20 @@
 					}
 				},
 			})
-			updateFinalPrice();
-			updateFinalCount();
+			.then(function() {
+				updateFinalPrice();
+				updateFinalCount();
+			});
 		})
 	}
 
 	for(let btn of removeCheckedBtn) {
-		btn.addEventListener('click', async function() {
+		btn.addEventListener('click', function() {
+			let requests = [];
 			for(let i of itemCheckbox) {
 				if(i.checked === true) {
 					let btnName = i.name;
-					await $.ajax({
+					let request = $.ajax({
 						url: '@Url.Action("RemoveFromCart", "ShoppingCart")',
 						type: 'POST',
 						data: { IdSanPham: btnName },
@@ -233,10 +236,13 @@
 							}
 						},
 					})
+					requests.push(request);
 				}
 			}
-			updateFinalPrice();
-			updateFinalCount();
+			Promise.all(requests).then(() => {
+				updateFinalPrice();
+				updateFinalCount();
+			});
 		})
 	}
 
@@ -352,21 +358,28 @@
 	function ConfirmPayment() {
 		let danhSachSanPham = [];
 		const products = document.querySelectorAll(`.itemCheck`);
+		let count = 0;
 		for(let i of products) {
 			if(i.checked) {
+				count++;
 				let name = i.name;
 				let id = document.querySelector(`[name="${name}"].IdSanPham`).textContent;
 				danhSachSanPham.push(id.toString());
 			}
 		}
-		let form = document.getElementById("confirmForm");
-		for(let i of danhSachSanPham) {
-			let input = document.createElement("input");
-			input.type = "hidden";
-			input.name = "danhSachSanPham";
-			input.value = i;
-			form.appendChild(input);
+		if(count === 0) {
+			alert("Bạn chưa chọn sản phẩm nào!");
+		} 
+		else {
+			let form = document.getElementById("confirmForm");
+			for(let i of danhSachSanPham) {
+				let input = document.createElement("input");
+				input.type = "hidden";
+				input.name = "danhSachSanPham";
+				input.value = i;
+				form.appendChild(input);
+			}
+			form.submit();
 		}
-		form.submit();
 	}
 </script>

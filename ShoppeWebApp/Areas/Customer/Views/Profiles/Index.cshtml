@@ -1,0 +1,49 @@
+﻿@model Profiles
+@{
+	ViewData["Title"] = "Trang cá nhân";
+}
+<div class="profiles-wrapper">
+	<div class="profiles-sidebar">
+		<div class="profiles-avatar-wrapper">
+			@if (Model.UrlAnhDaiDien != null)
+			{
+				<img src="~/images/@Model.UrlAnhDaiDien" class="profiles-avatar" />
+			}
+			else
+			{
+				<img src="~/Resource/user.png" class="profiles-avatar" />
+			}
+		</div>
+		<div class="profiles-name">@Html.DisplayFor(model => model.HoVaTen)</div>
+		<div class="profiles-username">@Html.DisplayFor(model => model.Email)</div>
+		<a class="profiles-edit-button" asp-action="ChangeProfiles" asp-route-username="@User.Identity?.Name" asp-route-id="@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value">
+			Chỉnh sửa thông tin
+		</a>
+	</div>
+
+	<div class="profiles-main">
+		<div class="profiles-info-section">
+			<h2 class="profiles-section-title">
+				<strong>Thông tin cá nhân</strong>
+			</h2>
+
+			<div class="profiles-info-item">
+				<strong>CCCD:</strong>
+				<div>@Html.DisplayFor(model => model.Cccd)</div>
+			</div>
+
+			<div class="profiles-info-item">
+				<strong>Số Điện Thoại:</strong>
+				<div>@Html.DisplayFor(model => model.SoDienThoai)</div>
+			</div>
+			<div class="profiles-info-item">
+				<strong>Địa chỉ:</strong>
+				<div>@Html.DisplayFor(model => model.DiaChi)</div>
+			</div>
+			<div class="profiles-info-item">
+				<strong>Số dư tài khoản:</strong>
+				<div>@Html.DisplayFor(model => model.SoDu)</div>
+			</div>
+		</div>
+	</div>
+</div>
