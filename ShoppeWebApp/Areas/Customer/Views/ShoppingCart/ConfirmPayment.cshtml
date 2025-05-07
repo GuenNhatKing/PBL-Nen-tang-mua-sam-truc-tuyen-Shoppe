@@ -8,31 +8,33 @@
 		<h4>Thông tin liên hệ</h4>
 		@{
 			bool first = true;
-			foreach(var i in Model.ThongTinLienHe)
+			foreach (var i in Model.ThongTinLienHe)
 			{
 				<div class="d-flex gap-3 mt-3">
-					<div>
-						@if(first)
-						{
-							<input type="radio" name="address-info" checked/>
-							first = false;
-						}
-						else
-						{
-							<input type="radio" name="address-info" />
-						}
-					</div>
-					<div>
-						<strong>
-							@i.HoVaTen
-						</strong>
-					</div>
-					<div>
-						@i.Sdt
-					</div>
-					<div>
-						@i.DiaChi
-					</div>
+					@if (first)
+					{
+						<input class="address-radio" type="radio" id="address-@i.IdLienHe"
+						name="address-info" data-group="@i.IdLienHe" checked />
+						first = false;
+					}
+					else
+					{
+						<input class="address-radio" type="radio" id="address-@i.IdLienHe"
+						name="address-info" data-group="@i.IdLienHe" />
+					}
+					<label for="address-@i.IdLienHe">
+						<span>
+							<strong class="address-radio info-name" data-group="@i.IdLienHe">
+								@i.HoVaTen
+							</strong>
+						</span>
+						<span class="address-radio info-phone" data-group="@i.IdLienHe">
+							@i.Sdt
+						</span>
+						<span class="address-radio info-address" data-group="@i.IdLienHe">
+							@i.DiaChi
+						</span>
+					</label>
 				</div>
 			}
 		}
@@ -56,19 +58,19 @@
 				{
 					<div class="d-flex gap-3 mt-3">
 						<div>
-							<strong>
+							<strong id="name-display">
 								@ttlh.HoVaTen
 							</strong>
 						</div>
-						<div>
+						<div id="phone-display">
 							@ttlh.Sdt
 						</div>
-						<div>
+						<div id="address-display">
 							@ttlh.DiaChi
 						</div>
 						<div>
 							<button id="change-address" class="invisible-button delete-product-shopcart-button">
-							Thay đổi
+								Thay đổi
 							</button>
 						</div>
 					</div>
@@ -126,8 +128,8 @@
 					{
 						<div>
 							@string.Format("{0:#,##0} ₫", Model.danhSachCuaHang
-																.SelectMany(s => s.danhSachSanPham)
-																.Sum(p => p.GiaBan * p.SoLuong))
+																										.SelectMany(s => s.danhSachSanPham)
+																										.Sum(p => p.GiaBan * p.SoLuong))
 						</div>
 					}
 					else
@@ -141,7 +143,7 @@
 		</div>
 
 		<div class="d-flex justify-content-end gap-3">
-			<form action="#" method="post">
+			<form asp-controller="ShoppingCart" asp-action="Payment" method="post">
 				@if (Model.danhSachCuaHang != null)
 					@foreach (var shop in Model.danhSachCuaHang)
 					{
@@ -150,6 +152,14 @@
 							<input type="hidden" name="danhSachSanPham" value="@product.IdSanPham" />
 						}
 					}
+				@if (@ttlh != null)
+				{
+					<input name="IdLienHe" id="IdLienHe" value="@ttlh.IdLienHe" type="hidden" readonly />
+				}
+				else
+				{
+					<input name="IdLienHe" id="IdLienHe" type="hidden" readonly />
+				}
 				<button type="submit" class="invisible-button btn-buy">Xác nhận đặt hàng</button>
 			</form>
 		</div>
@@ -162,9 +172,26 @@
 	let cancelAddressBtn = document.getElementById('cancelBtn');
 	changeAddressBtn.addEventListener('click', function() {
 		document.getElementById('address-box').style.display = 'flex';
-	});	
+	});
 	confirmAddressBtn.addEventListener('click', function() {
 		document.getElementById('address-box').style.display = 'none';
+				let info = document.querySelectorAll('.address-radio');
+		for(let i of info) {
+			if(i.checked === true) {
+				let group = i.dataset.group;
+				let nameInfo = document.querySelector(`.address-radio.info-name[data-group="${group}"]`);
+				let phoneInfo = document.querySelector(`.address-radio.info-phone[data-group="${group}"]`);
+				let addressInfo = document.querySelector(`.address-radio.info-address[data-group="${group}"]`);
+				let nameDis = document.getElementById('name-display');
+				let phoneDis = document.getElementById('phone-display');
+				let addressDis = document.getElementById('address-display');
+				let idLienHe = document.getElementById('IdLienHe');
+				nameDis.textContent = nameInfo.textContent;
+				phoneDis.textContent = phoneInfo.textContent;
+				addressDis.textContent = addressInfo.textContent;
+				idLienHe.value = group;
+			}
+		}
 	});
 	cancelAddressBtn.addEventListener('click', function() {
 		document.getElementById('address-box').style.display = 'none';

@@ -113,7 +113,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
 
         public async Task<JsonResult> RemoveFromCart(string? IdSanPham)
         {
-            if(IdSanPham == null)
+            if (IdSanPham == null)
             {
                 return Json(new JSResult(false, null));
             }
@@ -130,11 +130,11 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             try
             {
                 var cart = await _context.Giohangs.FirstOrDefaultAsync(i => i.IdSanPham == IdSanPham && i.IdNguoiDung == userId);
-                if(cart == null) return Json(new JSResult(false, null));
+                if (cart == null) return Json(new JSResult(false, null));
                 _context.Giohangs.Remove(cart);
                 await _context.SaveChangesAsync();
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return Json(new JSResult(false, null));
             }
@@ -190,6 +190,92 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             }
             shoppingCart.ThongTinLienHe = await _context.Thongtinlienhes.Where(i => i.IdNguoiDung == userId).ToListAsync();
             return View(shoppingCart);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Payment(string[] danhSachSanPham, string IdLienHe)
+        {
+            string? userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return NotFound();
+            }
+            var nguoiDung = await _context.Nguoidungs.FirstOrDefaultAsync(i => i.IdNguoiDung == userId);
+            if (nguoiDung == null)
+            {
+                return NotFound();
+            }
+
+            var sanPhams = await _context.Sanphams
+            .Where(i => danhSachSanPham.Contains(i.IdSanPham))
+            .ToListAsync();
+            decimal tongTien = 0;
+            foreach (var i in sanPhams)
+            {
+                tongTien += i.GiaBan;
+            }
+            using (var trans = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    string? maxIdDonHang = await _context.Donhangs.OrderByDescending(i => i.IdDonHang)
+                        .Select(i => i.IdDonHang).FirstOrDefaultAsync();
+                    Console.WriteLine(maxIdDonHang);
+                    string newIdDonHang = "";
+                    if(maxIdDonHang == null)
+                    {
+                        newIdDonHang = "DH-" + new String('0', 7);
+                    }
+                    else
+                    {
+                        string[] field = maxIdDonHang.Split('-');
+                        int? num = Convert.ToInt32(field[1]);
+                        if (num == null) throw new InvalidDataException("Id khong dung dinh dang");
+                        else
+                        {
+                            int newId = (int)num + 1;
+                            newIdDonHang = "DH-" + newId.ToString("D7");
+                        }
+                    }
+                    var donHang = new Donhang
+                    {
+                        IdDonHang = newIdDonHang,
+                        IdLienHe = IdLienHe,
+                        TongTien = tongTien,
+                        TrangThai = Constants.CHO_XAC_NHAN,
+                        ThoiGianTao = DateTime.UtcNow,
+                    };
+                    _context.Donhangs.Add(donHang);
+                    await _context.SaveChangesAsync();
+                    foreach(var i in sanPhams)
+                    {
+                        var productDetails = new Chitietdonhang
+                        {
+                            IdDonHang = donHang.IdDonHang,
+                            IdSanPham = i.IdSanPham,
+                            DonGia = i.GiaBan,
+                            SoLuong = (await _context.Giohangs.FirstOrDefaultAsync(j => j.IdSanPham == i.IdSanPham && j.IdNguoiDung == userId))!.SoLuong,
+                        };
+                        _context.Chitietdonhangs.Add(productDetails);
+                    }
+                    await _context.SaveChangesAsync();
+                    // Xoa khoi gio hang
+                    var gioHangs = await _context.Giohangs
+                        .Where(i => i.IdNguoiDung == userId && danhSachSanPham.Contains(i.IdSanPham))
+                        .ToListAsync();
+                    foreach(var i in gioHangs)
+                    {
+                        _context.Giohangs.Remove(i);
+                    }
+                    await _context.SaveChangesAsync();
+                    await trans.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    await trans.RollbackAsync();
+                }
+            }
+            return RedirectToAction("Index", "Profiles");
         }
     }
 }

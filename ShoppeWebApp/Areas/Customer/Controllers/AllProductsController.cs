@@ -31,8 +31,6 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             int totalPage = totalProducts % Constants.PAGINATION_SIZE == 0?
                 totalProducts / Constants.PAGINATION_SIZE
                 :totalProducts / Constants.PAGINATION_SIZE + 1;
-            Console.WriteLine($"Total products: {totalProducts}");
-            Console.WriteLine($"Total pages: {totalPage}");
             if (totalPage != 0 && (page < 1 || page > totalPage))
             {
                 return NotFound();

@@ -758,7 +758,7 @@ ul {
 
 .address-box {
     background: white;
-    padding: 20px;
+    padding: 40px 30px;
     border-radius: 10px;
     text-align: center;
     min-width: 300px;
@@ -1079,3 +1079,7 @@ ul {
     .profiles-cancel-button:active {
         background-color: #cbd5e1;
     }
+
+.address-radio:hover {
+    cursor: pointer;
+}

@@ -18,7 +18,6 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
 
         public async Task<IActionResult> index(string? id = null)
         {
-            Console.WriteLine($"ID: {id}");
             if (id == null)
             {
                 return NotFound();
