@@ -211,12 +211,20 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             decimal tongTien = 0;
             foreach (var i in sanPhams)
             {
-                tongTien += i.GiaBan;
+                int? soLuong = (await _context.Giohangs.FirstOrDefaultAsync())?.SoLuong;
+                tongTien += i.GiaBan * (soLuong ?? 0);
+            }
+            if(nguoiDung.SoDu < tongTien)
+            {
+                return RedirectToAction("Index", "Profiles");
             }
             using (var trans = _context.Database.BeginTransaction())
             {
                 try
                 {
+                    nguoiDung.SoDu -= tongTien;
+                    _context.Nguoidungs.Update(nguoiDung);
+                    await _context.SaveChangesAsync();
                     string? maxIdDonHang = await _context.Donhangs.OrderByDescending(i => i.IdDonHang)
                         .Select(i => i.IdDonHang).FirstOrDefaultAsync();
                     Console.WriteLine(maxIdDonHang);
