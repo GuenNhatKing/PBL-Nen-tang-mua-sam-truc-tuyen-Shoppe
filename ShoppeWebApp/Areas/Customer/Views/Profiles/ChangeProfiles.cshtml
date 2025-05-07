@@ -11,11 +11,11 @@
 		<div class="profiles-edit-avatar-wrapper">
 			@if (Model.UrlAnhDaiDien != null)
 			{
-				<img src="~/images/@Model.UrlAnhDaiDien" class="profiles-edit-avatar" />
+				<img src="~/@Model.UrlAnhDaiDien" class="profiles-edit-avatar" />
 			}
 			else
 			{
-				<img src="~/Resource/user.png" class="profiles-edit-avatar" />
+				<img src="~/images/avatar-mac-dinh.jpg" class="profiles-edit-avatar" />
 			}
 		</div>
 
@@ -23,6 +23,12 @@
 			<label asp-for="HoVaTen" class="profiles-label">Họ và tên</label>
 			<input asp-for="HoVaTen" class="profiles-input" />
 			<span asp-validation-for="HoVaTen" class="profiles-error"></span>
+		</div>
+
+		<div class="profiles-edit-field">
+			<label asp-for="Cccd" class="profiles-label">CCCD</label>
+			<input asp-for="Cccd" class="profiles-input" />
+			<span asp-validation-for="Cccd" class="profiles-error"></span>
 		</div>
 
 		<div class="profiles-edit-field">

@@ -9,7 +9,6 @@ namespace ShoppeWebApp.ViewModels.Customer
         [ValidateNever]
         public string? UrlAnhDaiDien { get; set; }
         public string HoVaTen { get; set; } = null!;
-        [ValidateNever]
         public string Cccd { get; set; } = null!;
         public string SoDienThoai { get; set; } = null!;
         public string Email { get; set; } = null!;

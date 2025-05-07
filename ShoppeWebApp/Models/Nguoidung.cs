@@ -16,7 +16,7 @@ public partial class Nguoidung
     [StringLength(50)]
     public string HoVaTen { get; set; } = null!;
 
-    [StringLength(100)]
+    [StringLength(2048)]
     public string? UrlAnh { get; set; } = null!;
 
     [Column("CCCD")]

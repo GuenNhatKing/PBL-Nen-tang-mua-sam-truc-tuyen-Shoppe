@@ -20,7 +20,7 @@ public partial class Cuahang
     [StringLength(100)]
     public string TenCuaHang { get; set; } = null!;
 
-    [StringLength(100)]
+    [StringLength(2048)]
     public string UrlAnh { get; set; } = null!;
 
     [Column(TypeName ="longtext")]

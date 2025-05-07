@@ -24,7 +24,7 @@ public partial class Sanpham
     [StringLength(100)]
     public string TenSanPham { get; set; } = null!;
 
-    [StringLength(100)]
+    [StringLength(2048)]
     public string UrlAnh { get; set; } = null!;
 
     [Column(TypeName ="longtext")]

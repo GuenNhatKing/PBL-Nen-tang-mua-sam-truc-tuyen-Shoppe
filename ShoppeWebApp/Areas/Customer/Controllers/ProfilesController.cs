@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using QLTTDT.Services;
 using ShoppeWebApp.Data;
 using ShoppeWebApp.Models;
 using ShoppeWebApp.ViewModels.Customer;
@@ -75,12 +76,19 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                 try
                 {
                     user.HoVaTen = profiles.HoVaTen;
+                    user.Cccd = profiles.Cccd;
                     user.Sdt = profiles.SoDienThoai;
                     user.Email = profiles.Email;
                     user.DiaChi = profiles.DiaChi;
                     _context.Update(user);
                     await _context.SaveChangesAsync();
-                    // upload image here                        
+                    var imageUpload = new ImageUpload(_webHost);
+                    if (await imageUpload.SaveImageAs(AnhDaiDien!, new [] {"images", "UserAvatar"}))
+                    {
+                        imageUpload.DeleteImage(user.UrlAnh!);
+                        user.UrlAnh = imageUpload.FilePath;
+                    }
+                    _context.Nguoidungs.Update(user);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException ex)
@@ -89,7 +97,6 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                 }
                 return RedirectToAction("Index");
             }
-            Console.WriteLine("Invalid!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             return View(profiles);
         }
         private string? GetUserId()

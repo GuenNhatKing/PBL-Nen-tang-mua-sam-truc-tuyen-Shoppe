@@ -7,11 +7,11 @@
 		<div class="profiles-avatar-wrapper">
 			@if (Model.UrlAnhDaiDien != null)
 			{
-				<img src="~/images/@Model.UrlAnhDaiDien" class="profiles-avatar" />
+				<img src="~/@Model.UrlAnhDaiDien" class="profiles-avatar" />
 			}
 			else
 			{
-				@* Ảnh mặc định *@
+				<img src="~/images/avatar-mac-dinh.jpg" class="profiles-avatar" />
 			}
 		</div>
 		<div class="profiles-name">@Html.DisplayFor(model => model.HoVaTen)</div>
