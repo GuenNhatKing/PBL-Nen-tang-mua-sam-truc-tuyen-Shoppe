@@ -45,6 +45,7 @@
             </div>
             <div class="products-container">
                 <form asp-controller="AllProducts" asp-action="Index" method="get" class="user-search-form">
+                    <input name="IdDanhMuc" value="@ViewBag.IdDanhMuc" type="hidden" />
                     <input type="text" name="searchString" value="@Context.Request.Query["searchString"]"
                            placeholder="Tìm kiếm sản phẩm"
                            class="user-search-input" />

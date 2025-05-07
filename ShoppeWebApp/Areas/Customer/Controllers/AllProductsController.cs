@@ -63,6 +63,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             }
             ViewBag.PagingInfo = PagingLoad.GetPaging(totalPage, page);
             ViewBag.Page = page;
+            ViewBag.IdDanhMuc = IdDanhMuc;
             return View(products);
         }
     }
