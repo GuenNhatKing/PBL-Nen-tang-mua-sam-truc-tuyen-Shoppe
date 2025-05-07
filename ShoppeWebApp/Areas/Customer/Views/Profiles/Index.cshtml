@@ -46,7 +46,7 @@
 			</div>
 			<div class="profiles-info-item">
 				<strong>Số dư tài khoản:</strong>
-				<div>@Html.DisplayFor(model => model.SoDu) ₫</div>
+				<div>@string.Format("{0:#,##0} ₫", Model.SoDu)</div>
 			</div>
 		</div>
 	</div>
