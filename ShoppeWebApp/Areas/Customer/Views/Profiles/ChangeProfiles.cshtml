@@ -36,6 +36,11 @@
 			<input asp-for="Email" class="profiles-input" />
 			<span asp-validation-for="Email" class="profiles-error"></span>
 		</div>
+		<div class="profiles-edit-field">
+			<label asp-for="DiaChi" class="profiles-label">Địa chỉ</label>
+			<input asp-for="DiaChi" class="profiles-input" />
+			<span asp-validation-for="DiaChi" class="profiles-error"></span>
+		</div>
 		<div class="profiles-upload-wrapper">
 			<label for="AnhDaiDien" class="control-label">Ảnh đại diện</label>
 			<div class="profiles-upload-container">
@@ -49,7 +54,7 @@
 		<div class="profiles-edit-actions">
 			<a asp-controller="Profiles" asp-action="Index"
 			   class="profiles-cancel-button">Huỷ</a>
-			<input @* type="submit" *@ value="Lưu Thay Đổi" class="profiles-save-button" />
+			<input type="submit" value="Lưu Thay Đổi" class="profiles-save-button" />
 		</div>
 	</form>
 </div>
