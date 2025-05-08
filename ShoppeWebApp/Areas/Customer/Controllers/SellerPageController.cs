@@ -1,36 +1,52 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Infrastructure;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShoppeWebApp.Data;
-using ShoppeWebApp.Models;
-using ShoppeWebApp.ViewModels.Customer;
 using ShoppeWebApp.Services;
+using ShoppeWebApp.ViewModels.Customer;
 
 namespace ShoppeWebApp.Areas.Customer.Controllers
 {
     [Area("Customer")]
-    public class AllProductsController : Controller
+    public class SellerPageController : Controller
     {
-        private readonly ShoppeWebAppDbContext _context;
-        public AllProductsController(ShoppeWebAppDbContext context)
+       private readonly ShoppeWebAppDbContext _context;
+        public SellerPageController(ShoppeWebAppDbContext context)
         {
             _context = context;
         }
-        public async Task<IActionResult> Index(int page = 1, string? IdDanhMuc = null, string? searchString = null)
+        public async Task<IActionResult> Index(int page = 1, string? IdShop = null, string? IdDanhMuc = null, string? searchString = null)
         {
-            AllProductInfo products = new AllProductInfo();
+            if(IdShop == null)
+            {
+                return NotFound();
+            }
+            var shop = await _context.Cuahangs.FirstOrDefaultAsync(i => i.IdCuaHang == IdShop);
+            if(shop == null)
+            {
+                return NotFound();
+            }
+            SellerPage sellerPage = new SellerPage
+            {
+                IdCuaHang = shop.IdCuaHang,
+                TenCuaHang = shop.TenCuaHang,
+                UrlAnhCuaHang = shop.UrlAnh,
+                SoSanPhamDangBan = await _context.Sanphams.CountAsync(i => i.IdCuaHang == IdShop),
+                DiaChiCuaHang = shop.DiaChi,
+                SdtCuaHang = shop.Sdt,
+                MoTaCuaHang = shop.MoTa,
+                ThoiGianThamGia = shop.ThoiGianTao,
+            };
             var danhMucCoSanPham = await _context.Sanphams
+            .Where(i => i.IdCuaHang == IdShop)
             .GroupBy(i => new
             {
                 IdDanhMuc = i.IdDanhMuc
             })
             .Select(i => i.Key.IdDanhMuc)
             .ToListAsync();
-            products.categories = await _context.Danhmucs.Where(i => danhMucCoSanPham.Contains(i.IdDanhMuc)).ToListAsync();
-            products.danhMuc = IdDanhMuc;
-            var query = _context.Sanphams.AsQueryable();
+            sellerPage.categories = await _context.Danhmucs.Where(i => danhMucCoSanPham.Contains(i.IdDanhMuc)).ToListAsync();
+            sellerPage.danhMuc = IdDanhMuc;
+            var query = _context.Sanphams.Where(i => i.IdCuaHang == IdShop).AsQueryable();
 
             if(IdDanhMuc != null)
             {
@@ -58,7 +74,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
 
             foreach (var i in pros)
             {
-                products.productInfos.Add(new ItemInfo
+                sellerPage.productInfos.Add(new ItemInfo
                 {
                     IdSanPham = i.IdSanPham,
                     TenSanPham = i.TenSanPham,
@@ -71,8 +87,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             ViewBag.PagingInfo = PagingLoad.GetPaging(totalPage, page);
             ViewBag.Page = page;
             ViewBag.IdDanhMuc = IdDanhMuc;
-            return View(products);
+            return View(sellerPage);
         }
     }
 }
-

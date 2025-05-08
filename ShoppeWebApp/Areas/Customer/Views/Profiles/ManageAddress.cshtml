@@ -1,4 +1,4 @@
-﻿@model Profiles
+﻿@model ManageAddress
 @{
 	ViewData["Title"] = "Trang cá nhân";
 }
@@ -32,26 +32,9 @@
 	<div class="profiles-main">
 		<div class="profiles-info-section">
 			<h2 class="profiles-section-title">
-				<strong>Thông tin cá nhân</strong>
+				<strong>Địa chỉ liên hệ</strong>
 			</h2>
 
-			<div class="profiles-info-item">
-				<strong>CCCD:</strong>
-				<div>@Html.DisplayFor(model => model.Cccd)</div>
-			</div>
-
-			<div class="profiles-info-item">
-				<strong>Số Điện Thoại:</strong>
-				<div>@Html.DisplayFor(model => model.SoDienThoai)</div>
-			</div>
-			<div class="profiles-info-item">
-				<strong>Địa chỉ:</strong>
-				<div>@Html.DisplayFor(model => model.DiaChi)</div>
-			</div>
-			<div class="profiles-info-item">
-				<strong>Số dư tài khoản:</strong>
-				<div>@string.Format("{0:#,##0} ₫", Model.SoDu)</div>
-			</div>
 		</div>
 	</div>
 </div>

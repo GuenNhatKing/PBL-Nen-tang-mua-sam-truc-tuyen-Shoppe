@@ -509,6 +509,7 @@ ul {
     }
 
 .btn-buy {
+    text-decoration: none;
     background-color: #f7542e;
     color: #fff;
     border: none;

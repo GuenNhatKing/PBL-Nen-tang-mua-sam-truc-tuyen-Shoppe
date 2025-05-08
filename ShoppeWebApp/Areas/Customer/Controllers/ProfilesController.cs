@@ -99,6 +99,50 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             }
             return View(profiles);
         }
+
+        public async Task<IActionResult> ManageProducts()
+        {
+            string? currUserId = GetUserId();
+            var user = await _context.Nguoidungs.FirstOrDefaultAsync(i => i.IdNguoiDung == currUserId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            var profiles = new ManageProducts
+            {
+                IdNguoiDung = user.IdNguoiDung,
+                Email = user.Email,
+                HoVaTen = user.HoVaTen,
+                SoDienThoai = user.Sdt,
+                UrlAnhDaiDien = user.UrlAnh,
+                Cccd = user.Cccd,
+                DiaChi = user.DiaChi,
+                SoDu = user.SoDu,
+            };
+            return View(profiles);
+        }
+        
+        public async Task<IActionResult> ManageAddress()
+        {
+            string? currUserId = GetUserId();
+            var user = await _context.Nguoidungs.FirstOrDefaultAsync(i => i.IdNguoiDung == currUserId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            var profiles = new ManageAddress
+            {
+                IdNguoiDung = user.IdNguoiDung,
+                Email = user.Email,
+                HoVaTen = user.HoVaTen,
+                SoDienThoai = user.Sdt,
+                UrlAnhDaiDien = user.UrlAnh,
+                Cccd = user.Cccd,
+                DiaChi = user.DiaChi,
+                SoDu = user.SoDu,
+            };
+            return View(profiles);
+        }
         private string? GetUserId()
         {
             return HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value.ToString();
