@@ -867,7 +867,7 @@ ul {
     }
 
     .profiles-edit-button:active {
-        background-color: var(--color-gray-10);
+        background-color: var(--color-gray-9);
     }
 
 .profiles-main {
@@ -1020,7 +1020,7 @@ ul {
     }
 
     .profiles-save-button:active {
-        background-color: var(--color-gray-10)
+        background-color: var(--color-gray-9)
     }
 
 .profiles-upload-wrapper {
@@ -1128,3 +1128,8 @@ ul {
         background-color: #b33514;
         transform: scale(0.98);
     }
+/*-------------------------------------------------------------------*/
+.gio-hang-trong-img {
+    width: 416px;
+    height: auto;
+}
