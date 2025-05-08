@@ -1133,3 +1133,47 @@ ul {
     width: 416px;
     height: auto;
 }
+/*-------------------------------------------------------------------*/
+.service-section {
+    margin-top: 20px;
+    padding: 20px;
+    color: #333;
+}
+
+.service-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+    .service-item h3 {
+        width: 160px;
+        font-size: 14px;
+        color: #212121;
+        line-height: 24px;
+    }
+
+.service-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+    .service-content img {
+        width: 24px;
+        height: auto;
+        margin-right: 0.5rem;
+    }
+
+.service-title {
+    font-size: 14px;
+    color: #333;
+}
+
+.service-text {
+    font-size: 13px;
+    color: #888;
+    margin: 4px 0 0 0;
+    line-height: 1.5;
+}
