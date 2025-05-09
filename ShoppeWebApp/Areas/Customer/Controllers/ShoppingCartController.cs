@@ -274,6 +274,15 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                         _context.Giohangs.Remove(i);
                     }
                     await _context.SaveChangesAsync();
+                    // Giam so luong kho cua san pham
+                    foreach (var i in sanPhams)
+                    {
+                        int? soLuong = (await _context.Giohangs.FirstOrDefaultAsync())?.SoLuong;
+                        Console.WriteLine("Giam so Luong ?");
+                        i.SoLuongKho -= soLuong ?? 0;
+                        _context.Sanphams.Update(i);
+                    }
+                    await _context.SaveChangesAsync();
                     await trans.CommitAsync();
                 }
                 catch (Exception ex)
