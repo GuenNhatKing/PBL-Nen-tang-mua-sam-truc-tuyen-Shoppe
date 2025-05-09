@@ -40,24 +40,80 @@
 				<strong>Quản lý đơn hàng</strong>
 			</h2>
 			<div class="bg-FBFBFB box-padding-20 border-style-3">
-				<div class="d-flex gap-3 box-padding-left-right-20">
-					<a class="tab-link" href="#">Tất cả</a>
-					<a class="tab-link" href="#">Chờ xác nhận</a>
-					<a class="tab-link" href="#">Đã xác nhận</a>
-					<a class="tab-link" href="#">Đã hoàn thành</a>
-					<a class="tab-link" href="#">Đã huỷ</a>
+				<div class="d-flex gap-3 font-size-18 box-padding-left-right-20">
+					@if (ViewBag.TinhTrang == null)
+					{
+						<a class="tab-link fw-bold" asp-action="ManageProducts">Tất cả</a>
+					}
+					else
+					{
+						<a class="tab-link" asp-action="ManageProducts">Tất cả</a>
+					}
+					@if (ViewBag.TinhTrang == Constants.CHO_XAC_NHAN)
+					{
+						<a class="tab-link fw-bold" asp-action="ManageProducts" asp-route-TinhTrang="@Constants.CHO_XAC_NHAN">Chờ xác nhận</a>
+					}
+					else
+					{
+						<a class="tab-link" asp-action="ManageProducts" asp-route-TinhTrang="@Constants.CHO_XAC_NHAN">Chờ xác nhận</a>
+					}
+					@if (ViewBag.TinhTrang == Constants.DA_XAC_NHAN)
+					{
+						<a class="tab-link fw-bold" asp-action="ManageProducts" asp-route-TinhTrang="@Constants.DA_XAC_NHAN">Đã xác nhận</a>
+					}
+					else
+					{
+						<a class="tab-link" asp-action="ManageProducts" asp-route-TinhTrang="@Constants.DA_XAC_NHAN">Đã xác nhận</a>
+					}
+					@if (ViewBag.TinhTrang == Constants.DA_GIAO)
+					{
+						<a class="tab-link fw-bold" asp-action="ManageProducts" asp-route-TinhTrang="@Constants.DA_GIAO">Đã hoàn thành</a>
+					}
+					else
+					{
+						<a class="tab-link" asp-action="ManageProducts" asp-route-TinhTrang="@Constants.DA_GIAO">Đã hoàn thành</a>
+					}
+					@if (ViewBag.TinhTrang == Constants.HUY_DON_HANG)
+					{
+						<a class="tab-link fw-bold" asp-action="ManageProducts" asp-route-TinhTrang="@Constants.HUY_DON_HANG">Đã huỷ</a>
+					}
+					else
+					{
+						<a class="tab-link" asp-action="ManageProducts" asp-route-TinhTrang="@Constants.HUY_DON_HANG">Đã huỷ</a>
+					}
 				</div>
 				<div class="d-flex flex-column gap-3">
 					@foreach (var donHang in Model.danhSachDonHang)
 					{
 						<div class="bg-white mt-3 box-padding-20 border-style-3">
 							<div class="d-flex flex-column gap-2 border-bottom-style-1 box-padding-10">
-								<div class="color-F7AD45 fw-bold">Mã đơn hàng: @donHang.IdDonHang</div>
-								<div class=" color-393E46 fw-semibold">Thời gian đặt hàng: @donHang.ThoiGianTao?.ToString("dd/MM/yyyy HH:mm")</div>
-								@if (donHang.ThoiGianGiao != null)
-								{
-									<div class="color-328E6E fw-semibold">Thời gian nhận hàng: @donHang.ThoiGianGiao?.ToString("dd/MM/yyyy HH:mm")</div>
-								}
+								<div class="d-flex gap-3 align-items-center">
+									<div class="color-F7AD45 fw-bold">Mã đơn hàng: @donHang.IdDonHang</div>
+									@if(donHang.TinhTrang == Constants.CHO_XAC_NHAN)
+									{
+										<div class="cho-xac-nhan">Chờ xác nhận</div>
+									}
+									else if (donHang.TinhTrang == Constants.DA_XAC_NHAN)
+									{
+										<div class="da-xac-nhan">Đã xác nhận</div>
+									}
+									else if (donHang.TinhTrang == Constants.DA_GIAO)
+									{
+										<div class="da-hoan-thanh">Đã hoàn thành</div>
+										@if (donHang.ThoiGianGiao != null)
+										{
+											<div class="color-328E6E fw-semibold ms-auto">Đã nhận: @donHang.ThoiGianGiao?.ToString("dd/MM/yyyy HH:mm")</div>
+										}
+									}
+									else if (donHang.TinhTrang == Constants.HUY_DON_HANG)
+									{
+										<div class="da-huy">Đã huỷ</div>
+									}
+								</div>
+								<div class="d-flex gap-2 align-items-center">
+									<img src="~/images/Resources/clock.png" class="img-16" />
+									<div class=" color-393E46 fw-semibold">@donHang.ThoiGianTao?.ToString("dd/MM/yyyy HH:mm")</div>
+								</div>
 							</div>
 							<div>
 								@foreach (var cuaHang in donHang.danhSachCuaHang)

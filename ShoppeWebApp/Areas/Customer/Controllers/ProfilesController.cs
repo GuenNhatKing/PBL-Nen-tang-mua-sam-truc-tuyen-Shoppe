@@ -194,6 +194,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                 }
                 profiles.danhSachDonHang.Add(order);
             }
+            ViewBag.TinhTrang = TinhTrang;
             return View(profiles);
         }
 

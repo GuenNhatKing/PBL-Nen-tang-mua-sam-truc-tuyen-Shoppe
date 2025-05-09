@@ -1254,6 +1254,35 @@ ul {
     }
 
 /*-------------------------------------------------------------------*/
-.manage-product-review-box {
+.font-size-18 {
+    font-size: 18px;
+}
 
+.img-16 {
+    width: 16px;
+    height: 16px;
+}
+
+.cho-xac-nhan {
+    background-color: #FFF4CC;
+    color: #996B00;
+    padding: 5px 10px;
+}
+
+.da-xac-nhan {
+    background-color: #CCE4FF;
+    color: #004085;
+    padding: 5px 10px;
+}
+
+.da-hoan-thanh {
+    background-color: #D1FADF;
+    color: #067647;
+    padding: 5px 10px;
+}
+
+.da-huy {
+    background-color: #FFE0E0;
+    color: #A80000;
+    padding: 5px 10px;
 }
