@@ -4,6 +4,7 @@ using ShoppeWebApp.ViewModels.Seller;
 using ShoppeWebApp.Data;
 using ShoppeWebApp.Models;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;  
 
 namespace ShoppeWebApp.Areas.Seller.Controllers
 {
@@ -89,7 +90,9 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                     GiaBan = p.GiaBan,
                     TyLeGiamGia = p.GiaGoc > 0 ? (int)((1 - (p.GiaBan / p.GiaGoc)) * 100) : 0,
                     SoLuongBan = p.SoLuongBan,
-                    UrlAnh = p.UrlAnh
+                    UrlAnh = p.UrlAnh,
+                    TrangThai = p.TrangThai, // Add this line
+                    ThoiGianXoa = p.ThoiGianXoa // Add this line
                 })
                 .ToList();
         
@@ -192,7 +195,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                 SoLuongKho = model.SoLuongKho ?? 0,
                 GiaGoc = model.GiaGoc ?? 0,
                 GiaBan = model.GiaBan ?? 0,
-                TrangThai = 1, // Mặc định là hoạt động
+                TrangThai = Constants.TAM_KHOA, 
                 ThoiGianTao = DateTime.Now
             };
         
@@ -201,6 +204,243 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
         
             TempData["SuccessMessage"] = "Thêm sản phẩm thành công!";
             return RedirectToAction("Index", new { IdCuaHang = model.IdCuaHang });
+        }
+
+        [HttpGet]
+        public IActionResult EditProduct(string id) // Changed parameter name from IdSanPham to id
+        {
+            // Log the request details for debugging
+            Console.WriteLine($"Request path: {Request.Path}");
+            Console.WriteLine($"Request query string: {Request.QueryString}");
+            Console.WriteLine($"Route data: {string.Join(", ", RouteData.Values.Select(v => $"{v.Key}={v.Value}"))}");
+            Console.WriteLine($"Initial id parameter value: '{id}'");
+
+            // Use the parameter directly since it's now correctly bound
+            string IdSanPham = id;
+            
+            // Your existing fallback logic in case the parameter is still empty
+            if (string.IsNullOrEmpty(IdSanPham))
+            {
+                // Try to get from query string first
+                IdSanPham = Request.Query["IdSanPham"].ToString();
+                Console.WriteLine($"ID from query string: '{IdSanPham}'");
+                
+                // Then from route data
+                if (string.IsNullOrEmpty(IdSanPham) && RouteData.Values.ContainsKey("id"))
+                {
+                    IdSanPham = RouteData.Values["id"]?.ToString();
+                    Console.WriteLine($"ID from route data 'id': '{IdSanPham}'");
+                }
+            }
+
+            // Ensure database context is available
+            if (_context.Sanphams == null)
+            {
+                Console.WriteLine("Database context for Sanphams is null");
+                return NotFound("Không thể kết nối đến cơ sở dữ liệu.");
+            }
+
+            // Try to find product with exact match first
+            var product = _context.Sanphams.FirstOrDefault(p => p.IdSanPham == IdSanPham);
+            
+            // If not found, try with trimming and other variations
+            if (product == null && !string.IsNullOrEmpty(IdSanPham))
+            {
+                // Try with trimming
+                product = _context.Sanphams.FirstOrDefault(p => 
+                    p.IdSanPham.Trim() == IdSanPham.Trim());
+                
+                // Try with numeric comparison if it's a number
+                if (product == null && long.TryParse(IdSanPham, out long idAsNumber))
+                {
+                    // Format the ID as expected in the database (with leading zeros)
+                    string formattedId = idAsNumber.ToString("D10");
+                    product = _context.Sanphams.FirstOrDefault(p => p.IdSanPham == formattedId);
+                    Console.WriteLine($"Trying formatted ID: '{formattedId}', found product: {product != null}");
+                }
+            }
+
+            if (product == null)
+            {
+                Console.WriteLine($"Product with ID '{IdSanPham}' not found in database.");
+                return NotFound("Không tìm thấy sản phẩm với ID này.");
+            }
+
+            var idCuaHang = User.Claims.FirstOrDefault(c => c.Type == "IdCuaHang")?.Value;
+            if (string.IsNullOrEmpty(idCuaHang))
+            {
+                TempData["ErrorMessage"] = "Không thể xác định cửa hàng. Vui lòng đăng nhập lại.";
+                return RedirectToAction("Login", "Account", new { area = "" });
+            }
+
+            // Check if product belongs to the seller's shop
+            if (product.IdCuaHang != idCuaHang)
+            {
+                TempData["ErrorMessage"] = "Sản phẩm này không thuộc cửa hàng của bạn.";
+                return RedirectToAction("Index");
+            }
+
+            // Get category name for display
+            var categoryName = _context.Danhmucs
+                .Where(c => c.IdDanhMuc == product.IdDanhMuc)
+                .Select(c => c.TenDanhMuc)
+                .FirstOrDefault() ?? "Không có danh mục";
+
+            // Create view model
+            var model = new EditProductViewModel
+            {
+                IdSanPham = product.IdSanPham,
+                IdCuaHang = product.IdCuaHang,
+                IdDanhMuc = product.IdDanhMuc,
+                TenDanhMuc = categoryName,
+                TenSanPham = product.TenSanPham,
+                MoTa = product.MoTa,
+                SoLuongKho = product.SoLuongKho,
+                GiaGoc = product.GiaGoc,
+                GiaBan = product.GiaBan,
+                UrlAnh = product.UrlAnh,
+                SoLuongBan = product.SoLuongBan
+            };
+
+            // Load categories for dropdown
+            ViewBag.Categories = _context.Danhmucs
+                .Select(c => new { c.IdDanhMuc, c.TenDanhMuc })
+                .ToList();
+                
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditProduct(EditProductViewModel model)
+        {
+            if (string.IsNullOrEmpty(model.IdSanPham) && RouteData.Values.ContainsKey("id"))
+            {
+                model.IdSanPham = RouteData.Values["id"]?.ToString();
+                Console.WriteLine($"POST EditProduct - Using ID from route: '{model.IdSanPham}'");
+            }
+
+            if (string.IsNullOrEmpty(model.IdSanPham))
+            {
+                TempData["ErrorMessage"] = "Mã sản phẩm không hợp lệ hoặc không được cung cấp.";
+                return RedirectToAction("Index");
+            }
+
+            var product = _context.Sanphams.FirstOrDefault(p => p.IdSanPham == model.IdSanPham);
+            
+            if (product == null && long.TryParse(model.IdSanPham, out long idAsNumber))
+            {
+                string formattedId = idAsNumber.ToString("D10");
+                product = _context.Sanphams.FirstOrDefault(p => p.IdSanPham == formattedId);
+                
+                if (product != null)
+                {
+                    model.IdSanPham = formattedId;
+                }
+            }
+            
+            if (product == null)
+            {
+                TempData["ErrorMessage"] = $"Không tìm thấy sản phẩm với mã: {model.IdSanPham}";
+                return RedirectToAction("Index");
+            }
+            
+            var idCuaHang = User.Claims.FirstOrDefault(c => c.Type == "IdCuaHang")?.Value;
+            
+            if (string.IsNullOrEmpty(idCuaHang) || product.IdCuaHang != idCuaHang)
+            {
+                TempData["ErrorMessage"] = "Bạn không có quyền chỉnh sửa sản phẩm này.";
+                return RedirectToAction("Index");
+            }
+            
+            model.IdCuaHang = product.IdCuaHang;
+            model.UrlAnh = product.UrlAnh; 
+            model.TenDanhMuc = _context.Danhmucs
+                .Where(c => c.IdDanhMuc == model.IdDanhMuc)
+                .Select(c => c.TenDanhMuc)
+                .FirstOrDefault() ?? "Không có danh mục";
+                
+            ModelState.Remove("IdCuaHang");
+            ModelState.Remove("UrlAnh");
+            ModelState.Remove("TenDanhMuc");
+            ModelState.Remove("NewUrlAnh");
+            
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                Console.WriteLine($"Model validation errors: {string.Join(", ", errors)}");
+                
+                ViewBag.Categories = _context.Danhmucs
+                    .Select(c => new { c.IdDanhMuc, c.TenDanhMuc })
+                    .ToList();
+                
+                model.UrlAnh = product.UrlAnh;
+                
+                return View(model);
+            }
+
+            var originalName = product.TenSanPham;
+            var originalPrice = product.GiaBan;
+
+            product.TenSanPham = model.TenSanPham;
+            product.IdDanhMuc = model.IdDanhMuc;
+            product.MoTa = string.IsNullOrWhiteSpace(model.MoTa) ? "Chưa cập nhật" : model.MoTa;
+            product.SoLuongKho = model.SoLuongKho ?? 0;
+            product.GiaGoc = model.GiaGoc ?? 0;
+            product.GiaBan = model.GiaBan ?? 0;
+
+            Console.WriteLine($"Updating product: {originalName} -> {product.TenSanPham}, Price: {originalPrice} -> {product.GiaBan}");
+
+            product.ThoiGianTao = DateTime.Now;
+
+            if (model.NewUrlAnh != null && model.NewUrlAnh.Length > 0)
+            {
+                Console.WriteLine("Uploading new image");
+                if (!string.IsNullOrEmpty(product.UrlAnh) && 
+                    !product.UrlAnh.Contains("default") && 
+                    System.IO.File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", product.UrlAnh)))
+                {
+                    System.IO.File.Delete(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", product.UrlAnh));
+                }
+
+                var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(model.NewUrlAnh.FileName)}";
+                var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Images/Products");
+                if (!Directory.Exists(uploadPath))
+                {
+                    Directory.CreateDirectory(uploadPath);
+                }
+                var filePath = Path.Combine(uploadPath, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    model.NewUrlAnh.CopyTo(stream);
+                }
+                product.UrlAnh = $"Images/Products/{fileName}";
+            }
+            else
+            {
+                Console.WriteLine("Keeping existing image: " + product.UrlAnh);
+            }
+
+            try
+            {
+                _context.Entry(product).State = EntityState.Modified;
+                int rowsAffected = _context.SaveChanges();
+                
+                Console.WriteLine($"Product updated successfully. ID: {product.IdSanPham}, Rows affected: {rowsAffected}");
+                TempData["SuccessMessage"] = "Cập nhật sản phẩm thành công!";
+                return RedirectToAction("DetailsProduct", new { IdSanPham = product.IdSanPham });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating product: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                ModelState.AddModelError("", $"Lỗi khi cập nhật sản phẩm: {ex.Message}");
+                ViewBag.Categories = _context.Danhmucs
+                    .Select(c => new { c.IdDanhMuc, c.TenDanhMuc })
+                    .ToList();
+                model.UrlAnh = product.UrlAnh;
+                return View(model);
+            }
         }
 
         [HttpGet]
@@ -250,116 +490,212 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                 SoLuongBan = product.SoLuongBan,
                 TongDiemDG = danhGias.Sum(dg => dg.DiemDanhGia),
                 SoLuotDG = danhGias.Count,
-                DanhGias = danhGias
+                DanhGias = danhGias,
+                TrangThai = product.TrangThai,
+                ThoiGianXoa = product.ThoiGianXoa
             };
 
             return View("DetailsProduct", viewModel);
         }
 
         [HttpGet]
-        public IActionResult Edit(string id)
+        public IActionResult Delete(string IdSanPham)
         {
-            // Lấy sản phẩm từ cơ sở dữ liệu
-            var product = _context.Sanphams.FirstOrDefault(p => p.IdSanPham == id);
-            if (product == null)
+            var idCuaHang = User.Claims.FirstOrDefault(c => c.Type == "IdCuaHang")?.Value;
+
+            if (string.IsNullOrEmpty(idCuaHang))
             {
-                TempData["ErrorMessage"] = "Không tìm thấy sản phẩm.";
-                return RedirectToAction("Index");
+                TempData["ErrorMessage"] = "Không thể xác định cửa hàng của bạn. Vui lòng đăng nhập lại.";
+                return RedirectToAction("Login", "Account", new { area = "" });
             }
 
-            // Tạo ViewModel
-            var model = new EditProductViewModel
+            var product = _context.Sanphams.FirstOrDefault(p => p.IdSanPham == IdSanPham && p.IdCuaHang == idCuaHang);
+            if (product == null)
+            {
+                return NotFound("Không tìm thấy sản phẩm.");
+            }
+
+            // Lấy danh sách đánh giá cho sản phẩm
+            var danhGias = _context.Danhgia
+                .Where(dg => dg.IdSanPham == IdSanPham)
+                .Select(dg => new DetailsProductViewModel.DanhGiaInfo
+                {
+                    IdDanhGia = dg.IdDanhGia,
+                    IdNguoiDung = dg.IdNguoiDung,
+                    TenNguoiDung = _context.Nguoidungs
+                        .Where(nd => nd.IdNguoiDung == dg.IdNguoiDung)
+                        .Select(nd => nd.HoVaTen)
+                        .FirstOrDefault(),
+                    DiemDanhGia = dg.DiemDanhGia,
+                    NoiDung = dg.NoiDung,
+                    ThoiGianDG = dg.ThoiGianDg
+                })
+                .ToList();
+
+            var viewModel = new DetailsProductViewModel
             {
                 IdSanPham = product.IdSanPham,
                 TenSanPham = product.TenSanPham,
-                IdDanhMuc = product.IdDanhMuc,
+                TenDanhMuc = _context.Danhmucs.FirstOrDefault(dm => dm.IdDanhMuc == product.IdDanhMuc)?.TenDanhMuc,
+                UrlAnh = product.UrlAnh,
+                MoTa = product.MoTa,
+                SoLuongKho = product.SoLuongKho,
                 GiaGoc = product.GiaGoc,
                 GiaBan = product.GiaBan,
-                SoLuongKho = product.SoLuongKho,
-                MoTa = product.MoTa,
-                UrlAnhHienTai = product.UrlAnh
+                SoLuongBan = product.SoLuongBan,
+                TongDiemDG = danhGias.Sum(dg => dg.DiemDanhGia),
+                SoLuotDG = danhGias.Count,
+                DanhGias = danhGias,
+                TrangThai = product.TrangThai,
+                ThoiGianXoa = product.ThoiGianXoa
             };
 
-            // Lấy danh sách danh mục để hiển thị trong dropdown
-            ViewBag.Categories = _context.Danhmucs
-                .Select(c => new { c.IdDanhMuc, c.TenDanhMuc })
-                .ToList();
-
-            return View(model);
+            return View(viewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(EditProductViewModel model)
+        public IActionResult DeleteConfirmed(string IdSanPham)
         {
-            if (!ModelState.IsValid)
-            {
-                // Lấy danh sách danh mục để hiển thị lại trong View
-                ViewBag.Categories = _context.Danhmucs
-                    .Select(c => new { c.IdDanhMuc, c.TenDanhMuc })
-                    .ToList();
+            var idCuaHang = User.Claims.FirstOrDefault(c => c.Type == "IdCuaHang")?.Value;
 
-                return View(model);
+            if (string.IsNullOrEmpty(idCuaHang))
+            {
+                TempData["ErrorMessage"] = "Không thể xác định cửa hàng của bạn. Vui lòng đăng nhập lại.";
+                return RedirectToAction("Login", "Account", new { area = "" });
             }
 
-            // Lấy sản phẩm từ cơ sở dữ liệu
-            var product = _context.Sanphams.FirstOrDefault(p => p.IdSanPham == model.IdSanPham);
+            var product = _context.Sanphams.FirstOrDefault(p => p.IdSanPham == IdSanPham && p.IdCuaHang == idCuaHang);
             if (product == null)
             {
-                TempData["ErrorMessage"] = "Không tìm thấy sản phẩm.";
-                return RedirectToAction("Index");
+                return NotFound("Không tìm thấy sản phẩm.");
             }
 
-            // Cập nhật thông tin sản phẩm
-            product.TenSanPham = model.TenSanPham;
-            product.IdDanhMuc = model.IdDanhMuc;
-            product.GiaGoc = model.GiaGoc;
-            product.GiaBan = model.GiaBan;
-            product.SoLuongKho = model.SoLuongKho;
-            product.MoTa = model.MoTa;
-
-            // Xử lý ảnh mới nếu có
-            if (model.UrlAnhMoi != null)
-            {
-                // Tạo tên file duy nhất
-                var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(model.UrlAnhMoi.FileName)}";
-
-                // Đường dẫn lưu file
-                var uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Images/Products");
-                if (!Directory.Exists(uploadFolder))
-                {
-                    Directory.CreateDirectory(uploadFolder);
-                }
-                var uploadPath = Path.Combine(uploadFolder, uniqueFileName);
-
-                // Lưu file vào thư mục
-                using (var fileStream = new FileStream(uploadPath, FileMode.Create))
-                {
-                    model.UrlAnhMoi.CopyTo(fileStream);
-                }
-
-                // Xóa ảnh cũ nếu có
-                if (!string.IsNullOrEmpty(product.UrlAnh))
-                {
-                    var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", product.UrlAnh.TrimStart('/'));
-                    if (System.IO.File.Exists(oldImagePath))
-                    {
-                        System.IO.File.Delete(oldImagePath);
-                    }
-                }
-
-                // Cập nhật URL ảnh mới
-                product.UrlAnh = $"/Images/Products/{uniqueFileName}";
-            }
-
-            // Lưu thay đổi vào cơ sở dữ liệu
-            _context.Sanphams.Update(product);
+            // Cập nhật trạng thái sản phẩm thành Constants.TAM_KHOA (0) thay vì xóa
+            product.TrangThai = Constants.TAM_KHOA;
+            product.ThoiGianXoa = DateTime.Now;
+            
             _context.SaveChanges();
-
-            TempData["SuccessMessage"] = "Cập nhật sản phẩm thành công!";
+            
+            TempData["SuccessMessage"] = $"Sản phẩm '{product.TenSanPham}' đã được xóa thành công!";
+            TempData["InfoMessage"] = "Sản phẩm đã xóa có thể khôi phục trong vòng 30 ngày.";
             return RedirectToAction("Index");
         }
- 
+
+        [HttpGet]
+        public IActionResult Restore(string IdSanPham)
+        {
+            var idCuaHang = User.Claims.FirstOrDefault(c => c.Type == "IdCuaHang")?.Value;
+
+            if (string.IsNullOrEmpty(idCuaHang))
+            {
+                TempData["ErrorMessage"] = "Không thể xác định cửa hàng của bạn. Vui lòng đăng nhập lại.";
+                return RedirectToAction("Login", "Account", new { area = "" });
+            }
+
+            var product = _context.Sanphams
+                .Include(p => p.IdDanhMucNavigation) // Include related category data
+                .FirstOrDefault(p => p.IdSanPham == IdSanPham && p.IdCuaHang == idCuaHang);
+                
+            if (product == null)
+            {
+                return NotFound("Không tìm thấy sản phẩm.");
+            }
+
+            // Kiểm tra xem sản phẩm có đang ở trạng thái đã xóa không
+            if (product.TrangThai != Constants.TAM_KHOA)
+            {
+                TempData["ErrorMessage"] = "Sản phẩm này không ở trạng thái đã xóa và không cần khôi phục.";
+                return RedirectToAction("DetailsProduct", new { IdSanPham = product.IdSanPham });
+            }
+
+            // Kiểm tra thời gian xóa
+            if (!product.ThoiGianXoa.HasValue)
+            {
+                TempData["ErrorMessage"] = "Không thể xác định thời gian xóa sản phẩm.";
+                return RedirectToAction("DetailsProduct", new { IdSanPham = product.IdSanPham });
+            }
+
+            // Tính số ngày đã qua kể từ khi xóa
+            TimeSpan timeSinceDeletion = DateTime.Now - product.ThoiGianXoa.Value;
+            int daysSinceDeletion = (int)timeSinceDeletion.TotalDays;
+
+            if (daysSinceDeletion > 30)
+            {
+                TempData["ErrorMessage"] = $"Không thể khôi phục sản phẩm đã xóa quá 30 ngày (đã xóa cách đây {daysSinceDeletion} ngày).";
+                return RedirectToAction("DetailsProduct", new { IdSanPham = product.IdSanPham });
+            }
+
+            // Lấy thêm thông tin chi tiết về sản phẩm
+            var danhGias = _context.Danhgia
+                .Where(dg => dg.IdSanPham == IdSanPham)
+                .ToList();
+
+            // Hiển thị trang xác nhận với thông tin chi tiết
+            var viewModel = new DetailsProductViewModel
+            {
+                IdSanPham = product.IdSanPham,
+                TenSanPham = product.TenSanPham,
+                TenDanhMuc = product.IdDanhMucNavigation?.TenDanhMuc ?? "Không có danh mục",
+                UrlAnh = product.UrlAnh,
+                GiaGoc = product.GiaGoc,
+                GiaBan = product.GiaBan,
+                SoLuongKho = product.SoLuongKho,
+                SoLuongBan = product.SoLuongBan,
+                MoTa = product.MoTa,
+                TrangThai = product.TrangThai,
+                ThoiGianXoa = product.ThoiGianXoa,
+                TongDiemDG = danhGias.Sum(dg => dg.DiemDanhGia),
+                SoLuotDG = danhGias.Count,
+                IdCuaHang = product.IdCuaHang,
+            };
+
+            return View("ConfirmRestore", viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult RestoreConfirmed(string IdSanPham)  // Changed method name from Restore to RestoreConfirmed
+        {
+            var idCuaHang = User.Claims.FirstOrDefault(c => c.Type == "IdCuaHang")?.Value;
+
+            if (string.IsNullOrEmpty(idCuaHang))
+            {
+                TempData["ErrorMessage"] = "Không thể xác định cửa hàng của bạn. Vui lòng đăng nhập lại.";
+                return RedirectToAction("Login", "Account", new { area = "" });
+            }
+
+            var product = _context.Sanphams.FirstOrDefault(p => p.IdSanPham == IdSanPham && p.IdCuaHang == idCuaHang);
+            if (product == null)
+            {
+                return NotFound("Không tìm thấy sản phẩm.");
+            }
+
+            // Kiểm tra xem có thể khôi phục sản phẩm hay không (dưới 30 ngày)
+            if (!product.ThoiGianXoa.HasValue)
+            {
+                TempData["ErrorMessage"] = "Không thể xác định thời gian xóa sản phẩm.";
+                return RedirectToAction("DetailsProduct", new { IdSanPham = product.IdSanPham });
+            }
+
+            // Tính số ngày đã qua kể từ khi xóa
+            TimeSpan timeSinceDeletion = DateTime.Now - product.ThoiGianXoa.Value;
+            int daysSinceDeletion = (int)timeSinceDeletion.TotalDays;
+
+            if (daysSinceDeletion > 30)
+            {
+                TempData["ErrorMessage"] = $"Không thể khôi phục sản phẩm đã xóa quá 30 ngày (đã xóa cách đây {daysSinceDeletion} ngày).";
+                return RedirectToAction("DetailsProduct", new { IdSanPham = product.IdSanPham });
+            }
+
+            // Khôi phục sản phẩm
+            product.TrangThai = Constants.CON_HANG; // CON_HANG = 1
+            product.ThoiGianXoa = null;
+            
+            _context.SaveChanges();
+            
+            TempData["SuccessMessage"] = $"Sản phẩm '{product.TenSanPham}' đã được khôi phục thành công!";
+            return RedirectToAction("DetailsProduct", new { IdSanPham = product.IdSanPham });
+        }
     }
 }
-
