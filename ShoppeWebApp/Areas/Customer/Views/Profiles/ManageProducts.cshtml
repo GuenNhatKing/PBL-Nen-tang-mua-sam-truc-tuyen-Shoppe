@@ -53,10 +53,10 @@
 						<div class="bg-white mt-3 box-padding-20 border-style-3">
 							<div class="d-flex flex-column gap-2 border-bottom-style-1 box-padding-10">
 								<div class="color-F7AD45 fw-bold">Mã đơn hàng: @donHang.IdDonHang</div>
-								<div class=" color-393E46 fw-semibold">Thời gian đặt hàng: @donHang.ThoiGianTao</div>
+								<div class=" color-393E46 fw-semibold">Thời gian đặt hàng: @donHang.ThoiGianTao?.ToString("dd/MM/yyyy HH:mm")</div>
 								@if (donHang.ThoiGianGiao != null)
 								{
-									<div class="color-328E6E fw-semibold">Thời gian nhận hàng: @donHang.ThoiGianGiao</div>
+									<div class="color-328E6E fw-semibold">Thời gian nhận hàng: @donHang.ThoiGianGiao?.ToString("dd/MM/yyyy HH:mm")</div>
 								}
 							</div>
 							<div>
@@ -86,25 +86,65 @@
 												<div>@string.Format("{0:#,##0} ₫", sanPham.DonGia * sanPham.SoLuong)</div>
 											</div>
 										</div>
-										<div style="display: none;">
-											@if (sanPham.danhGias != null)
-											@foreach (var danhGia in sanPham.danhGias)
-											{
-												@* <div>@danhGia.IdDanhGia</div> *@
-												<div>@danhGia.SoSaoDanhGia</div>
-												<div>@danhGia.ThoiGianDanhGia</div>
-												<div>@danhGia.NoiDungDanhGia</div>
-											}
+										<div class="review-box overlay-box" name="@sanPham.IdSanPham" style="display: none">
+											<div class="bg-white manage-product-review-box rounded">
+												<div class="box-padding-20 border-bottom-style-1">
+													<div class="box-padding-left-right-20">
+														<h3>Đánh giá sản phẩm</h3>
+													</div>
+												</div>
+												<div class="box-padding-left-right-20">
+													@if (sanPham.danhGias != null)
+														@foreach (var danhGia in sanPham.danhGias)
+														{
+															<div class="product-main-info-review-item d-flex gap-3 width-40rem">
+																<div class="box-padding-10">
+																	<img src="~/@Model.UrlAnhDaiDien" class="circle-img">
+																</div>
+																<div class="box-padding-10 width-100">
+																	<div class="product-main-info-review-meta">
+																		<div><strong>@Model.HoVaTen</strong></div>
+																		<div class="product-main-info-bold">
+																			@danhGia.SoSaoDanhGia
+																			@for (int j = 0; j < 5; j++)
+																			{
+																				if (j < danhGia.SoSaoDanhGia)
+																				{
+																					<span class="fa fa-star star-checked"></span>
+																				}
+																				else
+																				{
+																					<span class="fa fa-star"></span>
+																				}
+																			}
+																		</div>
+																		<div>@danhGia.ThoiGianDanhGia?.ToString("dd/MM/yyyy HH:mm")</div>
+																	</div>
+																	<div class="product-main-info-review-content">
+																		@danhGia.NoiDungDanhGia
+																	</div>
+																</div>
+															</div>
+														}
+												</div>
+												<div class="d-flex box-padding-20">
+													<button class="exitBtn ms-auto invisible-button profiles-edit-button" name="@sanPham.IdSanPham">Thoát</button>
+												</div>
+											</div>
 										</div>
 										<div class="d-flex">
 											<div class="ms-auto box-padding-10">
 												@if (sanPham.danhGias != null && sanPham.danhGias.Count > 0)
 												{
-													<button class="invisible-button manage-product-review-btn">Xem đánh giá</button>
+													<button name="@sanPham.IdSanPham" class="invisible-button manage-product-review-btn reviewBtn">
+														Xem đánh giá
+													</button>
 												}
 												else if (donHang.ThoiGianGiao <= DateTime.UtcNow + TimeSpan.FromDays(15))
 												{
-													<button class="invisible-button manage-product-review-btn">Đánh giá ngay</button>
+													<button name="@sanPham.IdSanPham" class="invisible-button manage-product-review-btn">
+														Đánh giá ngay
+													</button>
 												}
 											</div>
 										</div>
@@ -124,3 +164,22 @@
 		</div>
 	</div>
 </div>
+
+<script>
+	let reviewBtn = document.getElementsByClassName('reviewBtn');
+	let exitBtn = document.getElementsByClassName('exitBtn');
+	for(let btn of reviewBtn) {
+		btn.addEventListener('click', function() {
+			let name = this.name;
+			let box = document.querySelector(`.review-box[name="${name}"]`)
+			box.style.display = 'flex';
+		});
+	}
+	for(let btn of exitBtn) {
+		btn.addEventListener('click', function() {
+			let name = this.name;
+			let box = document.querySelector(`.review-box[name="${name}"]`)
+			box.style.display = 'none';
+		});
+	}
+</script>

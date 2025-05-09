@@ -357,6 +357,10 @@ ul {
     min-width: 150px;
 }
 
+.width-40rem {
+    width: 40rem;
+}
+
 .my-card {
     padding-bottom: 0.35rem;
 }
@@ -1248,3 +1252,8 @@ ul {
     .manage-product-review-btn:active {
         color: #4F8954;
     }
+
+/*-------------------------------------------------------------------*/
+.manage-product-review-box {
+
+}
