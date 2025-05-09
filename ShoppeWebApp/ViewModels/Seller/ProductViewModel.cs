@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace ShoppeWebApp.ViewModels.Seller
@@ -25,6 +26,8 @@ namespace ShoppeWebApp.ViewModels.Seller
         public int SoLuongBan { get; set; } 
         public string? UrlAnh { get; set; }
         public decimal TyLeGiamGia { get; set; } 
+        public int TrangThai { get; set; }
+        public DateTime? ThoiGianXoa { get; set; }
 
         public string SoLuongDaBan => ProcessQuantity(SoLuongBan);
 

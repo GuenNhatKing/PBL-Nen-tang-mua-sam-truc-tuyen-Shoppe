@@ -1,0 +1,160 @@
+@model ShoppeWebApp.ViewModels.Seller.EditProductViewModel
+
+@{
+    ViewData["Title"] = "Chỉnh sửa sản phẩm";
+    Layout = "~/Areas/Seller/Views/Shared/_MainLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <!-- Tiêu đề chỉnh sửa sản phẩm -->
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 10px;">
+            @ViewData["Title"]
+        </h2>
+    </div>
+
+    <!-- Hiển thị thông báo thành công -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Form chỉnh sửa sản phẩm -->
+    <div class="p-4 border border-success rounded" style="background-color: #fdfdfd;">
+        <form asp-action="EditProduct" asp-controller="Product" asp-area="Seller" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="IdSanPham" />
+            <input type="hidden" name="id" value="@Model.IdSanPham" />
+            
+            <div class="row">
+                <!-- Cột bên trái: Ảnh sản phẩm -->
+                <div class="col-md-4 text-center">
+                    <label class="form-label fw-bold">Ảnh sản phẩm</label>
+                    <div id="imagePreviewContainer">
+                        @if (Model.NewUrlAnh != null && !string.IsNullOrEmpty(Model.NewUrlAnh.ToString()))
+                        {
+                            <img src="~/@Model.NewUrlAnh" alt="Ảnh sản phẩm mới" 
+                                 class="img-thumbnail mb-3 shadow-sm" 
+                                 style="width: 300px; height: 300px; object-fit: cover;" id="imagePreview" />
+                        }
+                        else if (!string.IsNullOrEmpty(Model.UrlAnh))
+                        {
+                            <img src="~/@Model.UrlAnh" alt="Ảnh sản phẩm" 
+                                 class="img-thumbnail mb-3 shadow-sm" 
+                                 style="width: 300px; height: 300px; object-fit: cover;" id="imagePreview" />
+                        }
+                        else
+                        {
+                            <div class="text-center p-5 bg-light mb-3 shadow-sm" id="noImagePlaceholder" 
+                                 style="width: 300px; height: 300px; margin: 0 auto;">
+                                <i class="fas fa-image fa-3x text-muted" style="margin-top: 100px;"></i>
+                            </div>
+                            <img src="" alt="Ảnh sản phẩm mới" 
+                                 class="img-thumbnail mb-3 shadow-sm" 
+                                 style="width: 300px; height: 300px; object-fit: cover; display: none;" id="imagePreview" />
+                        }
+                    </div>
+                    <div class="mt-2">
+                        <input asp-for="NewUrlAnh" type="file" class="form-control" id="imageUpload" accept="image/*">
+                        <span asp-validation-for="NewUrlAnh" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Cột bên phải: Các trường thông tin -->
+                <div class="col-md-8">
+                    <div class="mb-3">
+                        <label asp-for="TenSanPham" class="form-label fw-bold">Tên sản phẩm</label>
+                        <input asp-for="TenSanPham" class="form-control" placeholder="Nhập tên sản phẩm" />
+                        <span asp-validation-for="TenSanPham" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="GiaGoc" class="form-label fw-bold">Giá gốc</label>
+                        <input asp-for="GiaGoc" class="form-control" type="number" step="0.01" placeholder="Nhập giá gốc" />
+                        <span asp-validation-for="GiaGoc" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="GiaBan" class="form-label fw-bold">Giá bán</label>
+                        <input asp-for="GiaBan" class="form-control" type="number" step="0.01" placeholder="Nhập giá bán" />
+                        <span asp-validation-for="GiaBan" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="SoLuongKho" class="form-label fw-bold">Số lượng kho</label>
+                        <input asp-for="SoLuongKho" class="form-control" type="number" placeholder="Nhập số lượng kho" />
+                        <span asp-validation-for="SoLuongKho" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <hr />
+
+            <!-- Các trường bên dưới -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="IdDanhMuc" class="form-label fw-bold">Danh mục</label>
+                        <select asp-for="IdDanhMuc" class="form-select">
+                            <option value="">-- Chọn danh mục --</option>
+                            @foreach (var category in (IEnumerable<dynamic>)ViewBag.Categories)
+                            {
+                                <option value="@category.IdDanhMuc" selected="@(category.IdDanhMuc == Model.IdDanhMuc ? "selected" : null)">
+                                    @category.TenDanhMuc
+                                </option>
+                            }
+                        </select>
+                        <span asp-validation-for="IdDanhMuc" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="mb-3">
+                        <label asp-for="MoTa" class="form-label fw-bold">Mô tả</label>
+                        <textarea asp-for="MoTa" class="form-control" rows="4" placeholder="Nhập mô tả sản phẩm"></textarea>
+                        <span asp-validation-for="MoTa" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nút hành động -->
+            <div class="text-end">
+                <button type="submit" class="btn btn-success px-4">Lưu thay đổi</button>
+                <a asp-action="Index" class="btn btn-secondary px-4 ms-2">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            console.log("Product ID: @Model.IdSanPham");
+            $('form').submit(function() {
+                console.log("Form submitted with ID: " + $("#IdSanPham").val());
+                return true;
+            });
+            
+            // Hiển thị ảnh xem trước khi chọn file
+            $('#imageUpload').change(function() {
+                var filename = $(this).val().split('\\').pop();
+                
+                var fileInput = this;
+                if (fileInput.files && fileInput.files[0]) {
+                    var reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        $('#noImagePlaceholder').hide();
+                        $('#imagePreview').attr('src', e.target.result);
+                        $('#imagePreview').show();
+                    }
+                    
+                    reader.readAsDataURL(fileInput.files[0]);
+                }
+            });
+        });
+    </script>
+}
