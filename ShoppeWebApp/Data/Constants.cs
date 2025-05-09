@@ -55,5 +55,6 @@
 
         public const int TAM_KHOA = 0; //cho sp
         public const int CON_HANG = 1; //con hang
+        public const int HET_HANG = 2; //het hang
     }
 }

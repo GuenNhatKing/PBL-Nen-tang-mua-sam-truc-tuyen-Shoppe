@@ -1,8 +1,12 @@
 @model ShoppeWebApp.ViewModels.Seller.DetailsProductViewModel
+@using ShoppeWebApp.Data
 
 @{
     Layout = "~/Areas/Seller/Views/Shared/_MainLayout.cshtml";
     ViewData["Title"] = "Chi tiết sản phẩm";
+    
+    // Kiểm tra xem sản phẩm có thể khôi phục không (dưới 30 ngày)
+    bool canRestore = Model.ThoiGianXoa.HasValue && (DateTime.Now - Model.ThoiGianXoa.Value).TotalDays <= 30;
 }
 
 <div class="container mt-4 border border-success rounded p-4">
@@ -80,22 +84,53 @@
             <p>@Html.Raw(Model.MoTa?.Replace("\n", "<br>"))</p>
         </div>
     
-        <!-- Nút quay lại, chỉnh sửa và xem đánh giá -->
+        <!-- Hiển thị nút tùy theo trạng thái sản phẩm -->
         <div class="mt-3 text-center">
             <a asp-area="Seller" asp-controller="Product" asp-action="Index" asp-route-IdCuaHang="@Model.IdCuaHang" 
                class="btn btn-secondary me-2">
                 <i class="fas fa-arrow-left"></i> Quay lại
             </a>
             
-            <a asp-area="Seller" asp-controller="Product" asp-action="EditProduct" asp-route-id="@Model.IdSanPham" 
-                class="btn btn-warning me-2">
+            @if (Model.TrangThai == Constants.TAM_KHOA)
+            {
+                @if (canRestore)
+                {
+                    <form asp-action="Restore" method="post" class="d-inline">
+                        <input type="hidden" name="IdSanPham" value="@Model.IdSanPham" />
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-undo-alt me-1"></i> Khôi phục
+                        </button>
+                    </form>
+                }
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle me-1"></i> 
+                    @if (canRestore)
+                    {
+                        <span>Sản phẩm này đã bị xóa và chỉ có thể khôi phục trong vòng 30 ngày kể từ ngày xóa (@Model.ThoiGianXoa?.ToString("dd/MM/yyyy HH:mm"))</span>
+                    }
+                    else
+                    {
+                        <span>Sản phẩm này đã bị xóa quá 30 ngày (@Model.ThoiGianXoa?.ToString("dd/MM/yyyy HH:mm")) và không thể khôi phục</span>
+                    }
+                </div>
+            }
+            else
+            {
+                <a asp-area="Seller" asp-controller="Product" asp-action="EditProduct" asp-route-id="@Model.IdSanPham" 
+                   class="btn btn-warning me-2">
                     <i class="fas fa-edit"></i> Chỉnh sửa
-            </a>
+                </a>
+                
+                <a asp-area="Seller" asp-controller="Product" asp-action="Delete" asp-route-IdSanPham="@Model.IdSanPham" 
+                   class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> Xóa
+                </a>
+            }
         </div>
     </div>
 
     <!-- Danh sách đánh giá -->
-        <div class="mt-5 border border-success rounded p-4" style="background-color: #f9f9f9;">
+    <div class="mt-5 border border-success rounded p-4" style="background-color: #f9f9f9;">
         <div class="text-center mb-4">
             <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 10px;">
                 Đánh giá sản phẩm

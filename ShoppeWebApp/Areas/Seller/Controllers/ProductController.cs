@@ -90,7 +90,9 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                     GiaBan = p.GiaBan,
                     TyLeGiamGia = p.GiaGoc > 0 ? (int)((1 - (p.GiaBan / p.GiaGoc)) * 100) : 0,
                     SoLuongBan = p.SoLuongBan,
-                    UrlAnh = p.UrlAnh
+                    UrlAnh = p.UrlAnh,
+                    TrangThai = p.TrangThai, // Add this line
+                    ThoiGianXoa = p.ThoiGianXoa // Add this line
                 })
                 .ToList();
         
@@ -193,7 +195,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                 SoLuongKho = model.SoLuongKho ?? 0,
                 GiaGoc = model.GiaGoc ?? 0,
                 GiaBan = model.GiaBan ?? 0,
-                TrangThai = 1, // Mặc định là hoạt động
+                TrangThai = Constants.TAM_KHOA, 
                 ThoiGianTao = DateTime.Now
             };
         
@@ -488,11 +490,128 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                 SoLuongBan = product.SoLuongBan,
                 TongDiemDG = danhGias.Sum(dg => dg.DiemDanhGia),
                 SoLuotDG = danhGias.Count,
-                DanhGias = danhGias
+                DanhGias = danhGias,
+                TrangThai = product.TrangThai,
+                ThoiGianXoa = product.ThoiGianXoa
             };
 
             return View("DetailsProduct", viewModel);
         }
 
+        [HttpGet]
+        public IActionResult Delete(string IdSanPham)
+        {
+            var idCuaHang = User.Claims.FirstOrDefault(c => c.Type == "IdCuaHang")?.Value;
+
+            if (string.IsNullOrEmpty(idCuaHang))
+            {
+                TempData["ErrorMessage"] = "Không thể xác định cửa hàng của bạn. Vui lòng đăng nhập lại.";
+                return RedirectToAction("Login", "Account", new { area = "" });
+            }
+
+            var product = _context.Sanphams.FirstOrDefault(p => p.IdSanPham == IdSanPham && p.IdCuaHang == idCuaHang);
+            if (product == null)
+            {
+                return NotFound("Không tìm thấy sản phẩm.");
+            }
+
+            // Lấy danh sách đánh giá cho sản phẩm
+            var danhGias = _context.Danhgia
+                .Where(dg => dg.IdSanPham == IdSanPham)
+                .Select(dg => new DetailsProductViewModel.DanhGiaInfo
+                {
+                    IdDanhGia = dg.IdDanhGia,
+                    IdNguoiDung = dg.IdNguoiDung,
+                    TenNguoiDung = _context.Nguoidungs
+                        .Where(nd => nd.IdNguoiDung == dg.IdNguoiDung)
+                        .Select(nd => nd.HoVaTen)
+                        .FirstOrDefault(),
+                    DiemDanhGia = dg.DiemDanhGia,
+                    NoiDung = dg.NoiDung,
+                    ThoiGianDG = dg.ThoiGianDg
+                })
+                .ToList();
+
+            var viewModel = new DetailsProductViewModel
+            {
+                IdSanPham = product.IdSanPham,
+                TenSanPham = product.TenSanPham,
+                TenDanhMuc = _context.Danhmucs.FirstOrDefault(dm => dm.IdDanhMuc == product.IdDanhMuc)?.TenDanhMuc,
+                UrlAnh = product.UrlAnh,
+                MoTa = product.MoTa,
+                SoLuongKho = product.SoLuongKho,
+                GiaGoc = product.GiaGoc,
+                GiaBan = product.GiaBan,
+                SoLuongBan = product.SoLuongBan,
+                TongDiemDG = danhGias.Sum(dg => dg.DiemDanhGia),
+                SoLuotDG = danhGias.Count,
+                DanhGias = danhGias
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(string IdSanPham)
+        {
+            var idCuaHang = User.Claims.FirstOrDefault(c => c.Type == "IdCuaHang")?.Value;
+
+            if (string.IsNullOrEmpty(idCuaHang))
+            {
+                TempData["ErrorMessage"] = "Không thể xác định cửa hàng của bạn. Vui lòng đăng nhập lại.";
+                return RedirectToAction("Login", "Account", new { area = "" });
+            }
+
+            var product = _context.Sanphams.FirstOrDefault(p => p.IdSanPham == IdSanPham && p.IdCuaHang == idCuaHang);
+            if (product == null)
+            {
+                return NotFound("Không tìm thấy sản phẩm.");
+            }
+
+            // Cập nhật trạng thái sản phẩm thành Constants.TAM_KHOA (0) thay vì xóa
+            product.TrangThai = Constants.TAM_KHOA;
+            product.ThoiGianXoa = DateTime.Now;
+            
+            _context.SaveChanges();
+            
+            TempData["SuccessMessage"] = $"Sản phẩm '{product.TenSanPham}' đã được xóa thành công!";
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Restore(string IdSanPham)
+        {
+            var idCuaHang = User.Claims.FirstOrDefault(c => c.Type == "IdCuaHang")?.Value;
+
+            if (string.IsNullOrEmpty(idCuaHang))
+            {
+                TempData["ErrorMessage"] = "Không thể xác định cửa hàng của bạn. Vui lòng đăng nhập lại.";
+                return RedirectToAction("Login", "Account", new { area = "" });
+            }
+
+            var product = _context.Sanphams.FirstOrDefault(p => p.IdSanPham == IdSanPham && p.IdCuaHang == idCuaHang);
+            if (product == null)
+            {
+                return NotFound("Không tìm thấy sản phẩm.");
+            }
+
+            // Kiểm tra xem có thể khôi phục sản phẩm hay không (dưới 30 ngày)
+            if (!product.ThoiGianXoa.HasValue || (DateTime.Now - product.ThoiGianXoa.Value).TotalDays > 30)
+            {
+                TempData["ErrorMessage"] = "Không thể khôi phục sản phẩm đã xóa quá 30 ngày.";
+                return RedirectToAction("Index");
+            }
+
+            // Khôi phục sản phẩm
+            product.TrangThai = Constants.CON_HANG; 
+            product.ThoiGianXoa = null;
+            
+            _context.SaveChanges();
+            
+            TempData["SuccessMessage"] = $"Sản phẩm '{product.TenSanPham}' đã được khôi phục thành công!";
+            return RedirectToAction("Index");
+        }
     }
 }

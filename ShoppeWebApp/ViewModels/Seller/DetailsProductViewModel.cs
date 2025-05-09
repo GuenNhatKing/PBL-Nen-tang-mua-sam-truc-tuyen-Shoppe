@@ -15,6 +15,7 @@ namespace ShoppeWebApp.ViewModels.Seller
         public decimal GiaGoc { get; set; }
         public decimal GiaBan { get; set; }
         public int TrangThai { get; set; }
+        public DateTime? ThoiGianXoa { get; set; }
         public int TongDiemDG { get; set; }
         public int SoLuotDG { get; set; }
         public int SoLuongBan { get; set; }
