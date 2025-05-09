@@ -517,6 +517,7 @@ ul {
     .btn-add-shopping-cart:hover {
         background-color: #fff3f0;
     }
+
     .btn-add-shopping-cart:active {
         background-color: #ffe6e0;
     }
@@ -772,7 +773,7 @@ ul {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 9999; 
+    z-index: 9999;
 }
 
 .address-box {
@@ -1210,3 +1211,40 @@ ul {
 .bg-FBFBFB {
     background-color: #FBFBFB;
 }
+
+.color-328E6E {
+    color: #328E6E;
+}
+
+.color-90C67C {
+    color: #90C67C;
+}
+
+.color-393E46 {
+    color: #393E46;
+}
+
+.color-F7AD45 {
+    color: #F7AD45;
+}
+
+.width-16 {
+    width: 16%;
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+.manage-product-review-btn {
+    font-weight: 500;
+    font-size: 16px;
+    color: #67AE6E;
+}
+
+    .manage-product-review-btn:hover {
+        color: #5B9B61;
+    }
+    .manage-product-review-btn:active {
+        color: #4F8954;
+    }
