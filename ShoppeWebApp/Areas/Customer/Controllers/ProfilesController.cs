@@ -1,7 +1,9 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using QLTTDT.Services;
 using ShoppeWebApp.Data;
 using ShoppeWebApp.Models;
@@ -83,7 +85,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                     _context.Update(user);
                     await _context.SaveChangesAsync();
                     var imageUpload = new ImageUpload(_webHost);
-                    if (await imageUpload.SaveImageAs(AnhDaiDien!, new [] {"images", "UserAvatar"}))
+                    if (await imageUpload.SaveImageAs(AnhDaiDien!, new[] { "images", "UserAvatar" }))
                     {
                         imageUpload.DeleteImage(user.UrlAnh!);
                         user.UrlAnh = imageUpload.FilePath;
@@ -100,7 +102,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             return View(profiles);
         }
 
-        public async Task<IActionResult> ManageProducts()
+        public async Task<IActionResult> ManageProducts(int? TinhTrang = null)
         {
             string? currUserId = GetUserId();
             var user = await _context.Nguoidungs.FirstOrDefaultAsync(i => i.IdNguoiDung == currUserId);
@@ -113,15 +115,88 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                 IdNguoiDung = user.IdNguoiDung,
                 Email = user.Email,
                 HoVaTen = user.HoVaTen,
-                SoDienThoai = user.Sdt,
                 UrlAnhDaiDien = user.UrlAnh,
-                Cccd = user.Cccd,
-                DiaChi = user.DiaChi,
-                SoDu = user.SoDu,
             };
+            var query = _context.Donhangs
+                .Include(i => i.IdLienHeNavigation)
+                .Where(i => i.IdLienHeNavigation.IdNguoiDung == user.IdNguoiDung)
+                .AsQueryable();
+            if (TinhTrang != null)
+            {
+                query = query.Where(i => i.TrangThai == TinhTrang);
+            }
+            var donHangs = await query.OrderByDescending(i => i.ThoiGianTao).ToListAsync();
+            foreach (var donHang in donHangs)
+            {
+                var order = new ManageProductOrder
+                {
+                    IdDonHang = donHang.IdDonHang,
+                    ThoiGianTao = donHang.ThoiGianTao,
+                    ThoiGianGiao = donHang.ThoiGianGiao,
+                    TinhTrang = donHang.TrangThai,
+                    TongTien = donHang.TongTien,
+                };
+                var dsIdCuaHang = await _context.Chitietdonhangs
+                    .Where(i => i.IdDonHang == donHang.IdDonHang)
+                    .Include(i => i.IdSanPhamNavigation)
+                    .GroupBy(i => new
+                    {
+                        IdCuaHang = i.IdSanPhamNavigation.IdCuaHang
+                    })
+                    .Select(i => i.Key.IdCuaHang)
+                    .ToListAsync();
+                var dsCuaHang = await _context.Cuahangs.Where(i => dsIdCuaHang.Contains(i.IdCuaHang)).ToListAsync();
+                foreach (var cuaHang in dsCuaHang)
+                {
+                    var chiTietCuaHang = new OrderDescCuaHang
+                    {
+                        IdCuaHang = cuaHang.IdCuaHang,
+                        TenCuaHang = cuaHang.TenCuaHang
+                    };
+                    var dsSanPham = await _context.Chitietdonhangs
+                        .Include(i => i.IdSanPhamNavigation)
+                        .Where(i => i.IdDonHang == donHang.IdDonHang && i.IdSanPhamNavigation.IdCuaHang == cuaHang.IdCuaHang)
+                        .Select(i => new
+                        {
+                            IdSanPham = i.IdSanPham,
+                            TenSanPham = i.IdSanPhamNavigation.TenSanPham,
+                            UrlAnhSanPham = i.IdSanPhamNavigation.UrlAnh,
+                            DonGia = i.DonGia,
+                            SoLuong = i.SoLuong,
+                        })
+                        .ToListAsync();
+                    foreach (var sanPham in dsSanPham)
+                    {
+                        var chiTietSanPham = new OrderDescSanPham
+                        {
+                            IdSanPham = sanPham.IdSanPham,
+                            TenSanPham = sanPham.TenSanPham,
+                            UrlAnhSanPham = sanPham.UrlAnhSanPham,
+                            SoLuong = sanPham.SoLuong,
+                            DonGia = sanPham.DonGia,
+                        };
+                        var dsDanhGia = await _context.Danhgia
+                            .Where(i => i.IdSanPham == sanPham.IdSanPham && i.IdNguoiDung == user.IdNguoiDung)
+                            .ToListAsync();
+                        foreach (var danhGia in dsDanhGia)
+                        {
+                            chiTietSanPham.danhGias.Add(new DanhGiaInfo
+                            {
+                                IdDanhGia = danhGia.IdDanhGia,
+                                ThoiGianDanhGia = danhGia.ThoiGianDg,
+                                NoiDungDanhGia = danhGia.NoiDung,
+                                SoSaoDanhGia = danhGia.DiemDanhGia
+                            });
+                        }
+                        chiTietCuaHang.danhSachSanPhams.Add(chiTietSanPham);
+                    }
+                    order.danhSachCuaHang.Add(chiTietCuaHang);
+                }
+                profiles.danhSachDonHang.Add(order);
+            }
             return View(profiles);
         }
-        
+
         public async Task<IActionResult> ManageAddress()
         {
             string? currUserId = GetUserId();

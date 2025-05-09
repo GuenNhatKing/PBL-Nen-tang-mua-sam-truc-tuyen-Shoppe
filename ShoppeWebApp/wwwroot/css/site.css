@@ -353,6 +353,10 @@ ul {
     min-width: 5rem;
 }
 
+.min-width-150 {
+    min-width: 150px;
+}
+
 .my-card {
     padding-bottom: 0.35rem;
 }
@@ -403,6 +407,11 @@ ul {
 
 .box-padding-20 {
     padding: 20px;
+}
+
+.box-padding-top-bottom-20 {
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 .product-main-title-font {
@@ -476,6 +485,10 @@ ul {
 
 .border-style-3 {
     border: 1px solid #ddd;
+}
+
+.border-style-4 {
+    border: 1px solid #646464;
 }
 
 .counting-input {
@@ -652,6 +665,11 @@ ul {
 .box-padding-left-right-10 {
     padding-left: 10px;
     padding-right: 10px;
+}
+
+.box-padding-left-right-20 {
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 .delete-product-shopcart-button {
@@ -1177,4 +1195,18 @@ ul {
     color: #888;
     margin: 4px 0 0 0;
     line-height: 1.5;
+}
+
+/*-------------------------------------------------------------------*/
+
+.shop-side {
+    grid-column: 1 / span 6;
+}
+
+.shop-desc-side {
+    grid-column: 7 / span 9;
+}
+
+.bg-FBFBFB {
+    background-color: #FBFBFB;
 }
