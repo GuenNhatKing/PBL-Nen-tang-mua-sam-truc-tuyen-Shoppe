@@ -545,7 +545,9 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                 SoLuongBan = product.SoLuongBan,
                 TongDiemDG = danhGias.Sum(dg => dg.DiemDanhGia),
                 SoLuotDG = danhGias.Count,
-                DanhGias = danhGias
+                DanhGias = danhGias,
+                TrangThai = product.TrangThai,
+                ThoiGianXoa = product.ThoiGianXoa
             };
 
             return View(viewModel);
@@ -576,12 +578,84 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
             _context.SaveChanges();
             
             TempData["SuccessMessage"] = $"Sản phẩm '{product.TenSanPham}' đã được xóa thành công!";
+            TempData["InfoMessage"] = "Sản phẩm đã xóa có thể khôi phục trong vòng 30 ngày.";
             return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public IActionResult Restore(string IdSanPham)
+        {
+            var idCuaHang = User.Claims.FirstOrDefault(c => c.Type == "IdCuaHang")?.Value;
+
+            if (string.IsNullOrEmpty(idCuaHang))
+            {
+                TempData["ErrorMessage"] = "Không thể xác định cửa hàng của bạn. Vui lòng đăng nhập lại.";
+                return RedirectToAction("Login", "Account", new { area = "" });
+            }
+
+            var product = _context.Sanphams
+                .Include(p => p.IdDanhMucNavigation) // Include related category data
+                .FirstOrDefault(p => p.IdSanPham == IdSanPham && p.IdCuaHang == idCuaHang);
+                
+            if (product == null)
+            {
+                return NotFound("Không tìm thấy sản phẩm.");
+            }
+
+            // Kiểm tra xem sản phẩm có đang ở trạng thái đã xóa không
+            if (product.TrangThai != Constants.TAM_KHOA)
+            {
+                TempData["ErrorMessage"] = "Sản phẩm này không ở trạng thái đã xóa và không cần khôi phục.";
+                return RedirectToAction("DetailsProduct", new { IdSanPham = product.IdSanPham });
+            }
+
+            // Kiểm tra thời gian xóa
+            if (!product.ThoiGianXoa.HasValue)
+            {
+                TempData["ErrorMessage"] = "Không thể xác định thời gian xóa sản phẩm.";
+                return RedirectToAction("DetailsProduct", new { IdSanPham = product.IdSanPham });
+            }
+
+            // Tính số ngày đã qua kể từ khi xóa
+            TimeSpan timeSinceDeletion = DateTime.Now - product.ThoiGianXoa.Value;
+            int daysSinceDeletion = (int)timeSinceDeletion.TotalDays;
+
+            if (daysSinceDeletion > 30)
+            {
+                TempData["ErrorMessage"] = $"Không thể khôi phục sản phẩm đã xóa quá 30 ngày (đã xóa cách đây {daysSinceDeletion} ngày).";
+                return RedirectToAction("DetailsProduct", new { IdSanPham = product.IdSanPham });
+            }
+
+            // Lấy thêm thông tin chi tiết về sản phẩm
+            var danhGias = _context.Danhgia
+                .Where(dg => dg.IdSanPham == IdSanPham)
+                .ToList();
+
+            // Hiển thị trang xác nhận với thông tin chi tiết
+            var viewModel = new DetailsProductViewModel
+            {
+                IdSanPham = product.IdSanPham,
+                TenSanPham = product.TenSanPham,
+                TenDanhMuc = product.IdDanhMucNavigation?.TenDanhMuc ?? "Không có danh mục",
+                UrlAnh = product.UrlAnh,
+                GiaGoc = product.GiaGoc,
+                GiaBan = product.GiaBan,
+                SoLuongKho = product.SoLuongKho,
+                SoLuongBan = product.SoLuongBan,
+                MoTa = product.MoTa,
+                TrangThai = product.TrangThai,
+                ThoiGianXoa = product.ThoiGianXoa,
+                TongDiemDG = danhGias.Sum(dg => dg.DiemDanhGia),
+                SoLuotDG = danhGias.Count,
+                IdCuaHang = product.IdCuaHang,
+            };
+
+            return View("ConfirmRestore", viewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Restore(string IdSanPham)
+        public IActionResult RestoreConfirmed(string IdSanPham)  // Changed method name from Restore to RestoreConfirmed
         {
             var idCuaHang = User.Claims.FirstOrDefault(c => c.Type == "IdCuaHang")?.Value;
 
@@ -598,20 +672,30 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
             }
 
             // Kiểm tra xem có thể khôi phục sản phẩm hay không (dưới 30 ngày)
-            if (!product.ThoiGianXoa.HasValue || (DateTime.Now - product.ThoiGianXoa.Value).TotalDays > 30)
+            if (!product.ThoiGianXoa.HasValue)
             {
-                TempData["ErrorMessage"] = "Không thể khôi phục sản phẩm đã xóa quá 30 ngày.";
-                return RedirectToAction("Index");
+                TempData["ErrorMessage"] = "Không thể xác định thời gian xóa sản phẩm.";
+                return RedirectToAction("DetailsProduct", new { IdSanPham = product.IdSanPham });
+            }
+
+            // Tính số ngày đã qua kể từ khi xóa
+            TimeSpan timeSinceDeletion = DateTime.Now - product.ThoiGianXoa.Value;
+            int daysSinceDeletion = (int)timeSinceDeletion.TotalDays;
+
+            if (daysSinceDeletion > 30)
+            {
+                TempData["ErrorMessage"] = $"Không thể khôi phục sản phẩm đã xóa quá 30 ngày (đã xóa cách đây {daysSinceDeletion} ngày).";
+                return RedirectToAction("DetailsProduct", new { IdSanPham = product.IdSanPham });
             }
 
             // Khôi phục sản phẩm
-            product.TrangThai = Constants.CON_HANG; 
+            product.TrangThai = Constants.CON_HANG; // CON_HANG = 1
             product.ThoiGianXoa = null;
             
             _context.SaveChanges();
             
             TempData["SuccessMessage"] = $"Sản phẩm '{product.TenSanPham}' đã được khôi phục thành công!";
-            return RedirectToAction("Index");
+            return RedirectToAction("DetailsProduct", new { IdSanPham = product.IdSanPham });
         }
     }
 }

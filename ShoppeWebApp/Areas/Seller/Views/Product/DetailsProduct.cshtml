@@ -95,24 +95,18 @@
             {
                 @if (canRestore)
                 {
-                    <form asp-action="Restore" method="post" class="d-inline">
-                        <input type="hidden" name="IdSanPham" value="@Model.IdSanPham" />
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-undo-alt me-1"></i> Khôi phục
-                        </button>
-                    </form>
+                    <a asp-action="Restore" asp-route-IdSanPham="@Model.IdSanPham" 
+                       class="btn btn-success">
+                        <i class="fas fa-undo-alt me-1"></i> Khôi phục
+                    </a>
                 }
-                <div class="alert alert-warning mt-3">
-                    <i class="fas fa-exclamation-triangle me-1"></i> 
-                    @if (canRestore)
-                    {
-                        <span>Sản phẩm này đã bị xóa và chỉ có thể khôi phục trong vòng 30 ngày kể từ ngày xóa (@Model.ThoiGianXoa?.ToString("dd/MM/yyyy HH:mm"))</span>
-                    }
-                    else
-                    {
+                else
+                {
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-triangle me-1"></i>
                         <span>Sản phẩm này đã bị xóa quá 30 ngày (@Model.ThoiGianXoa?.ToString("dd/MM/yyyy HH:mm")) và không thể khôi phục</span>
-                    }
-                </div>
+                    </div>
+                }
             }
             else
             {
