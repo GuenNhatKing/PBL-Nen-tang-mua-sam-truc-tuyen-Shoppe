@@ -89,7 +89,7 @@
 							<div class="d-flex flex-column gap-2 border-bottom-style-1 box-padding-10">
 								<div class="d-flex gap-3 align-items-center">
 									<div class="color-F7AD45 fw-bold">Mã đơn hàng: @donHang.IdDonHang</div>
-									@if(donHang.TinhTrang == Constants.CHO_XAC_NHAN)
+									@if (donHang.TinhTrang == Constants.CHO_XAC_NHAN)
 									{
 										<div class="cho-xac-nhan">Chờ xác nhận</div>
 									}
@@ -142,11 +142,52 @@
 												<div>@string.Format("{0:#,##0} ₫", sanPham.DonGia * sanPham.SoLuong)</div>
 											</div>
 										</div>
-										<div class="review-box overlay-box" name="@sanPham.IdSanPham" style="display: none">
+										<div class="rating-box overlay-box" name="@sanPham.IdSanPham" style="display: none">
 											<div class="bg-white manage-product-review-box rounded">
 												<div class="box-padding-20 border-bottom-style-1">
 													<div class="box-padding-left-right-20">
 														<h3>Đánh giá sản phẩm</h3>
+													</div>
+												</div>
+												<div class="box-padding-left-right-20">
+													<div class="product-main-info-review-item d-flex gap-3 width-40rem">
+														<div class="box-padding-10">
+															<img src="~/@Model.UrlAnhDaiDien" class="circle-img">
+														</div>
+														<div class="box-padding-10 width-100">
+															<div class="d-flex flex-column product-main-info-review-meta">
+																<div><strong>@Model.HoVaTen</strong></div>
+																<div class="product-main-info-bold mt-2">
+																	<div class="rating d-flex align-items-center">
+																		<span class="selected-rating" name="@sanPham.IdSanPham">0</span>
+																		<div class="d-flex star-line">
+																			<span class="fa fa-star" name="@sanPham.IdSanPham" data-value="1"></span>
+																			<span class="fa fa-star" name="@sanPham.IdSanPham" data-value="2"></span>
+																			<span class="fa fa-star" name="@sanPham.IdSanPham" data-value="3"></span>
+																			<span class="fa fa-star" name="@sanPham.IdSanPham" data-value="4"></span>
+																			<span class="fa fa-star" name="@sanPham.IdSanPham" data-value="5"></span>
+																		</div>
+																	</div>
+																</div>
+															</div>
+															<div class="product-main-info-review-content mt-2">
+																<textarea class="custom-textarea-style-1 rating-content" name="@sanPham.IdSanPham"></textarea>
+															</div>
+														</div>
+													</div>
+												</div>
+
+												<div class="d-flex box-padding-20">
+													<button class="exitRatingBtn ms-auto invisible-button profiles-edit-button" name="@sanPham.IdSanPham">Thoát</button>
+													<button class="confirmRatingBtn ms-2 invisible-button profiles-edit-button" name="@sanPham.IdSanPham">Xác nhận</button>
+												</div>
+											</div>
+										</div>
+										<div class="review-box overlay-box" name="@sanPham.IdSanPham" style="display: none">
+											<div class="bg-white manage-product-review-box rounded">
+												<div class="box-padding-20 border-bottom-style-1">
+													<div class="box-padding-left-right-20">
+														<h3>Đã đánh giá</h3>
 													</div>
 												</div>
 												<div class="box-padding-left-right-20">
@@ -198,7 +239,7 @@
 												}
 												else if (donHang.ThoiGianGiao <= DateTime.UtcNow + TimeSpan.FromDays(15))
 												{
-													<button name="@sanPham.IdSanPham" class="invisible-button manage-product-review-btn">
+													<button name="@sanPham.IdSanPham" class="invisible-button manage-product-review-btn ratingBtn">
 														Đánh giá ngay
 													</button>
 												}
@@ -224,6 +265,9 @@
 <script>
 	let reviewBtn = document.getElementsByClassName('reviewBtn');
 	let exitBtn = document.getElementsByClassName('exitBtn');
+	let ratingBtn = document.getElementsByClassName('ratingBtn');
+	let exitRatingBtn = document.getElementsByClassName('exitRatingBtn');
+	let confirmRatingBtn = document.getElementsByClassName('confirmRatingBtn');
 	for(let btn of reviewBtn) {
 		btn.addEventListener('click', function() {
 			let name = this.name;
@@ -237,5 +281,68 @@
 			let box = document.querySelector(`.review-box[name="${name}"]`)
 			box.style.display = 'none';
 		});
+	}
+	for(let btn of ratingBtn) {
+		btn.addEventListener('click', function() {
+			let name = this.name;
+			let box = document.querySelector(`.rating-box[name="${name}"]`)
+			box.style.display = 'flex';
+		});
+	}
+	for(let btn of exitRatingBtn) {
+		btn.addEventListener('click', function() {
+			let name = this.name;
+			let box = document.querySelector(`.rating-box[name="${name}"]`)
+			box.style.display = 'none';
+		});
+	}
+	for(let btn of confirmRatingBtn) {
+		btn.addEventListener('click', function() {
+			let name = this.name;
+			let box = document.querySelector(`.rating-box[name="${name}"]`)
+			box.style.display = 'none';
+		});
+	}
+	let ratingDivs = document.getElementsByClassName('rating');
+
+	for (let ratingDiv of ratingDivs) {
+		let productId = ratingDiv.querySelector('.fa-star').getAttribute('name');
+		let stars = ratingDiv.querySelectorAll(`.fa-star[name="${productId}"]`);
+		let selectedRating = ratingDiv.querySelector(`.selected-rating[name="${productId}"]`);
+
+		for (let star of stars) {
+			star.addEventListener('click', function () {
+				let value = parseInt(this.getAttribute('data-value'));
+
+				for (let s of stars) {
+					s.classList.remove('star-checked');
+				}
+				for (let s of stars) {
+					if (parseInt(s.getAttribute('data-value')) <= value) {
+						s.classList.add('star-checked');
+					}
+				}
+
+				selectedRating.textContent = value;
+			});
+
+			star.addEventListener('mouseenter', function () {
+				let value = parseInt(this.getAttribute('data-value'));
+				for (let s of stars) {
+					s.classList.remove('star-hovered');
+				}
+				for (let s of stars) {
+					if (parseInt(s.getAttribute('data-value')) <= value) {
+						s.classList.add('star-hovered');
+					}
+				}
+			});
+
+			star.addEventListener('mouseleave', function () {
+				for (let s of stars) {
+					s.classList.remove('star-hovered');
+				}
+			});
+		}
 	}
 </script>
