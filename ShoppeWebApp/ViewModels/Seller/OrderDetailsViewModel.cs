@@ -22,6 +22,7 @@ namespace ShoppeWebApp.ViewModels.Seller
 
     public class SanPhamViewModel
     {
+        public string IdSanPham { get; set; }
         public string TenSanPham { get; set; }
         public int SoLuong { get; set; }
         public decimal DonGia { get; set; }
