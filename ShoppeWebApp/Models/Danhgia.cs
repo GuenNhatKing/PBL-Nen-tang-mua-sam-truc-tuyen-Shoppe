@@ -29,8 +29,6 @@ public partial class Danhgia
     [Column("ThoiGianDG", TypeName = "datetime")]
     public DateTime? ThoiGianDg { get; set; }
 
-    public string MaDonHang { get; set; }
-
     [ForeignKey("IdNguoiDung")]
     [InverseProperty("Danhgia")]
     public virtual Nguoidung IdNguoiDungNavigation { get; set; } = null!;
