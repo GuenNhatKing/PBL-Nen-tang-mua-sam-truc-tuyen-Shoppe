@@ -4,39 +4,41 @@
 }
 <div class="template-2">
 	<div class="container-2">
-		<div class="bg-white box-padding-20 border-rounded product-main-info-store">
-			<div class="d-flex gap-4">
-				<div class="box-padding-15">
-					<img src="@Model.UrlAnhCuaHang" class="circle-img">
-				</div>
-				<div class="d-flex flex-column justify-content-center">
-					<div class="product-main-info-store-name">@Model.TenCuaHang</div>
-					<table class="product-main-info-stat">
-						<tr>
-							<td>Sản phẩm đang bán:</td>
-							<td>@Model.SoSanPhamDangBan</td>
-						</tr>
-						<tr>
-							<td>Đã tham gia vào:</td>
-							<td>@Model.ThoiGianThamGia?.ToString("dd/MM/yyyy")</td>
-						</tr>
-						<tr>
-							<td>Địa chỉ cửa hàng:</td>
-							<td>@Model.DiaChiCuaHang</td>
-						</tr>
-					</table>
+		<div class="bg-white box-padding-left-right-20 border-rounded gh-grid">
+			<div class="shop-side box-padding-top-bottom-20">
+				<div class="bg-FBFBFB box-padding-20 border-rounded product-main-info-store">
+					<div class="d-flex gap-4">
+						<div class="box-padding-15">
+							<img src="@Model.UrlAnhCuaHang" class="circle-img">
+						</div>
+						<div class="d-flex flex-column justify-content-center">
+							<div class="product-main-info-store-name">@Model.TenCuaHang</div>
+							<table class="product-main-info-stat">
+								<tr>
+									<td class="min-width-150">Sản phẩm đang bán:</td>
+									<td>@Model.SoSanPhamDangBan</td>
+								</tr>
+								<tr>
+									<td>Đã tham gia vào:</td>
+									<td>@Model.ThoiGianThamGia?.ToString("dd/MM/yyyy")</td>
+								</tr>
+								<tr>
+									<td>Địa chỉ cửa hàng:</td>
+									<td>@Model.DiaChiCuaHang</td>
+								</tr>
+							</table>
+						</div>
+					</div>
 				</div>
 			</div>
-		</div>
-		@if (!string.IsNullOrEmpty(Model.MoTaCuaHang))
-		{
-			<div class="bg-white box-padding-20 border-rounded product-main-info-store">
+			<div class="shop-desc-side bg-white box-padding-20 border-rounded product-main-info-store">
 				<div class="product-main-info-store-name">Mô tả cửa hàng</div>
 				<div>
 					@Model.MoTaCuaHang
 				</div>
 			</div>
-		}
+		</div>
+
 		<div class="gh-grid mt-4">
 			<div class="sidebar">
 				<div class="bg-white d-flex flex-column overflow-hidden border-rounded">
