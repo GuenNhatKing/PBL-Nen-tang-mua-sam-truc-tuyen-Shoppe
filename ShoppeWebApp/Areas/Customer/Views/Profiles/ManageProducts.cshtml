@@ -125,7 +125,7 @@
 									foreach (var sanPham in cuaHang.danhSachSanPhams)
 									{
 										@* <div>@sanPham.IdSanPham</div> *@
-										<div class="bg-FBFBFB d-flex box-padding-10 gap-3 border-bottom-style-1 product-display">
+										<div class="bg-FBFBFB d-flex box-padding-10 gap-3 border-bottom-style-1">
 											<div class="width-62 d-flex gap-3">
 												<div class="width-height-80px graphic-cover-2">
 													<img src="~/@sanPham.UrlAnhSanPham" />
@@ -143,14 +143,22 @@
 											</div>
 										</div>
 										<div class="rating-box overlay-box" name="@sanPham.IdSanPham" style="display: none">
-											<div class="bg-white manage-product-review-box rounded">
+											<div class="bg-white manage-product-review-box rounded width-40rem">
 												<div class="box-padding-20 border-bottom-style-1">
 													<div class="box-padding-left-right-20">
 														<h3>Đánh giá sản phẩm</h3>
 													</div>
 												</div>
+												<div class="bg-FBFBFB d-flex box-padding-20 gap-3 border-bottom-style-1 width-100">
+													<div class="d-flex width-100 gap-3">
+														<div class="width-height-80px graphic-cover-2">
+															<img src="~/@sanPham.UrlAnhSanPham" />
+														</div>
+														<div>@sanPham.TenSanPham</div>
+													</div>
+												</div>
 												<div class="box-padding-left-right-20">
-													<div class="product-main-info-review-item d-flex gap-3 width-40rem">
+													<div class="product-main-info-review-item d-flex gap-3 width-100">
 														<div class="box-padding-10">
 															<img src="~/@Model.UrlAnhDaiDien" class="circle-img">
 														</div>
@@ -184,17 +192,25 @@
 											</div>
 										</div>
 										<div class="review-box overlay-box" name="@sanPham.IdSanPham" style="display: none">
-											<div class="bg-white manage-product-review-box rounded">
+											<div class="bg-white manage-product-review-box rounded width-40rem">
 												<div class="box-padding-20 border-bottom-style-1">
 													<div class="box-padding-left-right-20">
 														<h3>Đã đánh giá</h3>
+													</div>
+												</div>
+												<div class="bg-FBFBFB d-flex box-padding-20 gap-3 border-bottom-style-1 width-100">
+													<div class="d-flex width-100 gap-3">
+														<div class="width-height-80px graphic-cover-2">
+															<img src="~/@sanPham.UrlAnhSanPham" />
+														</div>
+														<div>@sanPham.TenSanPham</div>
 													</div>
 												</div>
 												<div class="box-padding-left-right-20">
 													@if (sanPham.danhGias != null)
 														@foreach (var danhGia in sanPham.danhGias)
 														{
-															<div class="product-main-info-review-item d-flex gap-3 width-40rem">
+															<div class="product-main-info-review-item d-flex gap-3 width-100">
 																<div class="box-padding-10">
 																	<img src="~/@Model.UrlAnhDaiDien" class="circle-img">
 																</div>
@@ -287,6 +303,14 @@
 			let name = this.name;
 			let box = document.querySelector(`.rating-box[name="${name}"]`)
 			box.style.display = 'flex';
+			let stars = document.querySelectorAll(`.fa-star[name="${name}"]`);
+			for (let s of stars) {
+				s.classList.remove('star-checked');
+			}
+			let ratingValue = document.querySelector(`.selected-rating[name="${name}"]`);
+			let ratingContent = document.querySelector(`.rating-content[name="${name}"]`);
+			ratingValue.textContent = 0;
+			ratingContent.value = "";
 		});
 	}
 	for(let btn of exitRatingBtn) {
@@ -296,10 +320,34 @@
 			box.style.display = 'none';
 		});
 	}
+	window.addEventListener("load", () => {
+	    let scrollPos = localStorage.getItem("scrollPos");
+	    if (scrollPos !== null) {
+		    window.scrollTo(0, parseInt(scrollPos));
+		    localStorage.removeItem("scrollPos");
+	    }
+	});
 	for(let btn of confirmRatingBtn) {
 		btn.addEventListener('click', function() {
 			let name = this.name;
-			let box = document.querySelector(`.rating-box[name="${name}"]`)
+			let box = document.querySelector(`.rating-box[name="${name}"]`);
+			let ratingValue = parseInt(document.querySelector(`.selected-rating[name="${name}"]`).textContent);
+			let ratingContent = document.querySelector(`.rating-content[name="${name}"]`).value;
+			$.ajax({
+				url: '@Url.Action("SubmitRating", "Profiles")',
+				type: 'POST',
+				data: { IdSanPham: name, ratingValue: ratingValue, ratingContent: ratingContent },
+				dataType: "json",
+				success: function(response) {
+					if(response.isSuccess === true) {
+						let btn = document.querySelector(`.ratingBtn[name="${name}"]`)
+						btn.remove();
+						let scrollY = window.scrollY;
+						localStorage.setItem("scrollPos", scrollY);
+						location.reload();
+					}
+				},
+			})
 			box.style.display = 'none';
 		});
 	}

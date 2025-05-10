@@ -265,11 +265,12 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                         _context.Chitietdonhangs.Add(productDetails);
                     }
                     await _context.SaveChangesAsync();
-                    // Giam so luong kho cua san pham
+                    // Thay doi so luong kho va so luong ban cua san pham
                     foreach (var i in sanPhams)
                     {
                         int? soLuong = (await _context.Giohangs.FirstOrDefaultAsync())?.SoLuong;
                         i.SoLuongKho -= soLuong ?? 0;
+                        i.SoLuongBan += soLuong ?? 0;
                         _context.Sanphams.Update(i);
                     }
                     await _context.SaveChangesAsync();
