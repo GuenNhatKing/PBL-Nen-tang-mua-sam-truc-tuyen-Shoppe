@@ -73,8 +73,10 @@ namespace QLTTDT.Services
         {
             byte[] bytes = new byte[Constants.RANDOM_SIZE];
             RandomNumberGenerator.Fill(bytes);
-            long elapsed = (long)(DateTime.UtcNow - Constants.DAYS_USE_FOR_RANDOM).TotalMilliseconds;
-            return elapsed.ToString() + bytesToBase62(bytes);
+            int currentYear = DateTime.UtcNow.Year;
+            DateTime firstDayOfYear = new DateTime(currentYear, 1, 1);
+            long elapsed = (long)(DateTime.UtcNow - firstDayOfYear).TotalMilliseconds;
+            return currentYear.ToString() + elapsed.ToString() + bytesToBase62(bytes);
         }
         private static string bytesToBase62(byte[] bytes)
         {

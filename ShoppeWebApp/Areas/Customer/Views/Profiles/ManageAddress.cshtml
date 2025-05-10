@@ -39,7 +39,77 @@
 			<h2 class="profiles-section-title">
 				<strong>Địa chỉ liên hệ</strong>
 			</h2>
+			<div class="bg-FBFBFB box-padding-20 border-style-3">
+				<div class="d-flex flex-column gap-3">
+					<div class="d-flex">
+						<div class="ms-auto">
+							<button class="btn-buy">Thêm địa chỉ mới</button>
+						</div>
+					</div>
+					@foreach (var lienHe in Model.danhSachLienHe)
+					{
+						<div class="edit-address-box overlay-box" name="@lienHe.IdLienHe" style="display: none">
+							<div class="bg-white manage-product-review-box rounded width-40rem">
+								<div class="box-padding-20 border-bottom-style-1">
+									<div class="box-padding-left-right-20">
+										<h3>Chỉnh sửa địa chỉ</h3>
+									</div>
+								</div>
 
+								<div class="box-padding-left-right-20">
+									<div>
+										<div><strong>@lienHe.HoVaTen</strong></div>
+										<div>@lienHe.Sdt</div>
+										<div>@lienHe.DiaChi</div>
+									</div>
+								</div>
+
+								<div class="d-flex box-padding-20">
+									<button class="exitEditBtn ms-auto invisible-button profiles-edit-button" name="@lienHe.IdLienHe">Thoát</button>
+									<button class="confirmEditBtn ms-2 invisible-button profiles-edit-button" name="@lienHe.IdLienHe">Xác nhận</button>
+								</div>
+							</div>
+						</div>
+						<div class="bg-white box-padding-20 border-style-3 d-flex align-items-center">
+							<div>
+								<div><strong>@lienHe.HoVaTen</strong></div>
+								<div>@lienHe.Sdt</div>
+								<div>@lienHe.DiaChi</div>
+							</div>
+							<div class="ms-auto">
+								<button class="invisible-button manage-product-review-btn editBtn" name="@lienHe.IdLienHe">Chỉnh sửa</button>
+								<button class="invisible-button remove-address-btn">Xoá</button>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
+<script>
+	let editBtn = document.getElementsByClassName('editBtn');
+	let exitEditBtn = document.getElementsByClassName('exitEditBtn');
+	let confirmEditBtn = document.getElementsByClassName('confirmEditBtn');
+	for(let btn of editBtn) {
+		btn.addEventListener('click', function() {
+			let name = this.name;
+			let box = document.querySelector(`.edit-address-box[name="${name}"]`)
+			box.style.display = 'flex';
+		});
+	}
+	for(let btn of exitEditBtn) {
+		btn.addEventListener('click', function() {
+			let name = this.name;
+			let box = document.querySelector(`.edit-address-box[name="${name}"]`)
+			box.style.display = 'none';
+		});
+	}
+	for(let btn of confirmEditBtn) {
+		btn.addEventListener('click', function() {
+			let name = this.name;
+			let box = document.querySelector(`.edit-address-box[name="${name}"]`)
+			box.style.display = 'none';
+		});
+	}
+</script>

@@ -275,12 +275,10 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                 IdNguoiDung = user.IdNguoiDung,
                 Email = user.Email,
                 HoVaTen = user.HoVaTen,
-                SoDienThoai = user.Sdt,
                 UrlAnhDaiDien = user.UrlAnh,
-                Cccd = user.Cccd,
-                DiaChi = user.DiaChi,
-                SoDu = user.SoDu,
             };
+            profiles.danhSachLienHe = await _context.Thongtinlienhes
+                .Where(i => i.IdNguoiDung == user.IdNguoiDung).ToListAsync();
             return View(profiles);
         }
         private string? GetUserId()
