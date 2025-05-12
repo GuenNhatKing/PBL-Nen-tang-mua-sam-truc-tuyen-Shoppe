@@ -214,7 +214,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                 int? soLuong = (await _context.Giohangs.FirstOrDefaultAsync())?.SoLuong;
                 tongTien += i.GiaBan * (soLuong ?? 0);
             }
-            if(nguoiDung.SoDu < tongTien)
+            if (nguoiDung.SoDu < tongTien)
             {
                 return RedirectToAction("Index", "Profiles");
             }
@@ -228,7 +228,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                     string? maxIdDonHang = await _context.Donhangs.OrderByDescending(i => i.IdDonHang)
                         .Select(i => i.IdDonHang).FirstOrDefaultAsync();
                     string newIdDonHang = "";
-                    if(maxIdDonHang == null)
+                    if (maxIdDonHang == null)
                     {
                         newIdDonHang = "DH-" + new String('0', 7);
                     }
@@ -253,7 +253,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                     };
                     _context.Donhangs.Add(donHang);
                     await _context.SaveChangesAsync();
-                    foreach(var i in sanPhams)
+                    foreach (var i in sanPhams)
                     {
                         var productDetails = new Chitietdonhang
                         {
@@ -265,11 +265,20 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                         _context.Chitietdonhangs.Add(productDetails);
                     }
                     await _context.SaveChangesAsync();
+                    // Thay doi so luong kho va so luong ban cua san pham
+                    foreach (var i in sanPhams)
+                    {
+                        int? soLuong = (await _context.Giohangs.FirstOrDefaultAsync())?.SoLuong;
+                        i.SoLuongKho -= soLuong ?? 0;
+                        i.SoLuongBan += soLuong ?? 0;
+                        _context.Sanphams.Update(i);
+                    }
+                    await _context.SaveChangesAsync();
                     // Xoa khoi gio hang
                     var gioHangs = await _context.Giohangs
                         .Where(i => i.IdNguoiDung == userId && danhSachSanPham.Contains(i.IdSanPham))
                         .ToListAsync();
-                    foreach(var i in gioHangs)
+                    foreach (var i in gioHangs)
                     {
                         _context.Giohangs.Remove(i);
                     }

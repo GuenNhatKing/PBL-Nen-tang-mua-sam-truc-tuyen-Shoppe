@@ -194,7 +194,72 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                 }
                 profiles.danhSachDonHang.Add(order);
             }
+            ViewBag.TinhTrang = TinhTrang;
             return View(profiles);
+        }
+        public async Task<JsonResult> SubmitRating(string? IdSanPham, int? ratingValue, string? ratingContent)
+        {
+            if (IdSanPham == null || ratingValue == null)
+            {
+                return Json(new JSResult(false, null));
+            }
+            var sanPham = await _context.Sanphams.FirstOrDefaultAsync(i => i.IdSanPham == IdSanPham);
+            if (sanPham == null)
+            {
+                return Json(new JSResult(false, null));
+            }
+            string? currUserId = GetUserId();
+            var user = await _context.Nguoidungs.FirstOrDefaultAsync(i => i.IdNguoiDung == currUserId);
+            if (user == null)
+            {
+                return Json(new JSResult(false, null));
+            }
+            string? maxIdDanhGia = await _context.Danhgia.OrderByDescending(i => i.IdDanhGia)
+                .Select(i => i.IdDanhGia).FirstOrDefaultAsync();
+            Console.WriteLine();
+            string newIdDanhGia = "";
+            if (maxIdDanhGia == null)
+            {
+                newIdDanhGia = "DG-" + new String('0', 7);
+            }
+            else
+            {
+                string[] field = maxIdDanhGia.Split('-');
+                int? num = Convert.ToInt32(field[1]);
+                if (num == null) throw new InvalidDataException("Id khong dung dinh dang");
+                else
+                {
+                    int newId = (int)num + 1;
+                    newIdDanhGia = "DG-" + newId.ToString("D7");
+                }
+            }
+            var newDanhGia = new Danhgia
+            {
+                IdDanhGia = newIdDanhGia,
+                IdNguoiDung = user.IdNguoiDung,
+                IdSanPham = sanPham.IdSanPham,
+                ThoiGianDg = DateTime.Now,
+                DiemDanhGia = (int)ratingValue,
+                NoiDung = ratingContent,
+            };
+            using(var trans = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    _context.Danhgia.Add(newDanhGia);
+                    await _context.SaveChangesAsync();
+                    sanPham.SoLuongDanhGia += 1;
+                    sanPham.TongDiemDanhGia += newDanhGia.DiemDanhGia;
+                    _context.Sanphams.Update(sanPham);
+                    await _context.SaveChangesAsync();
+                    await trans.CommitAsync();
+                }
+                catch(Exception)
+                {
+                    await trans.RollbackAsync();
+                }
+            }
+            return Json(new JSResult(true, null));
         }
 
         public async Task<IActionResult> ManageAddress()
@@ -210,12 +275,10 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                 IdNguoiDung = user.IdNguoiDung,
                 Email = user.Email,
                 HoVaTen = user.HoVaTen,
-                SoDienThoai = user.Sdt,
                 UrlAnhDaiDien = user.UrlAnh,
-                Cccd = user.Cccd,
-                DiaChi = user.DiaChi,
-                SoDu = user.SoDu,
             };
+            profiles.danhSachLienHe = await _context.Thongtinlienhes
+                .Where(i => i.IdNguoiDung == user.IdNguoiDung).ToListAsync();
             return View(profiles);
         }
         private string? GetUserId()
