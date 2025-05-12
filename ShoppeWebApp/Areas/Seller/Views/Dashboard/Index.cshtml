@@ -144,9 +144,13 @@
                 tension: 0.1
             }]
         };
+        
         new Chart(document.getElementById('revenueByDayChart'), {
             type: 'line',
-            data: revenueByDayData
+            data: revenueByDayData,
+            options: {
+                responsive: true
+            }
         });
 
         // Doanh thu theo sản phẩm
@@ -160,11 +164,7 @@
                 borderWidth: 1
             }]
         };
-        new Chart(document.getElementById('revenueByProductChart'), {
-            type: 'bar',
-            data: revenueByProductData
-        });
-
+        
         // Tần suất đặt đơn hàng
         const orderFrequencyData = {
             labels: @Html.Raw(Json.Serialize(Model.OrderFrequency.Select(r => r.Date.ToString("dd/MM/yyyy")))),
@@ -176,9 +176,24 @@
                 borderWidth: 1
             }]
         };
+        
+        // Làm tròn dữ liệu đơn hàng lên 1.0
+        orderFrequencyData.datasets[0].data = orderFrequencyData.datasets[0].data.map(value => Math.ceil(value));
+        
         new Chart(document.getElementById('orderFrequencyChart'), {
             type: 'bar',
-            data: orderFrequencyData
+            data: orderFrequencyData,
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
         });
     </script>
 }
