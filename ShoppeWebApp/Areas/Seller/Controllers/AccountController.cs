@@ -31,12 +31,10 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
         {
             if (ModelState.IsValid)
             {
-                var potentialAccounts = _context.Taikhoans
-                    .Include(a => a.IdNguoiDungNavigation)
-                    .Where(a => a.Username.ToLower() == model.Username.ToLower() && a.Password == model.Password)
-                    .AsEnumerable();
-                
-                var account = potentialAccounts.FirstOrDefault(a => a.Username == model.Username);
+                // Kiểm tra tài khoản và mật khẩu
+                var account = _context.Taikhoans
+                    .Include(a => a.IdNguoiDungNavigation) // Tải thông tin người dùng liên kết
+                    .FirstOrDefault(a => a.Username == model.Username && a.Password == model.Password);
         
                 if (account != null)
                 {
