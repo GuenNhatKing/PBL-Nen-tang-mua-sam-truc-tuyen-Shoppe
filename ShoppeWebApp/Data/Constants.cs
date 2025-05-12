@@ -46,7 +46,6 @@
         };
 
         public const int RANDOM_SIZE = 16;
-        public static DateTime DAYS_USE_FOR_RANDOM = new DateTime(2025, 1, 1);
         
         public const int HUY_DON_HANG = 0;
         public const int CHO_XAC_NHAN = 1;
