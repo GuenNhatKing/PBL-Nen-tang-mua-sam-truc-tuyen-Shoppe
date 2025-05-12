@@ -3,29 +3,34 @@
 	ViewData["Title"] = "Trang cá nhân";
 }
 <div class="profiles-wrapper">
-	<div class="profiles-sidebar">
-		<div class="profiles-avatar-wrapper">
-			@if (Model.UrlAnhDaiDien != null)
-			{
-				<img src="~/@Model.UrlAnhDaiDien" class="profiles-avatar" />
-			}
-			else
-			{
-				<img src="~/images/avatar-mac-dinh.jpg" class="profiles-avatar" />
-			}
-		</div>
-		<div class="profiles-name">@Html.DisplayFor(model => model.HoVaTen)</div>
-		<div class="profiles-username">@Html.DisplayFor(model => model.Email)</div>
-		<div class="d-flex flex-column align-items-center gap-3">
-			<a class="profiles-edit-button" asp-action="ChangeProfiles">
-				Chỉnh sửa thông tin
-			</a>
-			<a class="tab-link" asp-action="ManageProducts">
-				Quản lý đơn hàng
-			</a>
-			<a class="tab-link" asp-action="ManageAddress">
-				Địa chỉ liên hệ
-			</a>
+	<div>
+		<div class="profiles-sidebar">
+			<div class="profiles-avatar-wrapper">
+				@if (Model.UrlAnhDaiDien != null)
+				{
+					<img src="~/@Model.UrlAnhDaiDien" class="profiles-avatar" />
+				}
+				else
+				{
+					<img src="~/images/avatar-mac-dinh.jpg" class="profiles-avatar" />
+				}
+			</div>
+			<div class="profiles-name">@Html.DisplayFor(model => model.HoVaTen)</div>
+			<div class="profiles-username">@Html.DisplayFor(model => model.Email)</div>
+			<div class="d-flex flex-column align-items-center gap-3">
+				<a class="profiles-edit-button" asp-action="ChangeProfiles">
+					Chỉnh sửa thông tin
+				</a>
+				<a class="tab-link" asp-action="Index">
+					Thông tin cá nhân
+				</a>
+				<a class="tab-link" asp-action="ManageProducts">
+					Quản lý đơn hàng
+				</a>
+				<a class="tab-link" asp-action="ManageAddress">
+					Địa chỉ liên hệ
+				</a>
+			</div>
 		</div>
 	</div>
 
@@ -34,7 +39,62 @@
 			<h2 class="profiles-section-title">
 				<strong>Quản lý đơn hàng</strong>
 			</h2>
-
+			<div class="bg-FBFBFB box-padding-20">
+				<div class="d-flex gap-3">
+					<a class="tab-link" href="#">Tất cả</a>
+					<a class="tab-link" href="#">Chờ xác nhận</a>
+					<a class="tab-link" href="#">Đã xác nhận</a>
+					<a class="tab-link" href="#">Đã hoàn thành</a>
+					<a class="tab-link" href="#">Đã huỷ</a>
+				</div>
+				@foreach (var donHang in Model.danhSachDonHang)
+				{
+					<div class="bg-white mt-3 box-padding-20">
+						<div class="border-bottom-style-1">
+							<div>Mã đơn hàng: @donHang.IdDonHang</div>
+							<div>Thời gian đặt hàng: @donHang.ThoiGianTao</div>
+							@if (donHang.ThoiGianGiao != null)
+							{
+								<div>Thời gian nhận hàng: @donHang.ThoiGianGiao</div>
+							}
+						</div>
+						<div class="border-bottom-style-1">
+							@foreach (var cuaHang in donHang.danhSachCuaHang)
+							{
+								<div class="border-bottom-style-1">
+									@* <div>@cuaHang.IdCuaHang</div> *@
+									<div>@cuaHang.TenCuaHang</div>
+								</div>
+								foreach (var sanPham in cuaHang.danhSachSanPhams)
+								{
+									@* <div>@sanPham.IdSanPham</div> *@
+									<div>@sanPham.UrlAnhSanPham</div>
+									<div>@sanPham.TenSanPham</div>
+									<div>Số lượng: @sanPham.SoLuong</div>
+									<div>Đơn giá: @sanPham.DonGia</div>
+									<div>Tổng tiền: </div>
+									@if (sanPham.danhGias != null && sanPham.danhGias.Count > 0)
+									{
+										<button>Xem đánh giá</button>
+										foreach (var danhGia in sanPham.danhGias)
+										{
+											@* <div>@danhGia.IdDanhGia</div> *@
+											<div>@danhGia.SoSaoDanhGia</div>
+											<div>@danhGia.ThoiGianDanhGia</div>
+											<div>@danhGia.NoiDungDanhGia</div>
+										}
+									}
+									else if(donHang.ThoiGianGiao <= DateTime.UtcNow + TimeSpan.FromDays(15))
+									{
+										<button>Đánh giá ngay</button>
+									}
+								}
+							}
+						</div>
+						<div>Thành tiền: @donHang.TongTien</div>
+					</div>
+				}
+			</div>
 		</div>
 	</div>
 </div>
