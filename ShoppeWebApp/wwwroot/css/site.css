@@ -642,6 +642,10 @@ ul {
     min-height: 3rem;
 }
 
+.min-height-4 {
+    min-height: 4rem;
+}
+
 .width-100 {
     width: 100%;
 }

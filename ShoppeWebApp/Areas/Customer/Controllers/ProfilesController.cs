@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Diagnostics;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -242,7 +243,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                 DiemDanhGia = (int)ratingValue,
                 NoiDung = ratingContent,
             };
-            using(var trans = _context.Database.BeginTransaction())
+            using (var trans = _context.Database.BeginTransaction())
             {
                 try
                 {
@@ -254,9 +255,10 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                     await _context.SaveChangesAsync();
                     await trans.CommitAsync();
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     await trans.RollbackAsync();
+                    return Json(new JSResult(false, null));
                 }
             }
             return Json(new JSResult(true, null));
@@ -281,6 +283,128 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                 .Where(i => i.IdNguoiDung == user.IdNguoiDung).ToListAsync();
             return View(profiles);
         }
+        [HttpPost]
+        public async Task<JsonResult> AddAddressInfo(string? HoVaTen = null, string? SDT = null, string? DiaChi = null)
+        {
+            if (HoVaTen == null || SDT == null || DiaChi == null)
+            {
+                return Json(new JSResult(false, null));
+            }
+            string? currUserId = GetUserId();
+            var user = await _context.Nguoidungs.FirstOrDefaultAsync(i => i.IdNguoiDung == currUserId);
+            if (user == null)
+            {
+                return Json(new JSResult(false, null));
+            }
+
+            try
+            {
+                string? maxIdLienHe = await _context.Thongtinlienhes.OrderByDescending(i => i.IdLienHe)
+                .Select(i => i.IdLienHe).FirstOrDefaultAsync();
+                Console.WriteLine();
+                string newIdLienHe = "";
+                if (maxIdLienHe == null)
+                {
+                    newIdLienHe = new String('0', 10);
+                }
+                else
+                {
+                    int? num = Convert.ToInt32(maxIdLienHe);
+                    if (num == null) throw new InvalidDataException("Id khong dung dinh dang");
+                    else
+                    {
+                        int newId = (int)num + 1;
+                        newIdLienHe = newId.ToString("D10");
+                    }
+                }
+                var lienHe = new Thongtinlienhe
+                {
+                    IdLienHe = newIdLienHe,
+                    HoVaTen = HoVaTen,
+                    IdNguoiDung = user.IdNguoiDung,
+                    Sdt = SDT,
+                    DiaChi = DiaChi,
+                };
+                _context.Thongtinlienhes.Add(lienHe);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                return Json(new JSResult(false, null));
+            }
+            return Json(new JSResult(true, null));
+        }
+        [HttpPost]
+        public async Task<JsonResult> UpdateAddressInfo(string? IdLienHe = null, string? HoVaTen = null, string? SDT = null, string? DiaChi = null)
+        {
+            if (IdLienHe == null || HoVaTen == null || SDT == null || DiaChi == null)
+            {
+                return Json(new JSResult(false, null));
+            }
+            var lienHe = await _context.Thongtinlienhes.FirstOrDefaultAsync(i => i.IdLienHe == IdLienHe);
+            if (lienHe == null)
+            {
+                return Json(new JSResult(false, null));
+            }
+            string? currUserId = GetUserId();
+            var user = await _context.Nguoidungs.FirstOrDefaultAsync(i => i.IdNguoiDung == currUserId);
+            if (user == null)
+            {
+                return Json(new JSResult(false, null));
+            }
+            if (lienHe.IdNguoiDung != user.IdNguoiDung)
+            {
+                return Json(new JSResult(false, null));
+            }
+            try
+            {
+                lienHe.HoVaTen = HoVaTen;
+                lienHe.Sdt = SDT;
+                lienHe.DiaChi = DiaChi;
+                _context.Thongtinlienhes.Update(lienHe);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                return Json(new JSResult(false, null));
+            }
+            return Json(new JSResult(true, null));
+        }
+        [HttpPost]
+        public async Task<JsonResult> RemoveAddressInfo(string? IdLienHe = null)
+        {
+            if (IdLienHe == null)
+            {
+                return Json(new JSResult(false, null));
+            }
+            var lienHe = await _context.Thongtinlienhes.FirstOrDefaultAsync(i => i.IdLienHe == IdLienHe);
+            if (lienHe == null)
+            {
+                return Json(new JSResult(false, null));
+            }
+            string? currUserId = GetUserId();
+            var user = await _context.Nguoidungs.FirstOrDefaultAsync(i => i.IdNguoiDung == currUserId);
+            if (user == null)
+            {
+                return Json(new JSResult(false, null));
+            }
+            if (lienHe.IdNguoiDung != user.IdNguoiDung)
+            {
+                return Json(new JSResult(false, null));
+            }
+            try
+            {
+                lienHe.DaXoa = true;
+                _context.Thongtinlienhes.Update(lienHe);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                return Json(new JSResult(false, null));
+            }
+            return Json(new JSResult(true, null));
+        }
+
         private string? GetUserId()
         {
             return HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value.ToString();

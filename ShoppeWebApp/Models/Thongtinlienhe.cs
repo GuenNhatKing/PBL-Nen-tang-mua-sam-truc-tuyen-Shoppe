@@ -26,6 +26,7 @@ public partial class Thongtinlienhe
 
     [StringLength(1000)]
     public string DiaChi { get; set; } = null!;
+    public bool? DaXoa { get; set; } = null!;
 
     [InverseProperty("IdLienHeNavigation")]
     public virtual ICollection<Donhang> Donhangs { get; set; } = new List<Donhang>();

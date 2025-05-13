@@ -2,6 +2,38 @@
 @{
 	ViewData["Title"] = "Trang cá nhân";
 }
+<div class="add-address-box overlay-box" style="display: none">
+	<div class="bg-white manage-product-review-box rounded width-40rem">
+		<div class="box-padding-20 border-bottom-style-1">
+			<div class="box-padding-left-right-20">
+				<h3>Thêm địa chỉ mới</h3>
+			</div>
+		</div>
+
+		<div class="box-padding-left-right-20 mt-3">
+			<div class="d-flex flex-column gap-3">
+				<div class="d-flex flex-column">
+					<label for="AddNameInput" class="fw-bold">Họ và tên</label>
+					<input type="text" id="AddNameInput" class="mt-2 profiles-input" />
+				</div>
+				<div class="d-flex flex-column">
+					<label for="AddPhoneInput" class="fw-bold">Số điện thoại</label>
+					<input type="text" id="AddPhoneInput" class="mt-2 profiles-input" />
+
+				</div>
+				<div class="d-flex flex-column">
+					<label for="AddAddressInput" class="fw-bold">Địa chỉ</label>
+					<input type="text" id="AddAddressInput" class="mt-2 profiles-input" />
+				</div>
+			</div>
+		</div>
+
+		<div class="d-flex box-padding-20">
+			<button class="exitAddBtn ms-auto invisible-button profiles-edit-button">Thoát</button>
+			<button class="confirmAddBtn ms-2 invisible-button profiles-edit-button">Xác nhận</button>
+		</div>
+	</div>
+</div>
 <div class="profiles-wrapper">
 	<div>
 		<div class="profiles-sidebar">
@@ -43,7 +75,7 @@
 				<div class="d-flex flex-column gap-3">
 					<div class="d-flex">
 						<div class="ms-auto">
-							<button class="btn-buy">Thêm địa chỉ mới</button>
+							<button class="btn-buy addBtn">Thêm địa chỉ mới</button>
 						</div>
 					</div>
 					@foreach (var lienHe in Model.danhSachLienHe)
@@ -56,11 +88,21 @@
 									</div>
 								</div>
 
-								<div class="box-padding-left-right-20">
-									<div>
-										<div><strong>@lienHe.HoVaTen</strong></div>
-										<div>@lienHe.Sdt</div>
-										<div>@lienHe.DiaChi</div>
+								<div class="box-padding-left-right-20 mt-3">
+									<div class="d-flex flex-column gap-3">
+										<div class="d-flex flex-column">
+											<label for="NameInput-@lienHe.IdLienHe" class="fw-bold">Họ và tên</label>
+											<input type="text" id="NameInput-@lienHe.IdLienHe" class="mt-2 profiles-input" />
+										</div>
+										<div class="d-flex flex-column">
+											<label for="PhoneInput-@lienHe.IdLienHe" class="fw-bold">Số điện thoại</label>
+											<input type="text" id="PhoneInput-@lienHe.IdLienHe" class="mt-2 profiles-input" />
+
+										</div>
+										<div class="d-flex flex-column">
+											<label for="AddressInput-@lienHe.IdLienHe" class="fw-bold">Địa chỉ</label>
+											<input type="text" id="AddressInput-@lienHe.IdLienHe" class="mt-2 profiles-input" />
+										</div>
 									</div>
 								</div>
 
@@ -70,15 +112,35 @@
 								</div>
 							</div>
 						</div>
+						<div class="delete-address-box overlay-box" name="@lienHe.IdLienHe" style="display: none">
+							<div class="bg-white manage-product-review-box rounded width-40rem">
+								<div class="box-padding-20 border-bottom-style-1">
+									<div class="box-padding-left-right-20">
+										<h3>Bạn chắc chắn muốn xoá địa chỉ này?</h3>
+									</div>
+								</div>
+								<div class="box-padding-left-right-20 mt-3">
+									<div class="d-flex flex-column gap-3">
+										<div><strong>@lienHe.HoVaTen</strong></div>
+										<div>@lienHe.Sdt</div>
+										<div>@lienHe.DiaChi</div>
+									</div>
+								</div>
+								<div class="d-flex box-padding-20">
+									<button class="exitDeleteBtn ms-auto invisible-button profiles-edit-button" name="@lienHe.IdLienHe">Thoát</button>
+									<button class="confirmDeleteBtn ms-2 invisible-button profiles-edit-button" name="@lienHe.IdLienHe">Xoá</button>
+								</div>
+							</div>
+						</div>
 						<div class="bg-white box-padding-20 border-style-3 d-flex align-items-center">
 							<div>
-								<div><strong>@lienHe.HoVaTen</strong></div>
-								<div>@lienHe.Sdt</div>
-								<div>@lienHe.DiaChi</div>
+								<div><strong id="NameInfo-@lienHe.IdLienHe">@lienHe.HoVaTen</strong></div>
+								<div id="PhoneInfo-@lienHe.IdLienHe">@lienHe.Sdt</div>
+								<div id="AddressInfo-@lienHe.IdLienHe">@lienHe.DiaChi</div>
 							</div>
 							<div class="ms-auto">
 								<button class="invisible-button manage-product-review-btn editBtn" name="@lienHe.IdLienHe">Chỉnh sửa</button>
-								<button class="invisible-button remove-address-btn">Xoá</button>
+								<button class="invisible-button remove-address-btn deleteBtn" name="@lienHe.IdLienHe">Xoá</button>
 							</div>
 						</div>
 					}
@@ -91,11 +153,23 @@
 	let editBtn = document.getElementsByClassName('editBtn');
 	let exitEditBtn = document.getElementsByClassName('exitEditBtn');
 	let confirmEditBtn = document.getElementsByClassName('confirmEditBtn');
+	let addBtn = document.getElementsByClassName('addBtn');
+	let exitAddBtn = document.getElementsByClassName('exitAddBtn');
+	let confirmAddBtn = document.getElementsByClassName('confirmAddBtn');
+	let deleteBtn = document.getElementsByClassName('deleteBtn');
+	let exitDeleteBtn = document.getElementsByClassName('exitDeleteBtn');
+	let confirmDeleteBtn = document.getElementsByClassName('confirmDeleteBtn');
 	for(let btn of editBtn) {
 		btn.addEventListener('click', function() {
 			let name = this.name;
 			let box = document.querySelector(`.edit-address-box[name="${name}"]`)
 			box.style.display = 'flex';
+			let nameInput = document.getElementById(`NameInput-${name}`);
+			let phoneInput = document.getElementById(`PhoneInput-${name}`);
+			let addressInput = document.getElementById(`AddressInput-${name}`);
+			nameInput.value = document.getElementById(`NameInfo-${name}`).textContent;
+			phoneInput.value = document.getElementById(`PhoneInfo-${name}`).textContent;
+			addressInput.value = document.getElementById(`AddressInfo-${name}`).textContent;
 		});
 	}
 	for(let btn of exitEditBtn) {
@@ -110,6 +184,93 @@
 			let name = this.name;
 			let box = document.querySelector(`.edit-address-box[name="${name}"]`)
 			box.style.display = 'none';
+			let nameInput = document.getElementById(`NameInput-${name}`).value;
+			let phoneInput = document.getElementById(`PhoneInput-${name}`).value;
+			let addressInput = document.getElementById(`AddressInput-${name}`).value;
+			$.ajax({
+				url: '@Url.Action("UpdateAddressInfo", "Profiles")',
+				type: 'POST',
+				data: { IdLienHe: name, HoVaTen: nameInput, SDT: phoneInput, DiaChi: addressInput },
+				dataType: "json",
+				success: function(response) {
+					if(response.isSuccess === true) {
+						alert("Cập nhật thông tin địa chỉ thành công");
+						let scrollY = window.scrollY;
+						localStorage.setItem("scrollPos", scrollY);
+						location.reload();
+					}
+				},
+			})
+		});
+	}
+	for(let btn of addBtn) {
+		btn.addEventListener('click', function() {
+			let box = document.querySelector(`.add-address-box`)
+			box.style.display = 'flex';
+		});
+	}
+	for(let btn of exitAddBtn) {
+		btn.addEventListener('click', function() {
+			let box = document.querySelector(`.add-address-box`)
+			box.style.display = 'none';
+		});
+	}
+	for(let btn of confirmAddBtn) {
+		btn.addEventListener('click', function() {
+			let box = document.querySelector(`.add-address-box`)
+			box.style.display = 'none';
+			let nameInput = document.getElementById(`AddNameInput`).value;
+			let phoneInput = document.getElementById(`AddPhoneInput`).value;
+			let addressInput = document.getElementById(`AddAddressInput`).value;
+			$.ajax({
+				url: '@Url.Action("AddAddressInfo", "Profiles")',
+				type: 'POST',
+				data: {HoVaTen: nameInput, SDT: phoneInput, DiaChi: addressInput },
+				dataType: "json",
+				success: function(response) {
+					if(response.isSuccess === true) {
+						alert("Thêm thông tin địa chỉ thành công");
+						let scrollY = window.scrollY;
+						localStorage.setItem("scrollPos", scrollY);
+						location.reload();
+					}
+				},
+			})
+		});
+	}
+	for(let btn of deleteBtn) {
+		btn.addEventListener('click', function() {
+			let name = this.name;
+			let box = document.querySelector(`.delete-address-box[name="${name}"]`)
+			box.style.display = 'flex';
+		});
+	}
+	for(let btn of exitDeleteBtn) {
+		btn.addEventListener('click', function() {
+			let name = this.name;
+			let box = document.querySelector(`.delete-address-box[name="${name}"]`)
+			box.style.display = 'none';
+		});
+	}
+	for(let btn of confirmDeleteBtn) {
+		btn.addEventListener('click', function() {
+			let name = this.name;
+			let box = document.querySelector(`.delete-address-box[name="${name}"]`)
+			box.style.display = 'none';
+			$.ajax({
+				url: '@Url.Action("RemoveAddressInfo", "Profiles")',
+				type: 'POST',
+				data: { IdLienHe: name},
+				dataType: "json",
+				success: function(response) {
+					if(response.isSuccess === true) {
+						alert("Xoá địa chỉ thành công");
+						let scrollY = window.scrollY;
+						localStorage.setItem("scrollPos", scrollY);
+						location.reload();
+					}
+				},
+			})
 		});
 	}
 </script>

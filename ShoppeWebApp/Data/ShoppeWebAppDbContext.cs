@@ -138,6 +138,7 @@ public partial class ShoppeWebAppDbContext : DbContext
             entity.HasOne(d => d.IdNguoiDungNavigation).WithMany(p => p.Thongtinlienhes)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("thongtinlienhe_ibfk_1");
+            entity.HasQueryFilter(i => i.DaXoa != true);
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -340,8 +340,6 @@
 				dataType: "json",
 				success: function(response) {
 					if(response.isSuccess === true) {
-						let btn = document.querySelector(`.ratingBtn[name="${name}"]`)
-						btn.remove();
 						let scrollY = window.scrollY;
 						localStorage.setItem("scrollPos", scrollY);
 						location.reload();

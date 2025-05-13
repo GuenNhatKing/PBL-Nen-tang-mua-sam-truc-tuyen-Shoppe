@@ -4,43 +4,50 @@
 }
 
 <div id="address-box" class="overlay-box" style="display: none">
-	<div class="address-box">
-		<h4>Thông tin liên hệ</h4>
-		@{
-			bool first = true;
-			foreach (var i in Model.ThongTinLienHe)
-			{
-				<div class="d-flex gap-3 mt-3">
-					@if (first)
-					{
-						<input class="address-radio" type="radio" id="address-@i.IdLienHe"
-							   name="address-info" data-group="@i.IdLienHe" checked />
-						first = false;
-					}
-					else
-					{
-						<input class="address-radio" type="radio" id="address-@i.IdLienHe"
-							   name="address-info" data-group="@i.IdLienHe" />
-					}
-					<label for="address-@i.IdLienHe">
-						<span>
-							<strong class="address-radio info-name" data-group="@i.IdLienHe">
-								@i.HoVaTen
-							</strong>
-						</span>
-						<span class="address-radio info-phone" data-group="@i.IdLienHe">
-							@i.Sdt
-						</span>
-						<span class="address-radio info-address" data-group="@i.IdLienHe">
-							@i.DiaChi
-						</span>
-					</label>
-				</div>
+	<div class="bg-white manage-product-review-box rounded width-40rem">
+		<div class="box-padding-20 border-bottom-style-1">
+			<div class="box-padding-left-right-20">
+				<h3>Thông tin liên hệ</h3>
+			</div>
+		</div>
+
+		<div class="box-padding-left-right-20">
+			@{
+				bool first = true;
+				foreach (var i in Model.ThongTinLienHe)
+				{
+					<div class="d-flex gap-3 mt-3 min-height-3 align-items-center">
+						@if (first)
+						{
+							<input class="address-radio" type="radio" id="address-@i.IdLienHe"
+								   name="address-info" data-group="@i.IdLienHe" checked />
+							first = false;
+						}
+						else
+						{
+							<input class="address-radio" type="radio" id="address-@i.IdLienHe"
+								   name="address-info" data-group="@i.IdLienHe" />
+						}
+						<label for="address-@i.IdLienHe">
+							<span>
+								<strong class="address-radio info-name" data-group="@i.IdLienHe">
+									@i.HoVaTen
+								</strong>
+							</span>
+							<span class="address-radio info-phone" data-group="@i.IdLienHe">
+								@i.Sdt
+							</span>
+							<span class="address-radio info-address" data-group="@i.IdLienHe">
+								@i.DiaChi
+							</span>
+						</label>
+					</div>
+				}
 			}
-		}
-		<div class="d-flex gap-2 mt-3 justify-content-end">
-			<button id="cancelBtn" class="invisible-button btn-cancel">Huỷ</button>
-			<button id="confirmBtn" class="invisible-button btn-confirm">OK</button>
+		</div>
+		<div class="d-flex box-padding-20">
+			<button id="cancelBtn" class="ms-auto invisible-button profiles-edit-button">Thoát</button>
+			<button id="confirmBtn" class="ms-2 invisible-button profiles-edit-button">Xác nhận</button>
 		</div>
 	</div>
 </div>
