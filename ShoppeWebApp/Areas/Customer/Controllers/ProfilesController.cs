@@ -120,6 +120,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             };
             var query = _context.Donhangs
                 .Include(i => i.IdLienHeNavigation)
+                .IgnoreQueryFilters()
                 .Where(i => i.IdLienHeNavigation.IdNguoiDung == user.IdNguoiDung)
                 .AsQueryable();
             if (TinhTrang != null)
