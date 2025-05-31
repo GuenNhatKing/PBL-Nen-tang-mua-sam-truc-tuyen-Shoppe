@@ -188,21 +188,53 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                 })
                 .ToListAsync();
             }
+            if(_context.Thongtinlienhes.FirstOrDefault(i => i.IdNguoiDung == userId) == null)
+            {
+                    string? maxIdLienHe = await _context.Thongtinlienhes.IgnoreQueryFilters().OrderByDescending(i => i.IdLienHe)
+                        .Select(i => i.IdLienHe).FirstOrDefaultAsync();
+                    string newIdLienHe = "";
+                    Console.WriteLine("MAX ID:" + maxIdLienHe);
+                    if (maxIdLienHe == null)
+                    {
+                        newIdLienHe = new String('0', 10);
+                    }
+                    else
+                    {
+                        int? num = Convert.ToInt32(maxIdLienHe);
+                        if (num == null) throw new InvalidDataException("Id khong dung dinh dang");
+                        else
+                        {
+                            int newId = (int)num + 1;
+                            newIdLienHe = newId.ToString("D10");
+                        }
+                    }
+
+                var newLienHe = new Thongtinlienhe
+                {
+                    IdLienHe = newIdLienHe,
+                    IdNguoiDung = nguoiDung.IdNguoiDung,
+                    HoVaTen = nguoiDung.HoVaTen,
+                    Sdt = nguoiDung.Sdt,
+                    DiaChi = nguoiDung.DiaChi,
+                };
+                _context.Thongtinlienhes.Add(newLienHe);
+                await _context.SaveChangesAsync();
+            }
             shoppingCart.ThongTinLienHe = await _context.Thongtinlienhes.Where(i => i.IdNguoiDung == userId).ToListAsync();
             return View(shoppingCart);
         }
         [HttpPost]
-        public async Task<IActionResult> Payment(string[] danhSachSanPham, string IdLienHe)
+        public async Task<JsonResult> Payment(string[] danhSachSanPham, string IdLienHe)
         {
             string? userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
             {
-                return NotFound();
+                return Json(new JSResult(false, null));
             }
             var nguoiDung = await _context.Nguoidungs.FirstOrDefaultAsync(i => i.IdNguoiDung == userId);
             if (nguoiDung == null)
             {
-                return NotFound();
+                return Json(new JSResult(false, null));
             }
 
             var sanPhams = await _context.Sanphams
@@ -216,7 +248,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             }
             if (nguoiDung.SoDu < tongTien)
             {
-                return RedirectToAction("Index", "Profiles");
+                return Json(new JSResult(false, null, "Số dư tài khoản không đủ để thanh toán đơn hàng này!"));
             }
             using (var trans = _context.Database.BeginTransaction())
             {
@@ -230,17 +262,16 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                     string newIdDonHang = "";
                     if (maxIdDonHang == null)
                     {
-                        newIdDonHang = "DH-" + new String('0', 7);
+                        newIdDonHang = new String('0', 10);
                     }
                     else
                     {
-                        string[] field = maxIdDonHang.Split('-');
-                        int? num = Convert.ToInt32(field[1]);
+                        int? num = Convert.ToInt32(maxIdDonHang);
                         if (num == null) throw new InvalidDataException("Id khong dung dinh dang");
                         else
                         {
                             int newId = (int)num + 1;
-                            newIdDonHang = "DH-" + newId.ToString("D7");
+                            newIdDonHang = newId.ToString("D10");
                         }
                     }
                     var donHang = new Donhang
@@ -291,7 +322,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                     await trans.RollbackAsync();
                 }
             }
-            return RedirectToAction("Index", "Profiles");
+            return Json(new JSResult(true, null));
         }
     }
 }

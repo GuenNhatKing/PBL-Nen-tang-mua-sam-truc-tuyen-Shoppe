@@ -20,13 +20,13 @@
 						@if (first)
 						{
 							<input class="address-radio" type="radio" id="address-@i.IdLienHe"
-								   name="address-info" data-group="@i.IdLienHe" checked />
+							name="address-info" data-group="@i.IdLienHe" checked />
 							first = false;
 						}
 						else
 						{
 							<input class="address-radio" type="radio" id="address-@i.IdLienHe"
-								   name="address-info" data-group="@i.IdLienHe" />
+							name="address-info" data-group="@i.IdLienHe" />
 						}
 						<label for="address-@i.IdLienHe">
 							<span>
@@ -151,7 +151,7 @@
 		</div>
 
 		<div class="d-flex justify-content-end gap-3">
-			<form asp-controller="ShoppingCart" asp-action="Payment" method="post">
+			<form id="myForm" method="post">
 				@if (Model.danhSachCuaHang != null)
 					@foreach (var shop in Model.danhSachCuaHang)
 					{
@@ -168,40 +168,64 @@
 				{
 					<input name="IdLienHe" id="IdLienHe" type="hidden" readonly />
 				}
-				<button type="submit" class="invisible-button btn-buy">Xác nhận đặt hàng</button>
+				<button class="invisible-button btn-buy">Xác nhận đặt hàng</button>
 			</form>
 		</div>
 	</div>
 </div>
 
-<script>
-	let changeAddressBtn = document.getElementById('change-address');
-	let confirmAddressBtn = document.getElementById('confirmBtn');
-	let cancelAddressBtn = document.getElementById('cancelBtn');
-	changeAddressBtn.addEventListener('click', function() {
-		document.getElementById('address-box').style.display = 'flex';
-	});
-	confirmAddressBtn.addEventListener('click', function() {
-		document.getElementById('address-box').style.display = 'none';
-				let info = document.querySelectorAll('.address-radio');
-		for(let i of info) {
-			if(i.checked === true) {
-				let group = i.dataset.group;
-				let nameInfo = document.querySelector(`.address-radio.info-name[data-group="${group}"]`);
-				let phoneInfo = document.querySelector(`.address-radio.info-phone[data-group="${group}"]`);
-				let addressInfo = document.querySelector(`.address-radio.info-address[data-group="${group}"]`);
-				let nameDis = document.getElementById('name-display');
-				let phoneDis = document.getElementById('phone-display');
-				let addressDis = document.getElementById('address-display');
-				let idLienHe = document.getElementById('IdLienHe');
-				nameDis.textContent = nameInfo.textContent;
-				phoneDis.textContent = phoneInfo.textContent;
-				addressDis.textContent = addressInfo.textContent;
-				idLienHe.value = group;
-			}
+@section Scripts {
+	<script>
+		let changeAddressBtn = document.getElementById('change-address');
+		let confirmAddressBtn = document.getElementById('confirmBtn');
+		let cancelAddressBtn = document.getElementById('cancelBtn');
+		if (changeAddressBtn) {
+			changeAddressBtn.addEventListener('click', function() {
+				document.getElementById('address-box').style.display = 'flex';
+			});
 		}
-	});
-	cancelAddressBtn.addEventListener('click', function() {
-		document.getElementById('address-box').style.display = 'none';
-	});
-</script>
+		confirmAddressBtn.addEventListener('click', function() {
+			document.getElementById('address-box').style.display = 'none';
+					let info = document.querySelectorAll('.address-radio');
+			for(let i of info) {
+				if(i.checked === true) {
+					let group = i.dataset.group;
+					let nameInfo = document.querySelector(`.address-radio.info-name[data-group="${group}"]`);
+					let phoneInfo = document.querySelector(`.address-radio.info-phone[data-group="${group}"]`);
+					let addressInfo = document.querySelector(`.address-radio.info-address[data-group="${group}"]`);
+					let nameDis = document.getElementById('name-display');
+					let phoneDis = document.getElementById('phone-display');
+					let addressDis = document.getElementById('address-display');
+					let idLienHe = document.getElementById('IdLienHe');
+					nameDis.textContent = nameInfo.textContent;
+					phoneDis.textContent = phoneInfo.textContent;
+					addressDis.textContent = addressInfo.textContent;
+					idLienHe.value = group;
+				}
+			}
+		});
+		cancelAddressBtn.addEventListener('click', function() {
+			document.getElementById('address-box').style.display = 'none';
+		});
+		$(document).ready(function() {
+			$("#myForm").submit(function (e) {	
+				e.preventDefault();
+				var redirect = '@Url.Action("Index", "Profiles")';
+				$.ajax({
+					url: '@Url.Action("Payment", "ShoppingCart")',
+					type: 'POST',
+					data: $(this).serialize(),
+					dataType: "json",
+					success: function(response) {
+						if(response.isSuccess) {
+							window.location.href = redirect;
+						}
+						else {
+							alert(response.message);
+						}
+					}
+				});
+			});
+		});
+	</script>
+}

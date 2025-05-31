@@ -222,17 +222,16 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             string newIdDanhGia = "";
             if (maxIdDanhGia == null)
             {
-                newIdDanhGia = "DG-" + new String('0', 7);
+                newIdDanhGia = new String('0', 10);
             }
             else
             {
-                string[] field = maxIdDanhGia.Split('-');
-                int? num = Convert.ToInt32(field[1]);
+                int? num = Convert.ToInt32(maxIdDanhGia);
                 if (num == null) throw new InvalidDataException("Id khong dung dinh dang");
                 else
                 {
                     int newId = (int)num + 1;
-                    newIdDanhGia = "DG-" + newId.ToString("D7");
+                    newIdDanhGia = newId.ToString("D10");
                 }
             }
             var newDanhGia = new Danhgia

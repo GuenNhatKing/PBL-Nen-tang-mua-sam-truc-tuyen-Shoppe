@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShoppeWebApp.Data;
 using ShoppeWebApp.Models;
+using ShoppeWebApp.Services;
 using ShoppeWebApp.ViewModels;
 
 namespace ShoppeWebApp.Areas.Customer.Controllers
@@ -32,7 +33,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             if (ModelState.IsValid)
             {
                 var Taikhoan = _context.Taikhoans
-                    .FirstOrDefault(a => a.Username == model.Username && a.Password == model.Password);
+                    .FirstOrDefault(a => a.Username == model.Username && a.Password == PasswordHasher.ComputeSha256Hash(model.Password));
 
                 if (Taikhoan != null)
                 {
@@ -119,12 +120,11 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             string newId;
             if (string.IsNullOrEmpty(maxId))
             {
-                newId = "0000000001"; // Nếu chưa có ID nào, bắt đầu từ 0000000001
+                newId = "0000000000";
             }
             else
             {
-                // Pls fix it
-                newId = (long.Parse(maxId) + 1).ToString("D10"); // Tăng ID lên 1 và định dạng thành 10 chữ số
+                newId = (long.Parse(maxId) + 1).ToString("D10");
             }
 
             var Nguoidung = new Nguoidung
@@ -143,7 +143,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             var Taikhoan = new Taikhoan
             {
                 Username = model.TenDangNhap,
-                Password = model.MatKhau,
+                Password = PasswordHasher.ComputeSha256Hash(model.MatKhau),
                 IdNguoiDung = newId
             };
 
@@ -215,7 +215,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                     if (Taikhoan != null)
                     {
                         _logger.LogInformation("Tài khoản tìm thấy: {Username}", model.Username);
-                        Taikhoan.Password = model.NewPassword;
+                        Taikhoan.Password = PasswordHasher.ComputeSha256Hash(model.NewPassword);
 
                         try
                         {

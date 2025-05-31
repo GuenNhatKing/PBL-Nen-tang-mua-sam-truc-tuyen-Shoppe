@@ -136,261 +136,263 @@
 <form asp-controller="ShoppingCart" asp-action="ConfirmPayment" id="confirmForm" method="get">
 </form>
 
-<script>
-	const allCheckbox = document.getElementsByClassName('allCheck');
-	const shopCheckbox = document.getElementsByClassName('shopCheck');
-	const itemCheckbox = document.getElementsByClassName('itemCheck');
-	const removeBtn = document.getElementsByClassName('remove-from-btn');
-	const removeCheckedBtn = document.getElementsByClassName('remove-checked-product');
-	function updateAllCheckbox() {
-		let IsAllChecked = true;
-		for(let i of itemCheckbox) {
-			if(i.checked === false) IsAllChecked = false;
-		}
-		for(let i of allCheckbox) {
-			i.checked = IsAllChecked;
-		}
-		updateFinalPrice();
-		updateFinalCount();
-	}
-	function updateShopCheckbox(group) {
-		let IsAllChecked = true;
-		const shopCheckboxes = document.querySelectorAll(`[data-group="${group}"]`);
-		let shop = document.querySelector(`[data-group="${group}"].shopCheck`);
-		for(let i of shopCheckboxes) {
-			if(i.className === 'itemCheck' && i.checked === false)
-				IsAllChecked = false;
-		}
-		shop.checked = IsAllChecked;
-		updateAllCheckbox();
-	}
-
-	for (let checkbox of allCheckbox) {
-		checkbox.addEventListener('change', function() {
-			const isChecked = this.checked;
-			for(let i of allCheckbox) {
-				i.checked = isChecked;
-			}
-			for(let i of shopCheckbox) {
-				i.checked = isChecked;
-			}
+@section Scripts {
+	<script>
+		const allCheckbox = document.getElementsByClassName('allCheck');
+		const shopCheckbox = document.getElementsByClassName('shopCheck');
+		const itemCheckbox = document.getElementsByClassName('itemCheck');
+		const removeBtn = document.getElementsByClassName('remove-from-btn');
+		const removeCheckedBtn = document.getElementsByClassName('remove-checked-product');
+		function updateAllCheckbox() {
+			let IsAllChecked = true;
 			for(let i of itemCheckbox) {
-				i.checked = isChecked;
+				if(i.checked === false) IsAllChecked = false;
+			}
+			for(let i of allCheckbox) {
+				i.checked = IsAllChecked;
 			}
 			updateFinalPrice();
 			updateFinalCount();
-		});
-	}
-	for(let checkbox of shopCheckbox) {
-		checkbox.addEventListener('change', function() {
-			const isChecked = this.checked;
-			const group = this.dataset.group;
-			const shopCheckboxes = document.querySelectorAll(`[data-group="${group}"]`)
+		}
+		function updateShopCheckbox(group) {
+			let IsAllChecked = true;
+			const shopCheckboxes = document.querySelectorAll(`[data-group="${group}"]`);
+			let shop = document.querySelector(`[data-group="${group}"].shopCheck`);
 			for(let i of shopCheckboxes) {
-				i.checked = isChecked;
+				if(i.className === 'itemCheck' && i.checked === false)
+					IsAllChecked = false;
 			}
+			shop.checked = IsAllChecked;
 			updateAllCheckbox();
-		});
-	}
-	for(let checkbox of itemCheckbox) {
-		checkbox.addEventListener('change', function() {
-			const group = this.dataset.group;
-			updateShopCheckbox(group);
-		});
-	}
+		}
 
-	for(let btn of removeBtn) {
-		btn.addEventListener('click', function() {
-			let btnName = this.name;
-			$.ajax({
-				url: '@Url.Action("RemoveFromCart", "ShoppingCart")',
-				type: 'POST',
-				data: { IdSanPham: btnName },
-				dataType: "json",
-				success: function(response) {
-					let product = document.querySelector(`.product-display[name="${btnName}"]`)
-					const group = product.dataset.group;
-					product.remove();
-					let shopProducts = document.querySelector(`.product-display[data-group="${group}"]`);
-					if(shopProducts === null) {
-						let shop = document.querySelector(`.shop-display[data-group="${group}"]`);
-						shop.remove();
-					}
-				},
-			})
-			.then(function() {
+		for (let checkbox of allCheckbox) {
+			checkbox.addEventListener('change', function() {
+				const isChecked = this.checked;
+				for(let i of allCheckbox) {
+					i.checked = isChecked;
+				}
+				for(let i of shopCheckbox) {
+					i.checked = isChecked;
+				}
+				for(let i of itemCheckbox) {
+					i.checked = isChecked;
+				}
 				updateFinalPrice();
 				updateFinalCount();
 			});
-		})
-	}
+		}
+		for(let checkbox of shopCheckbox) {
+			checkbox.addEventListener('change', function() {
+				const isChecked = this.checked;
+				const group = this.dataset.group;
+				const shopCheckboxes = document.querySelectorAll(`[data-group="${group}"]`)
+				for(let i of shopCheckboxes) {
+					i.checked = isChecked;
+				}
+				updateAllCheckbox();
+			});
+		}
+		for(let checkbox of itemCheckbox) {
+			checkbox.addEventListener('change', function() {
+				const group = this.dataset.group;
+				updateShopCheckbox(group);
+			});
+		}
 
-	for(let btn of removeCheckedBtn) {
-		btn.addEventListener('click', function() {
-			let requests = [];
-			for(let i of itemCheckbox) {
-				if(i.checked === true) {
-					let btnName = i.name;
-					let request = $.ajax({
-						url: '@Url.Action("RemoveFromCart", "ShoppingCart")',
-						type: 'POST',
-						data: { IdSanPham: btnName },
-						dataType: "json",
-						success: function(response) {
-							let product = document.querySelector(`.product-display[name="${btnName}"]`)
-							const group = product.dataset.group;
-							product.remove();
-							let shopProducts = document.querySelector(`.product-display[data-group="${group}"]`);
-							if(shopProducts === null) {
-								let shop = document.querySelector(`.shop-display[data-group="${group}"]`);
-								shop.remove();
-							}
-						},
-					})
-					requests.push(request);
+		for(let btn of removeBtn) {
+			btn.addEventListener('click', function() {
+				let btnName = this.name;
+				$.ajax({
+					url: '@Url.Action("RemoveFromCart", "ShoppingCart")',
+					type: 'POST',
+					data: { IdSanPham: btnName },
+					dataType: "json",
+					success: function(response) {
+						let product = document.querySelector(`.product-display[name="${btnName}"]`)
+						const group = product.dataset.group;
+						product.remove();
+						let shopProducts = document.querySelector(`.product-display[data-group="${group}"]`);
+						if(shopProducts === null) {
+							let shop = document.querySelector(`.shop-display[data-group="${group}"]`);
+							shop.remove();
+						}
+					},
+				})
+				.then(function() {
+					updateFinalPrice();
+					updateFinalCount();
+				});
+			})
+		}
+
+		for(let btn of removeCheckedBtn) {
+			btn.addEventListener('click', function() {
+				let requests = [];
+				for(let i of itemCheckbox) {
+					if(i.checked === true) {
+						let btnName = i.name;
+						let request = $.ajax({
+							url: '@Url.Action("RemoveFromCart", "ShoppingCart")',
+							type: 'POST',
+							data: { IdSanPham: btnName },
+							dataType: "json",
+							success: function(response) {
+								let product = document.querySelector(`.product-display[name="${btnName}"]`)
+								const group = product.dataset.group;
+								product.remove();
+								let shopProducts = document.querySelector(`.product-display[data-group="${group}"]`);
+								if(shopProducts === null) {
+									let shop = document.querySelector(`.shop-display[data-group="${group}"]`);
+									shop.remove();
+								}
+							},
+						})
+						requests.push(request);
+					}
+				}
+				Promise.all(requests).then(() => {
+					updateFinalPrice();
+					updateFinalCount();
+				});
+			})
+		}
+
+		const decreaseBtn = document.querySelectorAll('.decrease');
+		const increaseBtn = document.querySelectorAll('.increase');
+		const quantityInput = document.querySelectorAll('.quantity-input');
+
+		function updateQuantityDb(IdSanPham, SoLuong) {
+			$.ajax({
+				url: '@Url.Action("UpdateQuantity", "ShoppingCart")',
+				type: 'POST',
+				data: { IdSanPham: IdSanPham, SoLuong: SoLuong },
+				dataType: "json",
+			})
+		}
+
+		function updateTotalPrice(name) {
+			let total = document.querySelector(`[name="${name}"].Product-Total-Price`);
+			let soLuong = parseInt(document.querySelector(`[name="${name}"].quantity-input`).value.replace(/[^0-9]/g, '')) || 0;
+			let donGia = parseInt(document.querySelector(`[name="${name}"].new-price`).textContent.replace(/[^0-9]/g, '')) || 0;
+			total.textContent = formatCurrency(soLuong * donGia);
+		}
+
+		function updateFinalPrice() {
+			const checkedFinal = document.querySelectorAll(`.itemCheck`);
+			let finalPrice = 0;
+			for(let i of checkedFinal) {
+				if(i.checked) {
+					let name = i.name;
+					let total = document.querySelector(`[name="${name}"].Product-Total-Price`);
+					finalPrice += parseInt(total.textContent.replace(/[^0-9]/g, '')) || 0;
 				}
 			}
-			Promise.all(requests).then(() => {
+			let finalPriceObj = document.getElementById('FinalPrice');
+			finalPriceObj.textContent = formatCurrency(finalPrice);
+		}
+
+		function updateFinalCount() {
+			const checkedFinal = document.querySelectorAll(`.itemCheck`);
+			let finalCount = 0;
+			for(let i of checkedFinal) {
+				if(i.checked) {
+					let name = i.name;
+					let total = document.querySelector(`[name="${name}"].quantity-input`);
+					finalCount += parseInt(total.value.replace(/[^0-9]/g, '')) || 0;
+				}
+			}
+			let finalCountObj = document.getElementById('FinalCount');
+			finalCountObj.textContent = finalCount;
+		}
+
+		for (let btn of increaseBtn) {
+			btn.addEventListener('click', function () {
+				let name = this.name;
+				let quantity = document.querySelector(`[name="${name}"].quantity-input`);
+				let soLuong = parseInt(quantity.value) || 0;
+				let soLuongKho = parseInt(document.querySelector(`[name="${name}"].SoLuongKho`).textContent) || 0;
+				quantity.value = soLuong + 1;
+				if (quantity.value < 1) {
+					quantity.value = 1
+				}
+				if (quantity.value > soLuongKho) {
+					quantity.value = soLuongKho
+				}
+				let id = document.querySelector(`[name="${name}"].IdSanPham`).textContent;
+				updateQuantityDb(id, quantity.value);
+				updateTotalPrice(name);
 				updateFinalPrice();
 				updateFinalCount();
-			});
-		})
-	}
-
-	const decreaseBtn = document.querySelectorAll('.decrease');
-	const increaseBtn = document.querySelectorAll('.increase');
-	const quantityInput = document.querySelectorAll('.quantity-input');
-
-	function updateQuantityDb(IdSanPham, SoLuong) {
-		$.ajax({
-			url: '@Url.Action("UpdateQuantity", "ShoppingCart")',
-			type: 'POST',
-			data: { IdSanPham: IdSanPham, SoLuong: SoLuong },
-			dataType: "json",
-		})
-	}
-
-	function updateTotalPrice(name) {
-		let total = document.querySelector(`[name="${name}"].Product-Total-Price`);
-		let soLuong = parseInt(document.querySelector(`[name="${name}"].quantity-input`).value.replace(/[^0-9]/g, '')) || 0;
-		let donGia = parseInt(document.querySelector(`[name="${name}"].new-price`).textContent.replace(/[^0-9]/g, '')) || 0;
-		total.textContent = formatCurrency(soLuong * donGia);
-	}
-
-	function updateFinalPrice() {
-		const checkedFinal = document.querySelectorAll(`.itemCheck`);
-		let finalPrice = 0;
-		for(let i of checkedFinal) {
-			if(i.checked) {
-				let name = i.name;
-				let total = document.querySelector(`[name="${name}"].Product-Total-Price`);
-				finalPrice += parseInt(total.textContent.replace(/[^0-9]/g, '')) || 0;
-			}
+			})
 		}
-		let finalPriceObj = document.getElementById('FinalPrice');
-		finalPriceObj.textContent = formatCurrency(finalPrice);
-	}
 
-	function updateFinalCount() {
-		const checkedFinal = document.querySelectorAll(`.itemCheck`);
-		let finalCount = 0;
-		for(let i of checkedFinal) {
-			if(i.checked) {
-				let name = i.name;
-				let total = document.querySelector(`[name="${name}"].quantity-input`);
-				finalCount += parseInt(total.value.replace(/[^0-9]/g, '')) || 0;
-			}
-		}
-		let finalCountObj = document.getElementById('FinalCount');
-		finalCountObj.textContent = finalCount;
-	}
-
-	for (let btn of increaseBtn) {
-		btn.addEventListener('click', function () {
-			let name = this.name;
-			let quantity = document.querySelector(`[name="${name}"].quantity-input`);
-			let soLuong = parseInt(quantity.value) || 0;
-			let soLuongKho = parseInt(document.querySelector(`[name="${name}"].SoLuongKho`).textContent) || 0;
-			quantity.value = soLuong + 1;
-			if (quantity.value < 1) {
-				quantity.value = 1
-			}
-			if (quantity.value > soLuongKho) {
-				quantity.value = soLuongKho
-			}
-			let id = document.querySelector(`[name="${name}"].IdSanPham`).textContent;
-			updateQuantityDb(id, quantity.value);
-			updateTotalPrice(name);
-			updateFinalPrice();
-			updateFinalCount();
-		})
-	}
-
-	for (let btn of decreaseBtn) {
-		btn.addEventListener('click', function () {
-			let name = this.name;
-			let quantity = document.querySelector(`[name="${name}"].quantity-input`);
-			let soLuong = parseInt(quantity.value) || 0;
-			let soLuongKho = parseInt(document.querySelector(`[name="${name}"].SoLuongKho`).textContent) || 0;
-			quantity.value = soLuong - 1;
-			if (quantity.value < 1) {
-				quantity.value = 1
-			}
-			if (quantity.value > soLuongKho) {
-				quantity.value = soLuongKho
-			}
-			let id = document.querySelector(`[name="${name}"].IdSanPham`).textContent;
-			updateQuantityDb(id, quantity.value);
-			updateTotalPrice(name);
-			updateFinalPrice();
-			updateFinalCount();
-		})
-	}
-
-	for (let btn of quantityInput) {
-		btn.addEventListener('input', function () {
-			let name = this.name;
-			let quantity = document.querySelector(`[name="${name}"].quantity-input`);
-			quantity.value = quantity.value.replace(/[^0-9]/g, '');
-			let soLuongKho = parseInt(document.querySelector(`[name="${name}"].SoLuongKho`).textContent) || 0;
-			if (quantity.value < 1) {
-				quantity.value = 1
-			}
-			if (quantity.value > soLuongKho) {
-				quantity.value = soLuongKho
-			}
-			let id = document.querySelector(`[name="${name}"].IdSanPham`).textContent;
-			updateQuantityDb(id, quantity.value);
-			updateTotalPrice(name);
-			updateFinalPrice();
-			updateFinalCount();
-		})
-	}
-	function ConfirmPayment() {
-		let danhSachSanPham = [];
-		const products = document.querySelectorAll(`.itemCheck`);
-		let count = 0;
-		for(let i of products) {
-			if(i.checked) {
-				count++;
-				let name = i.name;
+		for (let btn of decreaseBtn) {
+			btn.addEventListener('click', function () {
+				let name = this.name;
+				let quantity = document.querySelector(`[name="${name}"].quantity-input`);
+				let soLuong = parseInt(quantity.value) || 0;
+				let soLuongKho = parseInt(document.querySelector(`[name="${name}"].SoLuongKho`).textContent) || 0;
+				quantity.value = soLuong - 1;
+				if (quantity.value < 1) {
+					quantity.value = 1
+				}
+				if (quantity.value > soLuongKho) {
+					quantity.value = soLuongKho
+				}
 				let id = document.querySelector(`[name="${name}"].IdSanPham`).textContent;
-				danhSachSanPham.push(id.toString());
+				updateQuantityDb(id, quantity.value);
+				updateTotalPrice(name);
+				updateFinalPrice();
+				updateFinalCount();
+			})
+		}
+
+		for (let btn of quantityInput) {
+			btn.addEventListener('input', function () {
+				let name = this.name;
+				let quantity = document.querySelector(`[name="${name}"].quantity-input`);
+				quantity.value = quantity.value.replace(/[^0-9]/g, '');
+				let soLuongKho = parseInt(document.querySelector(`[name="${name}"].SoLuongKho`).textContent) || 0;
+				if (quantity.value < 1) {
+					quantity.value = 1
+				}
+				if (quantity.value > soLuongKho) {
+					quantity.value = soLuongKho
+				}
+				let id = document.querySelector(`[name="${name}"].IdSanPham`).textContent;
+				updateQuantityDb(id, quantity.value);
+				updateTotalPrice(name);
+				updateFinalPrice();
+				updateFinalCount();
+			})
+		}
+		function ConfirmPayment() {
+			let danhSachSanPham = [];
+			const products = document.querySelectorAll(`.itemCheck`);
+			let count = 0;
+			for(let i of products) {
+				if(i.checked) {
+					count++;
+					let name = i.name;
+					let id = document.querySelector(`[name="${name}"].IdSanPham`).textContent;
+					danhSachSanPham.push(id.toString());
+				}
+			}
+			if(count === 0) {
+				alert("Bạn chưa chọn sản phẩm nào!");
+			}
+			else {
+				let form = document.getElementById("confirmForm");
+				for(let i of danhSachSanPham) {
+					let input = document.createElement("input");
+					input.type = "hidden";
+					input.name = "danhSachSanPham";
+					input.value = i;
+					form.appendChild(input);
+				}
+				form.submit();
 			}
 		}
-		if(count === 0) {
-			alert("Bạn chưa chọn sản phẩm nào!");
-		}
-		else {
-			let form = document.getElementById("confirmForm");
-			for(let i of danhSachSanPham) {
-				let input = document.createElement("input");
-				input.type = "hidden";
-				input.name = "danhSachSanPham";
-				input.value = i;
-				form.appendChild(input);
-			}
-			form.submit();
-		}
-	}
-</script>
+	</script>
+}

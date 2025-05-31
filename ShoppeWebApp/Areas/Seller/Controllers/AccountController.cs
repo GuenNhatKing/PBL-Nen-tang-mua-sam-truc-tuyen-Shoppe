@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using ShoppeWebApp.Data;
 using ShoppeWebApp.Models;
 using ShoppeWebApp.ViewModels;
+using ShoppeWebApp.Services;
 
 namespace ShoppeWebApp.Areas.Seller.Controllers
 {
@@ -33,7 +34,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
             {
                 var potentialAccounts = _context.Taikhoans
                     .Include(a => a.IdNguoiDungNavigation)
-                    .Where(a => a.Username.ToLower() == model.Username.ToLower() && a.Password == model.Password)
+                    .Where(a => a.Username.ToLower() == model.Username.ToLower() && a.Password == PasswordHasher.ComputeSha256Hash(model.Password))
                     .AsEnumerable();
                 
                 var account = potentialAccounts.FirstOrDefault(a => a.Username == model.Username);
@@ -103,7 +104,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ForgotPassword(ViewModels.Seller.ForgotPasswordViewModel model)
+        public IActionResult ForgotPassword(ViewModels.Seller.ForgotPasswordViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -114,9 +115,6 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
 
                     if (account != null)
                     {
-                        //account.Password = "12345678"; // Reset password logic
-                        //await _context.SaveChangesAsync();
-                        //ViewBag.Message = "Mật khẩu đã được đặt lại thành công.";
                         return RedirectToAction("ResetPassword", "Account", new {username = model.Username });
                     }
                     else
@@ -152,7 +150,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                     var account = await _context.Taikhoans.FirstOrDefaultAsync(a => a.Username == model.Username);
                     if (account != null)
                     {
-                        account.Password = model.NewPassword;
+                        account.Password = PasswordHasher.ComputeSha256Hash(model.NewPassword);
                         try
                         {
                             await _context.SaveChangesAsync();
@@ -258,7 +256,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
             var Taikhoan = new Taikhoan
             {
                 Username = model.TenDangNhap,
-                Password = model.MatKhau,
+                Password = PasswordHasher.ComputeSha256Hash(model.MatKhau),
                 IdNguoiDung = newId
             };
 
