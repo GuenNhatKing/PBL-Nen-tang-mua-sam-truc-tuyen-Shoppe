@@ -194,7 +194,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                 SoLuongKho = model.SoLuongKho ?? 0,
                 GiaGoc = model.GiaGoc ?? 0,
                 GiaBan = model.GiaBan ?? 0,
-                TrangThai = Constants.TAM_KHOA, 
+                TrangThai = (model.SoLuongKho == 0)? Constants.HET_HANG: Constants.CON_HANG, 
                 ThoiGianTao = DateTime.Now
             };
         

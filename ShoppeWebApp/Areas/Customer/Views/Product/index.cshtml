@@ -174,7 +174,14 @@
 				{
 					<div class="product-main-info-review-item d-flex gap-3">
 						<div class="box-padding-10">
-							<img src="/@i.UrlAnhNguoiDung" class="circle-img">
+							@if(i.UrlAnhNguoiDung != null)
+							{
+								<img src="/@i.UrlAnhNguoiDung" class="circle-img">
+							}
+							else
+							{
+								<img src="/images/avatar-mac-dinh.jpg" class="circle-img">
+							}
 						</div>
 						<div class="box-padding-10 width-100">
 							<div class="product-main-info-review-meta">

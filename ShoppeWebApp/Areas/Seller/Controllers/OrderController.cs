@@ -139,6 +139,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
 
             // Kiểm tra xem đơn hàng có chứa sản phẩm của cửa hàng này không
             bool orderContainsShopProducts = _context.Chitietdonhangs
+                .IgnoreQueryFilters()
                 .Include(ct => ct.IdSanPhamNavigation)
                 .Any(ct => ct.IdDonHang == id && 
                            ct.IdSanPhamNavigation != null && 
@@ -151,6 +152,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
 
             // Lấy chi tiết đơn hàng, chỉ lấy sản phẩm thuộc cửa hàng hiện tại
             var order = _context.Donhangs
+                .IgnoreQueryFilters()
                 .Where(o => o.IdDonHang == id)
                 .Select(o => new OrderDetailsViewModel
                 {
