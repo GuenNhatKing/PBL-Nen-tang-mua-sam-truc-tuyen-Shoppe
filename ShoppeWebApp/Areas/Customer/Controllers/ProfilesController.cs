@@ -205,8 +205,12 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                 return BadRequest();
             }
             var donHang = await _context.Donhangs.FirstOrDefaultAsync(i => i.IdDonHang == IdDonHang);
-            if(donHang != null)
+            string? IdNguoiDung = GetUserId();
+            if(donHang != null && IdNguoiDung != null)
             {
+                var nguoiDung = await _context.Nguoidungs
+                    .FirstOrDefaultAsync(i => i.IdNguoiDung == IdNguoiDung);
+                nguoiDung.SoDu += donHang.TongTien;
                 donHang.TrangThai = ShoppeWebApp.Data.Constants.HUY_DON_HANG;
                 _context.Donhangs.Update(donHang);
                 await _context.SaveChangesAsync();

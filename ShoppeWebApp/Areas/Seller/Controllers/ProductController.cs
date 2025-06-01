@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using ShoppeWebApp.ViewModels.Seller;
 using ShoppeWebApp.Data;
 using ShoppeWebApp.Models;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;  
 
 namespace ShoppeWebApp.Areas.Seller.Controllers
