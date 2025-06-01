@@ -333,7 +333,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
 
             try
             {
-                string? maxIdLienHe = await _context.Thongtinlienhes.OrderByDescending(i => i.IdLienHe)
+                string? maxIdLienHe = await _context.Thongtinlienhes.IgnoreQueryFilters().OrderByDescending(i => i.IdLienHe)
                 .Select(i => i.IdLienHe).FirstOrDefaultAsync();
                 Console.WriteLine();
                 string newIdLienHe = "";
