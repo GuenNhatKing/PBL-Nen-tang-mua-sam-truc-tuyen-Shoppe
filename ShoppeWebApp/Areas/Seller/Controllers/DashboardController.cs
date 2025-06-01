@@ -46,9 +46,11 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                              ct.IdDonHangNavigation.ThoiGianTao <= endDate)
                 .ToList();
 
-            // Tính tổng doanh thu theo sản phẩm
+            // Tính tổng doanh thu theo sản phẩm (không lấy các sản phẩm bị hủy)
             var revenueByProduct = orderDetails
-                .Where(ct => ct.IdSanPhamNavigation != null && ct.IdDonHangNavigation != null) // Đảm bảo không null
+                .Where(ct => ct.IdSanPhamNavigation != null && 
+                             ct.IdDonHangNavigation != null && 
+                             ct.IdDonHangNavigation.TrangThai != Constants.HUY_DON_HANG) // Loại bỏ đơn hàng bị hủy
                 .GroupBy(ct => new { ct.IdSanPhamNavigation.TenSanPham }) // Nhóm theo tên sản phẩm
                 .Select(g => new RevenueByProduct
                 {
@@ -58,9 +60,10 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                 .OrderByDescending(r => r.TotalRevenue) // Sắp xếp theo doanh thu giảm dần
                 .ToList();
 
-            // Tính tổng doanh thu theo ngày
+            // Tính tổng doanh thu theo ngày (không lấy các sản phẩm bị hủy)
             var revenueByDay = orderDetails
-                .Where(ct => ct.IdDonHangNavigation != null)
+                .Where(ct => ct.IdDonHangNavigation != null && 
+                             ct.IdDonHangNavigation.TrangThai != Constants.HUY_DON_HANG) // Loại bỏ đơn hàng bị hủy
                 .GroupBy(ct => ct.IdDonHangNavigation.ThoiGianTao.Value.Date)
                 .Select(g => new RevenueByDay
                 {
