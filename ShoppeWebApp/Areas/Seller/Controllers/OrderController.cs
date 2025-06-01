@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using ShoppeWebApp.Models;
 
 namespace ShoppeWebApp.Areas.Seller.Controllers
 {
@@ -216,7 +217,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
         }
         
         [HttpPost]
-        public IActionResult Confirm(string id)
+        public async Task<IActionResult> Confirm(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -256,7 +257,26 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
             }
 
             order.TrangThai = Constants.DA_XAC_NHAN;
-            _context.SaveChanges();
+            
+            var ctdh = await _context.Chitietdonhangs.Where(i => i.IdDonHang == id).ToListAsync();
+            List<Sanpham> sanPhams = new List<Sanpham>();
+            foreach(var chiTiet in ctdh)
+            {
+                var sp = await _context.Sanphams.FirstOrDefaultAsync(i => i.IdSanPham == chiTiet.IdSanPham);
+                if(sp != null)
+                {
+                    sanPhams.Add(sp);
+                }
+            }
+            foreach (var sp in sanPhams)
+            {
+                int? soLuong = (await _context.Chitietdonhangs
+                    .FirstOrDefaultAsync(i => i.IdDonHang == id && i.IdSanPham == sp.IdSanPham))?.SoLuong;
+                sp.SoLuongKho -= soLuong ?? 0;
+                sp.SoLuongBan += soLuong ?? 0;
+                _context.Sanphams.Update(sp);
+            }
+            await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Đơn hàng đã được xác nhận thành công.";
             return RedirectToAction("Index");

@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using AspNetCoreGeneratedDocument;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -193,7 +192,6 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                     string? maxIdLienHe = await _context.Thongtinlienhes.IgnoreQueryFilters().OrderByDescending(i => i.IdLienHe)
                         .Select(i => i.IdLienHe).FirstOrDefaultAsync();
                     string newIdLienHe = "";
-                    Console.WriteLine("MAX ID:" + maxIdLienHe);
                     if (maxIdLienHe == null)
                     {
                         newIdLienHe = new String('0', 10);
@@ -241,10 +239,13 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             .Where(i => danhSachSanPham.Contains(i.IdSanPham))
             .ToListAsync();
             decimal tongTien = 0;
+            List<string> idCuaHangs = new List<string>();
             foreach (var i in sanPhams)
             {
-                int? soLuong = (await _context.Giohangs.FirstOrDefaultAsync())?.SoLuong;
-                tongTien += i.GiaBan * (soLuong ?? 0);
+                if (!idCuaHangs.Contains(i.IdCuaHang))
+                {
+                    idCuaHangs.Add(i.IdCuaHang);
+                }
             }
             if (nguoiDung.SoDu < tongTien)
             {
@@ -254,57 +255,59 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             {
                 try
                 {
-                    nguoiDung.SoDu -= tongTien;
-                    _context.Nguoidungs.Update(nguoiDung);
-                    await _context.SaveChangesAsync();
-                    string? maxIdDonHang = await _context.Donhangs.OrderByDescending(i => i.IdDonHang)
-                        .Select(i => i.IdDonHang).FirstOrDefaultAsync();
-                    string newIdDonHang = "";
-                    if (maxIdDonHang == null)
+                    foreach (var idch in idCuaHangs)
                     {
-                        newIdDonHang = new String('0', 10);
-                    }
-                    else
-                    {
-                        int? num = Convert.ToInt32(maxIdDonHang);
-                        if (num == null) throw new InvalidDataException("Id khong dung dinh dang");
+                        tongTien = 0;
+                        string? maxIdDonHang = await _context.Donhangs.OrderByDescending(i => i.IdDonHang)
+                            .Select(i => i.IdDonHang).FirstOrDefaultAsync();
+                        string newIdDonHang = "";
+                        if (maxIdDonHang == null)
+                        {
+                            newIdDonHang = new String('0', 10);
+                        }
                         else
                         {
-                            int newId = (int)num + 1;
-                            newIdDonHang = newId.ToString("D10");
+                            int? num = Convert.ToInt32(maxIdDonHang);
+                            if (num == null) throw new InvalidDataException("Id khong dung dinh dang");
+                            else
+                            {
+                                int newId = (int)num + 1;
+                                newIdDonHang = newId.ToString("D10");
+                            }
                         }
-                    }
-                    var donHang = new Donhang
-                    {
-                        IdDonHang = newIdDonHang,
-                        IdLienHe = IdLienHe,
-                        TongTien = tongTien,
-                        TrangThai = Constants.CHO_XAC_NHAN,
-                        ThoiGianTao = DateTime.UtcNow,
-                    };
-                    _context.Donhangs.Add(donHang);
-                    await _context.SaveChangesAsync();
-                    foreach (var i in sanPhams)
-                    {
-                        var productDetails = new Chitietdonhang
+                        var donHang = new Donhang
                         {
-                            IdDonHang = donHang.IdDonHang,
-                            IdSanPham = i.IdSanPham,
-                            DonGia = i.GiaBan,
-                            SoLuong = (await _context.Giohangs.FirstOrDefaultAsync(j => j.IdSanPham == i.IdSanPham && j.IdNguoiDung == userId))!.SoLuong,
+                            IdDonHang = newIdDonHang,
+                            IdLienHe = IdLienHe,
+                            TongTien = tongTien,
+                            TrangThai = Constants.CHO_XAC_NHAN,
+                            ThoiGianTao = DateTime.UtcNow,
                         };
-                        _context.Chitietdonhangs.Add(productDetails);
+                        _context.Donhangs.Add(donHang);
+                        await _context.SaveChangesAsync();
+                        foreach (var i in sanPhams)
+                        {
+                            if(i.IdCuaHang == idch)
+                            {
+                                int soLuong = (await _context.Giohangs.FirstOrDefaultAsync(j => j.IdSanPham == i.IdSanPham && j.IdNguoiDung == userId))!.SoLuong;
+                                var productDetails = new Chitietdonhang
+                                {
+                                    IdDonHang = donHang.IdDonHang,
+                                    IdSanPham = i.IdSanPham,
+                                    DonGia = i.GiaBan,
+                                    SoLuong = soLuong,
+                                };
+                                tongTien += soLuong * i.GiaBan;
+                                _context.Chitietdonhangs.Add(productDetails);
+                            }
+                        }
+                        donHang.TongTien = tongTien;
+                        _context.Donhangs.Update(donHang);
+                        nguoiDung.SoDu -= tongTien;
+                        _context.Nguoidungs.Update(nguoiDung);
+                        await _context.SaveChangesAsync();
                     }
-                    await _context.SaveChangesAsync();
-                    // Thay doi so luong kho va so luong ban cua san pham
-                    foreach (var i in sanPhams)
-                    {
-                        int? soLuong = (await _context.Giohangs.FirstOrDefaultAsync())?.SoLuong;
-                        i.SoLuongKho -= soLuong ?? 0;
-                        i.SoLuongBan += soLuong ?? 0;
-                        _context.Sanphams.Update(i);
-                    }
-                    await _context.SaveChangesAsync();
+
                     // Xoa khoi gio hang
                     var gioHangs = await _context.Giohangs
                         .Where(i => i.IdNguoiDung == userId && danhSachSanPham.Contains(i.IdSanPham))

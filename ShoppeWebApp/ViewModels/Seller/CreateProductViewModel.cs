@@ -16,7 +16,6 @@ namespace ShoppeWebApp.ViewModels.Seller
         [Required(ErrorMessage = "Url ảnh là bắt buộc.")]
         public IFormFile? UrlAnh { get; set; }
 
-        [StringLength(1000, ErrorMessage = "Mô tả không được vượt quá 1000 ký tự.")]
         public string? MoTa { get; set; }
 
         [Required(ErrorMessage = "Số lượng kho là bắt buộc.")]

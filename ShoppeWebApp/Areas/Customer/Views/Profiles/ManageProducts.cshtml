@@ -92,10 +92,18 @@
 									@if (donHang.TinhTrang == Constants.CHO_XAC_NHAN)
 									{
 										<div class="cho-xac-nhan">Chờ xác nhận</div>
+										<form class="ms-auto" asp-action="HuyDonHang" method="post">
+											<input name="IdDonHang" value="@donHang.IdDonHang" type="hidden" />
+											<button type="submit" class="invisible-button manage-product-review-btn">Tôi muốn huỷ hàng</button>
+										</form>
 									}
 									else if (donHang.TinhTrang == Constants.DA_XAC_NHAN)
 									{
 										<div class="da-xac-nhan">Đã xác nhận</div>
+										<form class="ms-auto" asp-action="DaNhanDonHang" method="post">
+											<input name="IdDonHang" value="@donHang.IdDonHang" type="hidden" />
+											<button type="submit" class="invisible-button manage-product-review-btn">Tôi đã nhận hàng</button>
+										</form>
 									}
 									else if (donHang.TinhTrang == Constants.DA_GIAO)
 									{
@@ -119,17 +127,17 @@
 								@foreach (var cuaHang in donHang.danhSachCuaHang)
 								{
 									<div class="d-flex border-bottom-style-1 width-100 box-padding-10 gap-3">
-										@* <div>@cuaHang.IdCuaHang</div> *@
-										<div class="text-highlight">@cuaHang.TenCuaHang</div>
+										<a class="decorationNone text-highlight" asp-controller="SellerPage" asp-action="Index" asp-route-IdShop="@cuaHang.IdCuaHang">@cuaHang.TenCuaHang</a>
 									</div>
 									foreach (var sanPham in cuaHang.danhSachSanPhams)
 									{
-										@* <div>@sanPham.IdSanPham</div> *@
 										<div class="bg-FBFBFB d-flex box-padding-10 gap-3 border-bottom-style-1">
 											<div class="width-62 d-flex gap-3">
-												<div class="width-height-80px graphic-cover-2">
-													<img src="~/@sanPham.UrlAnhSanPham" />
-												</div>
+												<a asp-controller="Product" asp-action="index" asp-route-id="@sanPham.IdSanPham">
+													<div class="width-height-80px graphic-cover-2">
+														<img src="~/@sanPham.UrlAnhSanPham" />
+													</div>
+												</a>
 												<div>@sanPham.TenSanPham</div>
 											</div>
 											<div class="width-12 text-center new-price">
@@ -160,7 +168,14 @@
 												<div class="box-padding-left-right-20">
 													<div class="product-main-info-review-item d-flex gap-3 width-100">
 														<div class="box-padding-10">
-															<img src="~/@Model.UrlAnhDaiDien" class="circle-img">
+															@if (Model.UrlAnhDaiDien != null)
+															{
+																<img src="~/@Model.UrlAnhDaiDien" class="circle-img" />
+															}
+															else
+															{
+																<img src="~/images/avatar-mac-dinh.jpg" class="circle-img" />
+															}
 														</div>
 														<div class="box-padding-10 width-100">
 															<div class="d-flex flex-column product-main-info-review-meta">
@@ -212,7 +227,14 @@
 														{
 															<div class="product-main-info-review-item d-flex gap-3 width-100">
 																<div class="box-padding-10">
-																	<img src="~/@Model.UrlAnhDaiDien" class="circle-img">
+																	@if (Model.UrlAnhDaiDien != null)
+																	{
+																		<img src="~/@Model.UrlAnhDaiDien" class="circle-img" />
+																	}
+																	else
+																	{
+																		<img src="~/images/avatar-mac-dinh.jpg" class="circle-img" />
+																	}
 																</div>
 																<div class="box-padding-10 width-100">
 																	<div class="product-main-info-review-meta">

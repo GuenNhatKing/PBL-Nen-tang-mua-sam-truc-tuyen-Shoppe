@@ -1324,3 +1324,7 @@ ul {
     font-size: 1rem;
     box-sizing: border-box;
 }
+
+.decorationNone {
+    text-decoration: none;
+}

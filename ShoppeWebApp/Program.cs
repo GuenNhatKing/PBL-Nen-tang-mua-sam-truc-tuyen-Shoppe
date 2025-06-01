@@ -1,6 +1,10 @@
 ﻿using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using ShoppeWebApp.Data;
+using Hangfire;
+using Hangfire.MySql;
+using ShoppeWebApp.Services;
+using Microsoft.AspNetCore.Identity;
 
 namespace ShoppeWebApp
 {
@@ -15,6 +19,13 @@ namespace ShoppeWebApp
                 options.UseMySql(builder.Configuration.GetConnectionString("ShoppeWebApp"),
                 ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("ShoppeWebApp")));
             });
+            var storageOptions = new MySqlStorageOptions();
+            builder.Services.AddHangfire(config =>
+            {
+                config.UseStorage(new MySqlStorage(builder.Configuration.GetConnectionString("ShoppeWebApp"), storageOptions));
+            });
+            builder.Services.AddHangfireServer();
+            builder.Services.AddScoped<DatabaseChecker>();
 
             builder.Services.AddAuthentication("CustomerSchema")
             .AddCookie("CustomerSchema", options =>
@@ -48,6 +59,13 @@ namespace ShoppeWebApp
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseHangfireDashboard();
+            RecurringJob.AddOrUpdate<DatabaseChecker>(
+                "check-db-every-5-minutes",
+                checker => checker.CheckDatabase(),
+                "* * * * *"
+            );
+            // Hien tai la 1 phut cho de check
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

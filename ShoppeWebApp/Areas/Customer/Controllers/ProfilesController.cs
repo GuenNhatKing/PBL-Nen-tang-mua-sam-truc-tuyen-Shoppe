@@ -1,7 +1,5 @@
-﻿using System.Diagnostics;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
@@ -83,6 +81,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                     user.Sdt = profiles.SoDienThoai;
                     user.Email = profiles.Email;
                     user.DiaChi = profiles.DiaChi;
+                    user.SoDu = profiles.SoDu;
                     _context.Update(user);
                     await _context.SaveChangesAsync();
                     var imageUpload = new ImageUpload(_webHost);
@@ -198,6 +197,37 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             }
             ViewBag.TinhTrang = TinhTrang;
             return View(profiles);
+        }
+        public async Task<IActionResult> HuyDonHang(string? IdDonHang)
+        {
+            if(String.IsNullOrEmpty(IdDonHang))
+            {
+                return BadRequest();
+            }
+            var donHang = await _context.Donhangs.FirstOrDefaultAsync(i => i.IdDonHang == IdDonHang);
+            if(donHang != null)
+            {
+                donHang.TrangThai = ShoppeWebApp.Data.Constants.HUY_DON_HANG;
+                _context.Donhangs.Update(donHang);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction("ManageProducts");
+        }
+        public async Task<IActionResult> DaNhanDonHang(string? IdDonHang)
+        {
+            if(String.IsNullOrEmpty(IdDonHang))
+            {
+                return BadRequest();
+            }
+            var donHang = await _context.Donhangs.FirstOrDefaultAsync(i => i.IdDonHang == IdDonHang);
+            if(donHang != null)
+            {
+                donHang.TrangThai = ShoppeWebApp.Data.Constants.DA_GIAO;
+                donHang.ThoiGianGiao = DateTime.Now;
+                _context.Donhangs.Update(donHang);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction("ManageProducts");
         }
         public async Task<JsonResult> SubmitRating(string? IdSanPham, int? ratingValue, string? ratingContent)
         {
