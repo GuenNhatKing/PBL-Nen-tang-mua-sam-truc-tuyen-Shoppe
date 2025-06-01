@@ -281,7 +281,7 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
                             IdLienHe = IdLienHe,
                             TongTien = tongTien,
                             TrangThai = Constants.CHO_XAC_NHAN,
-                            ThoiGianTao = DateTime.UtcNow,
+                            ThoiGianTao = DateTime.Now,
                         };
                         _context.Donhangs.Add(donHang);
                         await _context.SaveChangesAsync();
