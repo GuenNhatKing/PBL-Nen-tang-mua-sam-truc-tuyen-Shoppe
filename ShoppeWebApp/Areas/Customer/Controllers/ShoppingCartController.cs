@@ -242,6 +242,8 @@ namespace ShoppeWebApp.Areas.Customer.Controllers
             List<string> idCuaHangs = new List<string>();
             foreach (var i in sanPhams)
             {
+                int? soLuong = (await _context.Giohangs.FirstOrDefaultAsync())?.SoLuong;
+                tongTien += i.GiaBan * (soLuong ?? 0);
                 if (!idCuaHangs.Contains(i.IdCuaHang))
                 {
                     idCuaHangs.Add(i.IdCuaHang);
