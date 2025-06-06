@@ -1328,3 +1328,31 @@ ul {
 .decorationNone {
     text-decoration: none;
 }
+
+.success-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    padding: 20px 30px;
+    border-radius: 8px;
+    text-align: center;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+    .success-message.show {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+.check-icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 10px;
+    display: block;
+}

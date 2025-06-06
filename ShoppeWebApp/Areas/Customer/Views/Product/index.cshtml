@@ -213,70 +213,79 @@
 	</div>
 </div>
 
-<script>
-	const decreaseBtn = document.querySelector('.decrease');
-	const increaseBtn = document.querySelector('.increase');
-	const quantityInput = document.querySelector('.quantity-input');
+<div class="success-message">
+	<div class="d-flex justify-content-center">
+		<img src="/images/Resources/thanh-cong.png" class="check-icon">
+	</div>
+	<p>Thêm vào giỏ hàng thành công!</p>
+</div>
+@section Scripts {
+	<script>
+		const decreaseBtn = document.querySelector('.decrease');
+		const increaseBtn = document.querySelector('.increase');
+		const quantityInput = document.querySelector('.quantity-input');
 
-	increaseBtn.addEventListener('click', () => {
-		let currentValue = parseInt(quantityInput.value) || 0;
-		quantityInput.value = currentValue + 1;
-		let soLuongKho = parseInt(document.getElementById('So-Luong-Kho').textContent) || 0;
-		if (quantityInput.value < 1) {
-			quantityInput.value = 1
-		}
-		if (quantityInput.value > soLuongKho) {
-			quantityInput.value = soLuongKho
-		}
-	});
-
-	decreaseBtn.addEventListener('click', () => {
-		let currentValue = parseInt(quantityInput.value) || 0;
-		if (currentValue > 1) {
-			quantityInput.value = currentValue - 1;
-		}
-		let soLuongKho = parseInt(document.getElementById('So-Luong-Kho').textContent) || 0;
-		if (quantityInput.value < 1) {
-			quantityInput.value = 1
-		}
-		if (quantityInput.value > soLuongKho) {
-			quantityInput.value = soLuongKho
-		}
-	});
-
-	quantityInput.addEventListener('input', () => {
-		quantityInput.value = quantityInput.value.replace(/[^0-9]/g, '');
-		let soLuongKho = parseInt(document.getElementById('So-Luong-Kho').textContent) || 0;
-		if (quantityInput.value < 1) {
-			quantityInput.value = 1
-		}
-		if (quantityInput.value > soLuongKho) {
-			quantityInput.value = soLuongKho
-		}
-	});
-	function AddToShoppingCart() {
-		$.ajax({
-			url: '@Url.Action("AddProductToShoppingCart", "Product")',
-			type: 'POST',
-			data: { IdSanPham: '@Model.IdSanPham', SoLuong: parseInt(quantityInput.value) || 0 },
-			dataType: "json",
-			success: function (response) {
-				if(response.isSuccess === true)
-					alert("Thêm vào giỏ hàng thành công!!");
+		increaseBtn.addEventListener('click', () => {
+			let currentValue = parseInt(quantityInput.value) || 0;
+			quantityInput.value = currentValue + 1;
+			let soLuongKho = parseInt(document.getElementById('So-Luong-Kho').textContent) || 0;
+			if (quantityInput.value < 1) {
+				quantityInput.value = 1
 			}
-		})
-	}
-	function BuyNow() {
-		var redirect = '@Url.Action("Index", "ShoppingCart")';
-		$.ajax({
-			url: '@Url.Action("AddProductToShoppingCart", "Product")',
-			type: 'POST',
-			data: { IdSanPham: '@Model.IdSanPham', SoLuong: parseInt(quantityInput.value) || 0 },
-			dataType: "json",
-			success: function (response) {
-				if(response.isSuccess === true)
-					window.location.href = redirect;
+			if (quantityInput.value > soLuongKho) {
+				quantityInput.value = soLuongKho
 			}
-		})
-	}
-</script>
+		});
+
+		decreaseBtn.addEventListener('click', () => {
+			let currentValue = parseInt(quantityInput.value) || 0;
+			if (currentValue > 1) {
+				quantityInput.value = currentValue - 1;
+			}
+			let soLuongKho = parseInt(document.getElementById('So-Luong-Kho').textContent) || 0;
+			if (quantityInput.value < 1) {
+				quantityInput.value = 1
+			}
+			if (quantityInput.value > soLuongKho) {
+				quantityInput.value = soLuongKho
+			}
+		});
+
+		quantityInput.addEventListener('input', () => {
+			quantityInput.value = quantityInput.value.replace(/[^0-9]/g, '');
+			let soLuongKho = parseInt(document.getElementById('So-Luong-Kho').textContent) || 0;
+			if (quantityInput.value < 1) {
+				quantityInput.value = 1
+			}
+			if (quantityInput.value > soLuongKho) {
+				quantityInput.value = soLuongKho
+			}
+		});
+		function AddToShoppingCart() {
+			$.ajax({
+				url: '@Url.Action("AddProductToShoppingCart", "Product")',
+				type: 'POST',
+				data: { IdSanPham: '@Model.IdSanPham', SoLuong: parseInt(quantityInput.value) || 0 },
+				dataType: "json",
+				success: function (response) {
+					if(response.isSuccess === true) {
+						showSuccessMessage();
+					}
+				}
+			})
+		}
+		function BuyNow() {
+			var redirect = '@Url.Action("Index", "ShoppingCart")';
+			$.ajax({
+				url: '@Url.Action("AddProductToShoppingCart", "Product")',
+				type: 'POST',
+				data: { IdSanPham: '@Model.IdSanPham', SoLuong: parseInt(quantityInput.value) || 0 },
+				dataType: "json",
+				success: function (response) {
+					if(response.isSuccess === true)
+						window.location.href = redirect;
+				}
+			})
+		}
+	</script>
+}

@@ -138,6 +138,13 @@
 <form asp-controller="ShoppingCart" asp-action="ConfirmPayment" id="confirmForm" method="get">
 </form>
 
+<div class="success-message">
+	<div class="d-flex justify-content-center">
+		<img src="/images/Resources/that-bai.png" class="check-icon">
+	</div>
+	<p>Bạn chưa chọn sản phẩm nào!</p>
+</div>
+
 @section Scripts {
 	<script>
 		const allCheckbox = document.getElementsByClassName('allCheck');
@@ -382,7 +389,7 @@
 				}
 			}
 			if(count === 0) {
-				alert("Bạn chưa chọn sản phẩm nào!");
+				showSuccessMessage();
 			}
 			else {
 				let form = document.getElementById("confirmForm");

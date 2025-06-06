@@ -14,3 +14,11 @@ function readImage(input) {
     }
 }
 
+function showSuccessMessage() {
+    const message = document.querySelector(".success-message");
+    message.classList.add("show");
+    setTimeout(function () {
+        message.classList.remove("show");
+    }, 2500);
+}
+
