@@ -1,6 +1,16 @@
 ﻿@model AllProductInfo;
 @{
-    ViewData["Title"] = "Tất cả sản phẩm";
+    if (string.IsNullOrEmpty(Model.danhMuc)) {
+        ViewData["Title"] = "Tất cả sản phẩm";
+    }
+    else
+    {
+        @foreach (var i in Model.categories)
+        {
+            @if (Model.danhMuc == i.IdDanhMuc)
+                ViewData["Title"] = i.TenDanhMuc;
+        }
+    }
 }
 <div class="template-2">
     <div class="container-2">

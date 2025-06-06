@@ -1,6 +1,6 @@
 ﻿@model ManageProducts
 @{
-	ViewData["Title"] = "Trang cá nhân";
+	ViewData["Title"] = "Quản lý đơn hàng";
 }
 <div class="profiles-wrapper">
 	<div>
@@ -300,117 +300,119 @@
 	</div>
 </div>
 
-<script>
-	let reviewBtn = document.getElementsByClassName('reviewBtn');
-	let exitBtn = document.getElementsByClassName('exitBtn');
-	let ratingBtn = document.getElementsByClassName('ratingBtn');
-	let exitRatingBtn = document.getElementsByClassName('exitRatingBtn');
-	let confirmRatingBtn = document.getElementsByClassName('confirmRatingBtn');
-	for(let btn of reviewBtn) {
-		btn.addEventListener('click', function() {
-			let name = this.name;
-			let box = document.querySelector(`.review-box[name="${name}"]`)
-			box.style.display = 'flex';
-		});
-	}
-	for(let btn of exitBtn) {
-		btn.addEventListener('click', function() {
-			let name = this.name;
-			let box = document.querySelector(`.review-box[name="${name}"]`)
-			box.style.display = 'none';
-		});
-	}
-	for(let btn of ratingBtn) {
-		btn.addEventListener('click', function() {
-			let name = this.name;
-			let box = document.querySelector(`.rating-box[name="${name}"]`)
-			box.style.display = 'flex';
-			let stars = document.querySelectorAll(`.fa-star[name="${name}"]`);
-			for (let s of stars) {
-				s.classList.remove('star-checked');
-			}
-			let ratingValue = document.querySelector(`.selected-rating[name="${name}"]`);
-			let ratingContent = document.querySelector(`.rating-content[name="${name}"]`);
-			ratingValue.textContent = 0;
-			ratingContent.value = "";
-		});
-	}
-	for(let btn of exitRatingBtn) {
-		btn.addEventListener('click', function() {
-			let name = this.name;
-			let box = document.querySelector(`.rating-box[name="${name}"]`)
-			box.style.display = 'none';
-		});
-	}
-	window.addEventListener("load", () => {
-	    let scrollPos = localStorage.getItem("scrollPos");
-	    if (scrollPos !== null) {
-		    window.scrollTo(0, parseInt(scrollPos));
-		    localStorage.removeItem("scrollPos");
-	    }
-	});
-	for(let btn of confirmRatingBtn) {
-		btn.addEventListener('click', function() {
-			let name = this.name;
-			let box = document.querySelector(`.rating-box[name="${name}"]`);
-			let ratingValue = parseInt(document.querySelector(`.selected-rating[name="${name}"]`).textContent);
-			let ratingContent = document.querySelector(`.rating-content[name="${name}"]`).value;
-			$.ajax({
-				url: '@Url.Action("SubmitRating", "Profiles")',
-				type: 'POST',
-				data: { IdSanPham: name, ratingValue: ratingValue, ratingContent: ratingContent },
-				dataType: "json",
-				success: function(response) {
-					if(response.isSuccess === true) {
-						let scrollY = window.scrollY;
-						localStorage.setItem("scrollPos", scrollY);
-						location.reload();
-					}
-				},
-			})
-			box.style.display = 'none';
-		});
-	}
-	let ratingDivs = document.getElementsByClassName('rating');
-
-	for (let ratingDiv of ratingDivs) {
-		let productId = ratingDiv.querySelector('.fa-star').getAttribute('name');
-		let stars = ratingDiv.querySelectorAll(`.fa-star[name="${productId}"]`);
-		let selectedRating = ratingDiv.querySelector(`.selected-rating[name="${productId}"]`);
-
-		for (let star of stars) {
-			star.addEventListener('click', function () {
-				let value = parseInt(this.getAttribute('data-value'));
-
+@section Scripts {
+	<script>
+		let reviewBtn = document.getElementsByClassName('reviewBtn');
+		let exitBtn = document.getElementsByClassName('exitBtn');
+		let ratingBtn = document.getElementsByClassName('ratingBtn');
+		let exitRatingBtn = document.getElementsByClassName('exitRatingBtn');
+		let confirmRatingBtn = document.getElementsByClassName('confirmRatingBtn');
+		for(let btn of reviewBtn) {
+			btn.addEventListener('click', function() {
+				let name = this.name;
+				let box = document.querySelector(`.review-box[name="${name}"]`)
+				box.style.display = 'flex';
+			});
+		}
+		for(let btn of exitBtn) {
+			btn.addEventListener('click', function() {
+				let name = this.name;
+				let box = document.querySelector(`.review-box[name="${name}"]`)
+				box.style.display = 'none';
+			});
+		}
+		for(let btn of ratingBtn) {
+			btn.addEventListener('click', function() {
+				let name = this.name;
+				let box = document.querySelector(`.rating-box[name="${name}"]`)
+				box.style.display = 'flex';
+				let stars = document.querySelectorAll(`.fa-star[name="${name}"]`);
 				for (let s of stars) {
 					s.classList.remove('star-checked');
 				}
-				for (let s of stars) {
-					if (parseInt(s.getAttribute('data-value')) <= value) {
-						s.classList.add('star-checked');
-					}
-				}
-
-				selectedRating.textContent = value;
-			});
-
-			star.addEventListener('mouseenter', function () {
-				let value = parseInt(this.getAttribute('data-value'));
-				for (let s of stars) {
-					s.classList.remove('star-hovered');
-				}
-				for (let s of stars) {
-					if (parseInt(s.getAttribute('data-value')) <= value) {
-						s.classList.add('star-hovered');
-					}
-				}
-			});
-
-			star.addEventListener('mouseleave', function () {
-				for (let s of stars) {
-					s.classList.remove('star-hovered');
-				}
+				let ratingValue = document.querySelector(`.selected-rating[name="${name}"]`);
+				let ratingContent = document.querySelector(`.rating-content[name="${name}"]`);
+				ratingValue.textContent = 0;
+				ratingContent.value = "";
 			});
 		}
-	}
-</script>
+		for(let btn of exitRatingBtn) {
+			btn.addEventListener('click', function() {
+				let name = this.name;
+				let box = document.querySelector(`.rating-box[name="${name}"]`)
+				box.style.display = 'none';
+			});
+		}
+		window.addEventListener("load", () => {
+			let scrollPos = localStorage.getItem("scrollPos");
+			if (scrollPos !== null) {
+				window.scrollTo(0, parseInt(scrollPos));
+				localStorage.removeItem("scrollPos");
+			}
+		});
+		for(let btn of confirmRatingBtn) {
+			btn.addEventListener('click', function() {
+				let name = this.name;
+				let box = document.querySelector(`.rating-box[name="${name}"]`);
+				let ratingValue = parseInt(document.querySelector(`.selected-rating[name="${name}"]`).textContent);
+				let ratingContent = document.querySelector(`.rating-content[name="${name}"]`).value;
+				$.ajax({
+					url: '@Url.Action("SubmitRating", "Profiles")',
+					type: 'POST',
+					data: { IdSanPham: name, ratingValue: ratingValue, ratingContent: ratingContent },
+					dataType: "json",
+					success: function(response) {
+						if(response.isSuccess === true) {
+							let scrollY = window.scrollY;
+							localStorage.setItem("scrollPos", scrollY);
+							location.reload();
+						}
+					},
+				})
+				box.style.display = 'none';
+			});
+		}
+		let ratingDivs = document.getElementsByClassName('rating');
+
+		for (let ratingDiv of ratingDivs) {
+			let productId = ratingDiv.querySelector('.fa-star').getAttribute('name');
+			let stars = ratingDiv.querySelectorAll(`.fa-star[name="${productId}"]`);
+			let selectedRating = ratingDiv.querySelector(`.selected-rating[name="${productId}"]`);
+
+			for (let star of stars) {
+				star.addEventListener('click', function () {
+					let value = parseInt(this.getAttribute('data-value'));
+
+					for (let s of stars) {
+						s.classList.remove('star-checked');
+					}
+					for (let s of stars) {
+						if (parseInt(s.getAttribute('data-value')) <= value) {
+							s.classList.add('star-checked');
+						}
+					}
+
+					selectedRating.textContent = value;
+				});
+
+				star.addEventListener('mouseenter', function () {
+					let value = parseInt(this.getAttribute('data-value'));
+					for (let s of stars) {
+						s.classList.remove('star-hovered');
+					}
+					for (let s of stars) {
+						if (parseInt(s.getAttribute('data-value')) <= value) {
+							s.classList.add('star-hovered');
+						}
+					}
+				});
+
+				star.addEventListener('mouseleave', function () {
+					for (let s of stars) {
+						s.classList.remove('star-hovered');
+					}
+				});
+			}
+		}
+	</script>
+}

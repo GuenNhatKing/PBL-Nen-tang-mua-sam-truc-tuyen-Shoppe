@@ -1356,3 +1356,31 @@ ul {
     margin-bottom: 10px;
     display: block;
 }
+
+.contact-container {
+    margin: 50px auto 30px auto;
+    font-family: Arial, sans-serif;
+    max-width: 700px;
+    padding: 0 15px;
+    color: #333;
+    line-height: 1.6;
+}
+
+.contact-title {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+.contact-link {
+    color: #2980b9;
+    text-decoration: none;
+}
+
+    .contact-link:hover {
+        text-decoration: underline;
+    }
+
+.contact-info {
+    margin-bottom: 25px;
+}

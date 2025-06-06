@@ -1,6 +1,6 @@
 ﻿@model ManageAddress
 @{
-	ViewData["Title"] = "Trang cá nhân";
+	ViewData["Title"] = "Thông tin liên hệ";
 }
 <div class="add-address-box overlay-box" style="display: none">
 	<div class="bg-white manage-product-review-box rounded width-40rem">
@@ -149,128 +149,130 @@
 		</div>
 	</div>
 </div>
-<script>
-	let editBtn = document.getElementsByClassName('editBtn');
-	let exitEditBtn = document.getElementsByClassName('exitEditBtn');
-	let confirmEditBtn = document.getElementsByClassName('confirmEditBtn');
-	let addBtn = document.getElementsByClassName('addBtn');
-	let exitAddBtn = document.getElementsByClassName('exitAddBtn');
-	let confirmAddBtn = document.getElementsByClassName('confirmAddBtn');
-	let deleteBtn = document.getElementsByClassName('deleteBtn');
-	let exitDeleteBtn = document.getElementsByClassName('exitDeleteBtn');
-	let confirmDeleteBtn = document.getElementsByClassName('confirmDeleteBtn');
-	for(let btn of editBtn) {
-		btn.addEventListener('click', function() {
-			let name = this.name;
-			let box = document.querySelector(`.edit-address-box[name="${name}"]`)
-			box.style.display = 'flex';
-			let nameInput = document.getElementById(`NameInput-${name}`);
-			let phoneInput = document.getElementById(`PhoneInput-${name}`);
-			let addressInput = document.getElementById(`AddressInput-${name}`);
-			nameInput.value = document.getElementById(`NameInfo-${name}`).textContent;
-			phoneInput.value = document.getElementById(`PhoneInfo-${name}`).textContent;
-			addressInput.value = document.getElementById(`AddressInfo-${name}`).textContent;
-		});
-	}
-	for(let btn of exitEditBtn) {
-		btn.addEventListener('click', function() {
-			let name = this.name;
-			let box = document.querySelector(`.edit-address-box[name="${name}"]`)
-			box.style.display = 'none';
-		});
-	}
-	for(let btn of confirmEditBtn) {
-		btn.addEventListener('click', function() {
-			let name = this.name;
-			let box = document.querySelector(`.edit-address-box[name="${name}"]`)
-			box.style.display = 'none';
-			let nameInput = document.getElementById(`NameInput-${name}`).value;
-			let phoneInput = document.getElementById(`PhoneInput-${name}`).value;
-			let addressInput = document.getElementById(`AddressInput-${name}`).value;
-			$.ajax({
-				url: '@Url.Action("UpdateAddressInfo", "Profiles")',
-				type: 'POST',
-				data: { IdLienHe: name, HoVaTen: nameInput, SDT: phoneInput, DiaChi: addressInput },
-				dataType: "json",
-				success: function(response) {
-					if(response.isSuccess === true) {
-						alert("Cập nhật thông tin địa chỉ thành công");
-						let scrollY = window.scrollY;
-						localStorage.setItem("scrollPos", scrollY);
-						location.reload();
-					}
-				},
-			})
-		});
-	}
-	for(let btn of addBtn) {
-		btn.addEventListener('click', function() {
-			let box = document.querySelector(`.add-address-box`)
-			box.style.display = 'flex';
-		});
-	}
-	for(let btn of exitAddBtn) {
-		btn.addEventListener('click', function() {
-			let box = document.querySelector(`.add-address-box`)
-			box.style.display = 'none';
-		});
-	}
-	for(let btn of confirmAddBtn) {
-		btn.addEventListener('click', function() {
-			let box = document.querySelector(`.add-address-box`)
-			box.style.display = 'none';
-			let nameInput = document.getElementById(`AddNameInput`).value;
-			let phoneInput = document.getElementById(`AddPhoneInput`).value;
-			let addressInput = document.getElementById(`AddAddressInput`).value;
-			$.ajax({
-				url: '@Url.Action("AddAddressInfo", "Profiles")',
-				type: 'POST',
-				data: {HoVaTen: nameInput, SDT: phoneInput, DiaChi: addressInput },
-				dataType: "json",
-				success: function(response) {
-					if(response.isSuccess === true) {
-						alert("Thêm thông tin địa chỉ thành công");
-						let scrollY = window.scrollY;
-						localStorage.setItem("scrollPos", scrollY);
-						location.reload();
-					}
-				},
-			})
-		});
-	}
-	for(let btn of deleteBtn) {
-		btn.addEventListener('click', function() {
-			let name = this.name;
-			let box = document.querySelector(`.delete-address-box[name="${name}"]`)
-			box.style.display = 'flex';
-		});
-	}
-	for(let btn of exitDeleteBtn) {
-		btn.addEventListener('click', function() {
-			let name = this.name;
-			let box = document.querySelector(`.delete-address-box[name="${name}"]`)
-			box.style.display = 'none';
-		});
-	}
-	for(let btn of confirmDeleteBtn) {
-		btn.addEventListener('click', function() {
-			let name = this.name;
-			let box = document.querySelector(`.delete-address-box[name="${name}"]`)
-			box.style.display = 'none';
-			$.ajax({
-				url: '@Url.Action("RemoveAddressInfo", "Profiles")',
-				type: 'POST',
-				data: { IdLienHe: name},
-				dataType: "json",
-				success: function(response) {
-					if(response.isSuccess === true) {
-						alert("Xoá địa chỉ thành công");
-						let scrollY = window.scrollY;
-						localStorage.setItem("scrollPos", scrollY);
-						location.reload();
-					}
-				},
-			})
-		});
-	}
-</script>
+@section Scripts {
+	<script>
+		let editBtn = document.getElementsByClassName('editBtn');
+		let exitEditBtn = document.getElementsByClassName('exitEditBtn');
+		let confirmEditBtn = document.getElementsByClassName('confirmEditBtn');
+		let addBtn = document.getElementsByClassName('addBtn');
+		let exitAddBtn = document.getElementsByClassName('exitAddBtn');
+		let confirmAddBtn = document.getElementsByClassName('confirmAddBtn');
+		let deleteBtn = document.getElementsByClassName('deleteBtn');
+		let exitDeleteBtn = document.getElementsByClassName('exitDeleteBtn');
+		let confirmDeleteBtn = document.getElementsByClassName('confirmDeleteBtn');
+		for(let btn of editBtn) {
+			btn.addEventListener('click', function() {
+				let name = this.name;
+				let box = document.querySelector(`.edit-address-box[name="${name}"]`)
+				box.style.display = 'flex';
+				let nameInput = document.getElementById(`NameInput-${name}`);
+				let phoneInput = document.getElementById(`PhoneInput-${name}`);
+				let addressInput = document.getElementById(`AddressInput-${name}`);
+				nameInput.value = document.getElementById(`NameInfo-${name}`).textContent;
+				phoneInput.value = document.getElementById(`PhoneInfo-${name}`).textContent;
+				addressInput.value = document.getElementById(`AddressInfo-${name}`).textContent;
+			});
+		}
+		for(let btn of exitEditBtn) {
+			btn.addEventListener('click', function() {
+				let name = this.name;
+				let box = document.querySelector(`.edit-address-box[name="${name}"]`)
+				box.style.display = 'none';
+			});
+		}
+		for(let btn of confirmEditBtn) {
+			btn.addEventListener('click', function() {
+				let name = this.name;
+				let box = document.querySelector(`.edit-address-box[name="${name}"]`)
+				box.style.display = 'none';
+				let nameInput = document.getElementById(`NameInput-${name}`).value;
+				let phoneInput = document.getElementById(`PhoneInput-${name}`).value;
+				let addressInput = document.getElementById(`AddressInput-${name}`).value;
+				$.ajax({
+					url: '@Url.Action("UpdateAddressInfo", "Profiles")',
+					type: 'POST',
+					data: { IdLienHe: name, HoVaTen: nameInput, SDT: phoneInput, DiaChi: addressInput },
+					dataType: "json",
+					success: function(response) {
+						if(response.isSuccess === true) {
+							alert("Cập nhật thông tin địa chỉ thành công");
+							let scrollY = window.scrollY;
+							localStorage.setItem("scrollPos", scrollY);
+							location.reload();
+						}
+					},
+				})
+			});
+		}
+		for(let btn of addBtn) {
+			btn.addEventListener('click', function() {
+				let box = document.querySelector(`.add-address-box`)
+				box.style.display = 'flex';
+			});
+		}
+		for(let btn of exitAddBtn) {
+			btn.addEventListener('click', function() {
+				let box = document.querySelector(`.add-address-box`)
+				box.style.display = 'none';
+			});
+		}
+		for(let btn of confirmAddBtn) {
+			btn.addEventListener('click', function() {
+				let box = document.querySelector(`.add-address-box`)
+				box.style.display = 'none';
+				let nameInput = document.getElementById(`AddNameInput`).value;
+				let phoneInput = document.getElementById(`AddPhoneInput`).value;
+				let addressInput = document.getElementById(`AddAddressInput`).value;
+				$.ajax({
+					url: '@Url.Action("AddAddressInfo", "Profiles")',
+					type: 'POST',
+					data: {HoVaTen: nameInput, SDT: phoneInput, DiaChi: addressInput },
+					dataType: "json",
+					success: function(response) {
+						if(response.isSuccess === true) {
+							alert("Thêm thông tin địa chỉ thành công");
+							let scrollY = window.scrollY;
+							localStorage.setItem("scrollPos", scrollY);
+							location.reload();
+						}
+					},
+				})
+			});
+		}
+		for(let btn of deleteBtn) {
+			btn.addEventListener('click', function() {
+				let name = this.name;
+				let box = document.querySelector(`.delete-address-box[name="${name}"]`)
+				box.style.display = 'flex';
+			});
+		}
+		for(let btn of exitDeleteBtn) {
+			btn.addEventListener('click', function() {
+				let name = this.name;
+				let box = document.querySelector(`.delete-address-box[name="${name}"]`)
+				box.style.display = 'none';
+			});
+		}
+		for(let btn of confirmDeleteBtn) {
+			btn.addEventListener('click', function() {
+				let name = this.name;
+				let box = document.querySelector(`.delete-address-box[name="${name}"]`)
+				box.style.display = 'none';
+				$.ajax({
+					url: '@Url.Action("RemoveAddressInfo", "Profiles")',
+					type: 'POST',
+					data: { IdLienHe: name},
+					dataType: "json",
+					success: function(response) {
+						if(response.isSuccess === true) {
+							alert("Xoá địa chỉ thành công");
+							let scrollY = window.scrollY;
+							localStorage.setItem("scrollPos", scrollY);
+							location.reload();
+						}
+					},
+				})
+			});
+		}
+	</script>
+}
