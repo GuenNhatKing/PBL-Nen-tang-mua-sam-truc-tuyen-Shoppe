@@ -72,10 +72,13 @@
 
             <!-- Nút xác nhận và hủy -->
             <div class="text-end">
-                <form asp-area="Admin" asp-controller="Account" asp-action="DeleteConfirmed" method="post" class="d-inline">
-                    <input type="hidden" name="id" value="@Model.Id" />
-                    <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
-                </form>
+                @if (TempData["ErrorMessage"] == null)
+                {
+                    <form asp-area="Admin" asp-controller="Account" asp-action="DeleteConfirmed" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
+                    </form>
+                }
                 <a asp-area="Admin" asp-controller="Account" asp-action="Index" class="btn btn-secondary">Hủy</a>
             </div>
         </div>

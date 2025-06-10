@@ -4,6 +4,7 @@ using ShoppeWebApp.Data;
 using ShoppeWebApp.ViewModels.Admin;
 using System.Linq;
 using ShoppeWebApp.Models; 
+using ShoppeWebApp.Services;
 
 //******************************************************
 // Xóa tài khoản sau 30 ngày có thể khôi phục được: CHƯA LÀM (Bổ sung sau)
@@ -160,7 +161,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
             {
                 IdNguoiDung = newId,
                 Username = model.Username ?? string.Empty,
-                Password = model.Password ?? string.Empty
+                Password = PasswordHasher.ComputeSha256Hash(model.Password ?? string.Empty)
             };
         
             try
@@ -202,7 +203,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
             {
                 Id = user.IdNguoiDung,
                 Username = account.Username,
-                AvatarUrl = String.IsNullOrEmpty(user.UrlAnh)? "/Images/avatar-mac-dinh.jpg": $"/{user.UrlAnh}", // Đường dẫn ảnh đại diện
+                AvatarUrl = string.IsNullOrEmpty(user.UrlAnh) ? "/Images/avatar-mac-dinh.jpg" : user.UrlAnh, 
                 Name = user.HoVaTen,
                 Email = user.Email,
                 Cccd = user.Cccd,
@@ -218,7 +219,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(EditAccountViewModel model)
+        public IActionResult Edit(EditAccountViewModel model, IFormFile? Avatar)
         {
             if (!ModelState.IsValid)
             {
@@ -282,9 +283,34 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
                     return View(model);
                 }
             }
+
+            // Xử lý upload ảnh đại diện mới nếu có
+            if (Avatar != null && Avatar.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "UserAvatar");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+                var fileExt = Path.GetExtension(Avatar.FileName);
+                var fileName = $"{Guid.NewGuid()}{fileExt}";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    Avatar.CopyTo(stream);
+                }
+
+                // Lưu đường dẫn vào DB (dùng dấu / cho web)
+                user.UrlAnh = $"/images/UserAvatar/{fileName}";
+            }
+            else
+            {
+                // Nếu không upload ảnh mới, giữ nguyên ảnh cũ
+                user.UrlAnh = model.AvatarUrl;
+            }            
         
             // Cập nhật thông tin người dùng
-            model.AvatarUrl = "/Images/avatar-mac-dinh.jpg"; 
             user.HoVaTen = model.Name ?? user.HoVaTen;
             user.Email = model.Email ?? user.Email;
             user.Cccd = model.Cccd ?? user.Cccd;
@@ -337,20 +363,56 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
             {
                 Id = user.IdNguoiDung,
                 Username = account.Username,
-                AvatarUrl =  "/Images/avatar-mac-dinh.jpg", // Đường dẫn ảnh đại diện
+                AvatarUrl = "/Images/avatar-mac-dinh.jpg",
                 Name = user.HoVaTen,
                 Email = user.Email,
                 Cccd = user.Cccd,
                 Sdt = user.Sdt,
                 Address = user.DiaChi,
                 Role = user.VaiTro,
-                Password = account.Password, // Mật khẩu hiện tại
-                ConfirmPassword = account.Password // Xác nhận mật khẩu
+                Password = account.Password,
+                ConfirmPassword = account.Password,
+                ThoiGianXoa = user.ThoiGianXoa 
             };
         
             return View(model);
         }
    
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Restore(string id)
+        {
+            // Tìm người dùng theo ID và đã bị xóa mềm
+            var user = _context.Nguoidungs.FirstOrDefault(u => u.IdNguoiDung == id && u.TrangThai == 0);
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy tài khoản hoặc tài khoản chưa bị xóa.";
+                return RedirectToAction("Index");
+            }
+        
+            // Kiểm tra thời gian xóa chưa quá 30 ngày
+            if (user.ThoiGianXoa == null || (DateTime.Now - user.ThoiGianXoa.Value).TotalDays > 30)
+            {
+                TempData["ErrorMessage"] = "Tài khoản đã bị xóa quá 30 ngày, không thể khôi phục.";
+                return RedirectToAction("Index");
+            }
+        
+            // Khôi phục tài khoản
+            user.TrangThai = 1;
+            user.ThoiGianXoa = null;
+        
+            try
+            {
+                _context.SaveChanges();
+                TempData["SuccessMessage"] = "Khôi phục tài khoản thành công!";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Đã xảy ra lỗi khi khôi phục tài khoản: " + ex.Message;
+            }
+        
+            return RedirectToAction("Index");
+        }
          [HttpGet]
         public IActionResult Delete(string id)
         {
@@ -379,7 +441,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
                             case 0: // Đơn hàng đang chờ xác nhận thanh toán
                                 warningMessage = "Khách hàng đang có đơn hàng chờ xác nhận thanh toán, không thể xóa tài khoản.";
                                 TempData["ErrorMessage"] = warningMessage;
-                                return RedirectToAction("Index");
+                                break;
                             case 1: // Đơn hàng đã được xác nhận thanh toán
                                 warningMessage = "Khách hàng có đơn hàng đã được xác nhận thanh toán. Nếu xóa, hệ thống sẽ tự động hoàn tiền.";
                                 break;

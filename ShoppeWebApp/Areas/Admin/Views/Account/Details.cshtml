@@ -73,8 +73,15 @@
             </p>
         </div>
 
-        <!-- Nút quay lại -->
+        <!-- Nút quay lại và khôi phục -->
         <div class="text-end">
+            @if (Model.ThoiGianXoa != null && (DateTime.Now - Model.ThoiGianXoa.Value).TotalDays <= 30)
+            {
+                <form asp-area="Admin" asp-controller="Account" asp-action="Restore" method="post" class="d-inline">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <button type="submit" class="btn btn-success me-2">Khôi phục</button>
+                </form>
+            }
             <a asp-area="Admin" asp-controller="Account" asp-action="Index" class="btn btn-secondary">Quay lại</a>
         </div>
     </div>
