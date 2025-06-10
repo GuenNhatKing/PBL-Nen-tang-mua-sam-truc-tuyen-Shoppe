@@ -71,6 +71,11 @@
         border: 2px solid #333;
     }
 
+    .btn-custom:hover {
+        background-color: #007bff; 
+        color: white;
+    }
+
     .btn-outline {
         background-color: white;
         color: #333;
@@ -111,6 +116,10 @@
         font-size: 14px;
         margin-bottom: 25px;
         color: #333;
+    }
+
+    .seller-note a {
+        color: #000; 
     }
 </style>
 
@@ -171,7 +180,7 @@
     </form>
 
     <div class="form-footer">
-        <p>Bạn đã có tài khoản? <a asp-area="Customer" asp-controller="Account" asp-action="Login" class="fw-bold text-primary">Đăng nhập</a></p>
+        <p>Bạn đã có tài khoản? <a asp-area="Customer" asp-controller="Account" asp-action="Login" class="fw-bold text-dark">Đăng nhập</a></p>
     </div>
 </div>
 
