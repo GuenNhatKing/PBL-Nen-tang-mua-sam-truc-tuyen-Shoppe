@@ -203,7 +203,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.AccountManager
             {
                 Id = user.IdNguoiDung,
                 Username = account.Username,
-                AvatarUrl = string.IsNullOrEmpty(user.UrlAnh) ? "/Images/avatar-mac-dinh.jpg" : user.UrlAnh, // Đường dẫn ảnh đại diện
+                AvatarUrl = string.IsNullOrEmpty(user.UrlAnh) ? "/Images/avatar-mac-dinh.jpg" : user.UrlAnh, 
                 Name = user.HoVaTen,
                 Email = user.Email,
                 Cccd = user.Cccd,

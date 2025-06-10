@@ -19,7 +19,7 @@
                 <div class="border rounded shadow-sm p-3">
                     @if (!string.IsNullOrEmpty(Model.UrlAnh))
                     {
-                        <img src="@Url.Content("~" + Model.UrlAnh)" alt="Ảnh sản phẩm" class="img-fluid rounded" />
+                        <img src="/@Model.UrlAnh" alt="Ảnh sản phẩm" class="img-fluid rounded" />
                     }
                     else
                     {

@@ -195,7 +195,6 @@
 					dataType: "json",
 					success: function(response) {
 						if(response.isSuccess === true) {
-							alert("Cập nhật thông tin địa chỉ thành công");
 							let scrollY = window.scrollY;
 							localStorage.setItem("scrollPos", scrollY);
 							location.reload();
@@ -230,7 +229,6 @@
 					dataType: "json",
 					success: function(response) {
 						if(response.isSuccess === true) {
-							alert("Thêm thông tin địa chỉ thành công");
 							let scrollY = window.scrollY;
 							localStorage.setItem("scrollPos", scrollY);
 							location.reload();
@@ -265,7 +263,6 @@
 					dataType: "json",
 					success: function(response) {
 						if(response.isSuccess === true) {
-							alert("Xoá địa chỉ thành công");
 							let scrollY = window.scrollY;
 							localStorage.setItem("scrollPos", scrollY);
 							location.reload();
