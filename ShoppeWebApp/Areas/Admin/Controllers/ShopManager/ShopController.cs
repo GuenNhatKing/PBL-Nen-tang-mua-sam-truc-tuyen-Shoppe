@@ -53,8 +53,9 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
                     IdSeller = shop.IdNguoiDung,
                     TenSeller = shop.IdNguoiDungNavigation.HoVaTen,
                     Sdt = shop.Sdt,
-                    UrlAnh = shop.UrlAnh,
-                    ThoiGianTao = shop.ThoiGianTao
+                    UrlAnh = shop.UrlAnh ?? "/Images/shop-dai-dien.png",
+                    ThoiGianTao = shop.ThoiGianTao,
+                    TrangThai = shop.TrangThai
                 })
                 .OrderBy(shop => shop.TenCuaHang)
                 .Skip((page - 1) * pageSize)
@@ -108,7 +109,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
             else
             {
                 // Nếu không tải lên ảnh, sử dụng ảnh mặc định
-                filePath = "/Images/shop-dai-dien.png";
+                filePath = "/Images/Shop/shop-dai-dien.png";
             }
         
             Console.WriteLine("File path: " + filePath);
@@ -213,6 +214,8 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
                     DiaChi = s.DiaChi,
                     MoTa = s.MoTa,
                     ThoiGianTao = s.ThoiGianTao,
+                    ThoiGianXoa = s.ThoiGianXoa,
+                    TrangThai = s.TrangThai,
                     SoSanPham = s.Sanphams.Count, // Đếm số sản phẩm thuộc cửa hàng
                     SoDonHang = _context.Donhangs // Đếm số đơn hàng liên quan đến sản phẩm của cửa hàng
                         .Where(dh => dh.Chitietdonhangs
@@ -232,6 +235,49 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ShopManager
             return View(shop);
         }
     
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Restore(string id)
+        {
+            // Kiểm tra nếu ID cửa hàng không hợp lệ
+            if (string.IsNullOrEmpty(id))
+            {
+                TempData["ErrorMessage"] = "ID cửa hàng không hợp lệ.";
+                return RedirectToAction("Index");
+            }
+        
+            // Lấy thông tin cửa hàng từ cơ sở dữ liệu
+            var shop = _context.Cuahangs.FirstOrDefault(s => s.IdCuaHang == id && s.TrangThai == 0);
+            if (shop == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy cửa hàng hoặc cửa hàng chưa bị xóa.";
+                return RedirectToAction("Index");
+            }
+        
+            // Kiểm tra thời gian xóa chưa quá 30 ngày
+            if (shop.ThoiGianXoa == null || (DateTime.Now - shop.ThoiGianXoa.Value).TotalDays > 30)
+            {
+                TempData["ErrorMessage"] = "Cửa hàng đã bị xóa quá 30 ngày, không thể khôi phục.";
+                return RedirectToAction("Index");
+            }
+        
+            // Khôi phục cửa hàng
+            shop.TrangThai = 1;
+            shop.ThoiGianXoa = null;
+        
+            try
+            {
+                _context.Cuahangs.Update(shop);
+                _context.SaveChanges();
+                TempData["SuccessMessage"] = "Khôi phục cửa hàng thành công!";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Đã xảy ra lỗi khi khôi phục cửa hàng: " + ex.Message;
+            }
+        
+            return RedirectToAction("DetailsShop", new { id = shop.IdCuaHang });
+        }
         [HttpGet]
         public IActionResult Edit(string id)
         {

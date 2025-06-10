@@ -176,8 +176,8 @@ namespace ShoppeWebApp.Areas.Admin.Controllers
         
             // Lấy danh sách sản phẩm bán chạy
             var topSellingProducts = productsQuery
-                .OrderByDescending(p => p.Revenue) // Sắp xếp theo doanh thu giảm dần
-                .Take(10) // Lấy 10 sản phẩm có doanh thu cao nhất
+                .OrderByDescending(p => p.QuantitySold) 
+                .Take(10) // Lấy 10 sản phẩm bán chạy nhất
                 .Select(p => new Product
                 {
                     ProductId = p.ProductId,
@@ -327,6 +327,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers
                 })
                 .Where(customer => customer.Revenue > 0) // Chỉ lấy khách hàng có doanh thu
                 .OrderByDescending(customer => customer.Revenue) // Sắp xếp theo doanh thu giảm dần
+                .Take(20) // Lấy 20 khách hàng doanh thu cao nhất
                 .ToList();
         
             // Truyền dữ liệu vào ViewModel

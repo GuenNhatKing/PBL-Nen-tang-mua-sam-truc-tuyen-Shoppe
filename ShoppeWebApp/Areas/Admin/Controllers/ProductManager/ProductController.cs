@@ -143,18 +143,18 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
             string? imagePath = null;
             if (model.UrlAnh != null)
             {
-                var fileName = $"{Guid.NewGuid()}";
-                var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Images/Products");
+                var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/products");
                 if (!Directory.Exists(uploadPath))
                 {
                     Directory.CreateDirectory(uploadPath);
                 }
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(model.UrlAnh.FileName)}";
                 var filePath = Path.Combine(uploadPath, fileName);
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     model.UrlAnh.CopyTo(stream);
                 }
-                imagePath = $"Images/Products/{fileName}";
+                imagePath = $"images/products/{fileName}";
             }
         
             // Tạo ID sản phẩm mới bằng cách tìm ID lớn nhất hiện tại và tăng lên
@@ -392,7 +392,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
                 }
             
                 // Xóa ảnh cũ nếu cần
-                if (!string.IsNullOrEmpty(sanPham.UrlAnh) && sanPham.UrlAnh != "/images/products/default.png")
+                if (!string.IsNullOrEmpty(sanPham.UrlAnh) && sanPham.UrlAnh != "images/products/default.png")
                 {
                     string oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", sanPham.UrlAnh.TrimStart('/'));
                     if (System.IO.File.Exists(oldFilePath))
@@ -402,7 +402,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
                 }
             
                 // Cập nhật đường dẫn ảnh mới vào cơ sở dữ liệu
-                sanPham.UrlAnh = $"/images/products/{uniqueFileName}";
+                sanPham.UrlAnh = $"images/products/{uniqueFileName}";
             }
 
             // Lưu thay đổi vào cơ sở dữ liệu
