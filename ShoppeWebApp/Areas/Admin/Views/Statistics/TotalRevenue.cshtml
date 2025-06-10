@@ -1,0 +1,282 @@
+@model ShoppeWebApp.ViewModels.Admin.TotalRevenueViewModel
+@{
+    Layout = "~/Areas/Admin/Shared/_Layout.cshtml"; 
+    var totalOrders = Model.TotalOrders > 0 ? Model.TotalOrders : 1; // Tránh chia 0
+    var avgRevenue = Model.TotalRevenue / totalOrders;
+    var deliveredRate = (Model.DeliveredOrders * 100.0) / totalOrders;
+    var cancelledRate = (Model.CancelledOrders * 100.0) / totalOrders;
+    var pendingRate = (Model.PendingOrders * 100.0) / totalOrders;
+    var confirmedRate = (Model.ConfirmedOrders * 100.0) / totalOrders;
+    var peakDate = Model.RevenueDates.Count > 0 ? Model.RevenueDates[Model.RevenueValues.IndexOf(Model.RevenueValues.Max())] : DateTime.MinValue;
+    var peakValue = Model.RevenueValues.Count > 0 ? Model.RevenueValues.Max() : 0;
+} 
+
+<div class="container mt-4">
+    <div class="p-5 border border-success rounded" style="background-color: #fdfdfd; min-height: 80vh;">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 10px;">
+                Thống kê tổng doanh thu
+            </h2>
+        </div>
+
+        <!-- Form chọn khoảng thời gian -->
+        <form asp-action="TotalRevenue" method="get" class="row g-3">
+            <div class="col-md-5">
+                <label for="StartDate" class="form-label fw-bold">Ngày bắt đầu</label>
+                <input type="date" id="StartDate" name="StartDate" class="form-control" value="@Model.StartDate?.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-5">
+                <label for="EndDate" class="form-label fw-bold">Ngày kết thúc</label>
+                <input type="date" id="EndDate" name="EndDate" class="form-control" value="@Model.EndDate?.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Xem thống kê</button>
+            </div>
+        </form>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger mt-3">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div>@error.ErrorMessage</div>
+                }
+            </div>
+        }
+
+        <!-- Thống kê trạng thái đơn hàng -->
+        <div class="row g-4 mt-4"> <!-- Thêm lớp mt-4 để tạo khoảng cách -->
+            <div class="col-md-3">
+                <div class="card shadow-sm bg-light border-primary">
+                    <div class="card-body text-center">
+                        <h3 class="text-primary fw-bold">@Model.PendingOrders</h3>
+                        <p>Chờ Xác Nhận</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm bg-light border-success">
+                    <div class="card-body text-center">
+                        <h3 class="text-success fw-bold">@Model.ConfirmedOrders</h3>
+                        <p>Đã Xác Nhận</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm bg-light border-info">
+                    <div class="card-body text-center">
+                        <h3 class="text-info fw-bold">@Model.DeliveredOrders</h3>
+                        <p>Đã Giao</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm bg-light border-danger">
+                    <div class="card-body text-center">
+                        <h3 class="text-danger fw-bold">@Model.CancelledOrders</h3>
+                        <p>Đơn Hủy</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thống kê trạng thái sản phẩm -->
+        <div class="row g-4 mt-4">
+            <div class="col-md-6">
+                <div class="card shadow-sm bg-light border-warning">
+                    <div class="card-body text-center">
+                        <h3 class="text-warning fw-bold">@Model.TemporarilyLockedProducts</h3>
+                        <p>Sản Phẩm Tạm Khóa</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm bg-light border-secondary">
+                    <div class="card-body text-center">
+                        <h3 class="text-secondary fw-bold">@Model.ActiveProducts</h3>
+                        <p>Sản Phẩm Đang Hoạt Động</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hiển thị tổng doanh thu -->
+        <div class="mt-4 text-center">
+            <div class="p-4 border border-success rounded shadow-sm" style="background-color: #e9f7ef;">
+                <h3 class="fw-bold text-uppercase" style="color: #28a745;">Tổng Doanh Thu</h3>
+                <h1 class="fw-bold text-success" style="font-size: 3rem;">@Model.TotalRevenue.ToString("C")</h1>
+            </div>
+        </div>
+
+        <!-- Tiêu đề chung -->
+        <div class="mt-4">
+            <h5>Tỷ lệ trạng thái và Doanh thu trung bình</h5>
+        </div>
+        
+        <!-- Biểu đồ tròn tỷ lệ trạng thái đơn hàng và doanh thu -->
+        <div class="row g-4 mt-4 mb-4">
+            <!-- Biểu đồ tròn tỷ lệ trạng thái đơn hàng -->
+            <div class="col-md-6 d-flex align-items-center justify-content-center">
+                <div class="p-4 border rounded bg-light shadow-sm w-100">
+                    <h5 class="text-center">Tỷ lệ trạng thái đơn hàng</h5>
+                    <canvas id="orderPieChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+        
+            <!-- Cột bên phải chứa Doanh thu trung bình mỗi đơn và Ngày có doanh thu cao nhất -->
+            <div class="col-md-6">
+                <!-- Doanh thu trung bình mỗi đơn -->
+                <div class="p-4 border rounded bg-light shadow-sm mb-4">
+                    <h5 class="text-center">Doanh thu trung bình mỗi đơn</h5>
+                    <h2 class="text-center text-success">@avgRevenue.ToString("C")</h2>
+                </div>
+        
+                <!-- Ngày có doanh thu cao nhất -->
+                <div class="p-4 border rounded bg-light shadow-sm">
+                    <h5 class="text-center">Ngày có doanh thu cao nhất</h5>
+                    <p class="text-center">@peakDate.ToString("dd/MM/yyyy")</p>
+                    <p class="text-center"><strong>@peakValue.ToString("C")</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Biểu đồ doanh thu theo ngày -->
+        <div class="mt-4">
+            <h5>Biểu đồ doanh thu theo ngày</h5>
+            <canvas id="revenueChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Biểu đồ tần suất trạng thái đơn hàng -->
+        <div class="mt-4">
+            <h5>Biểu đồ tần suất trạng thái đơn hàng</h5>
+            <canvas id="orderFrequencyChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Thêm Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Biểu đồ doanh thu theo ngày
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    const revenueChart = new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: @Html.Raw(Json.Serialize(Model.RevenueDates.Select(d => d.ToString("dd/MM/yyyy")))),
+            datasets: [{
+                label: 'Doanh thu',
+                data: @Html.Raw(Json.Serialize(Model.RevenueValues)),
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Biểu đồ tần suất trạng thái đơn hàng (cột chồng)
+    const orderFrequencyCtx = document.getElementById('orderFrequencyChart').getContext('2d');
+    const orderFrequencyChart = new Chart(orderFrequencyCtx, {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(Json.Serialize(Model.RevenueDates.Select(d => d.ToString("dd/MM/yyyy")))),
+            datasets: [
+                {
+                    label: 'Đặt đơn hàng',
+                    data: @Html.Raw(Json.Serialize(Model.OrderFrequencies)),
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Hủy đơn',
+                    data: @Html.Raw(Json.Serialize(Model.CancelledFrequencies)),
+                    backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Giao đơn thành công',
+                    data: @Html.Raw(Json.Serialize(Model.DeliveredFrequencies)),
+                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            },
+            scales: {
+                x: {
+                    stacked: true // Kích hoạt cột chồng trên trục X
+                },
+                y: {
+                    stacked: true, // Kích hoạt cột chồng trên trục Y
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script> <!-- Thêm plugin datalabels -->
+<script>
+    // Biểu đồ tròn trạng thái đơn hàng
+    const pieCtx = document.getElementById('orderPieChart').getContext('2d');
+    const orderPieChart = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Chờ xác nhận', 'Đã xác nhận', 'Đã giao', 'Đơn hủy'],
+            datasets: [{
+                data: [@Model.PendingOrders, @Model.ConfirmedOrders, @Model.DeliveredOrders, @Model.CancelledOrders],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(40, 167, 69, 0.7)',
+                    'rgba(255, 99, 132, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(40, 167, 69, 1)',
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                datalabels: {
+                    formatter: (value, ctx) => {
+                        let sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                        let percentage = ((value / sum) * 100).toFixed(2) + "%";
+                        return percentage; // Hiển thị tỷ lệ phần trăm
+                    },
+                    color: '#fff', // Màu chữ
+                    font: {
+                        weight: 'bold',
+                        size: 14
+                    }
+                }
+            }
+        },
+        plugins: [ChartDataLabels] // Kích hoạt plugin datalabels
+    });
+</script>

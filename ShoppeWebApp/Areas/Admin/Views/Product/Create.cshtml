@@ -24,13 +24,13 @@
                 <input asp-for="IdCuaHang" type="hidden" />
 
                 <div class="mb-3">
-                    <label asp-for="TenSanPham" class="form-label fw-bold">Tên sản phẩm</label>
+                    <label asp-for="TenSanPham" class="form-label fw-bold">Tên sản phẩm *</label>
                     <input asp-for="TenSanPham" class="form-control" placeholder="Nhập tên sản phẩm" />
                     <span asp-validation-for="TenSanPham" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="IdDanhMuc" class="form-label fw-bold">Danh mục</label>
+                    <label asp-for="IdDanhMuc" class="form-label fw-bold">Danh mục *</label>
                     <select asp-for="IdDanhMuc" class="form-select">
                         <option value="">-- Chọn danh mục --</option>
                         @foreach (var category in ViewBag.Categories)
@@ -42,19 +42,19 @@
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="SoLuongKho" class="form-label fw-bold">Số lượng kho</label>
+                    <label asp-for="SoLuongKho" class="form-label fw-bold">Số lượng kho *</label>
                     <input asp-for="SoLuongKho" class="form-control" placeholder="Nhập số lượng kho" />
                     <span asp-validation-for="SoLuongKho" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="GiaGoc" class="form-label fw-bold">Giá gốc</label>
+                    <label asp-for="GiaGoc" class="form-label fw-bold">Giá gốc *</label>
                     <input asp-for="GiaGoc" class="form-control" placeholder="Nhập giá gốc" />
                     <span asp-validation-for="GiaGoc" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="GiaBan" class="form-label fw-bold">Giá bán</label>
+                    <label asp-for="GiaBan" class="form-label fw-bold">Giá bán *</label>
                     <input asp-for="GiaBan" class="form-control" placeholder="Nhập giá bán" />
                     <span asp-validation-for="GiaBan" class="text-danger"></span>
                 </div>
@@ -66,7 +66,7 @@
                 </div>
                 
                 <div class="mb-3">
-                    <label asp-for="UrlAnh" class="form-label fw-bold">Tải lên ảnh</label>
+                    <label asp-for="UrlAnh" class="form-label fw-bold">Tải lên ảnh *</label>
                     <input asp-for="UrlAnh" type="file" class="form-control" accept="image/*" />
                     <span asp-validation-for="UrlAnh" class="text-danger"></span>
                 </div>

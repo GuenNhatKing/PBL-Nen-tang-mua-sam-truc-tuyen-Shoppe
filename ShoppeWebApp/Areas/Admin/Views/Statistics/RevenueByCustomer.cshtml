@@ -1,0 +1,147 @@
+@model ShoppeWebApp.ViewModels.Admin.RevenueByCustomerViewModel
+@{
+    Layout = "~/Areas/Admin/Shared/_Layout.cshtml"; 
+} 
+<div class="container mt-4">
+    <div class="p-5 border border-success rounded" style="background-color: #fdfdfd; min-height: 80vh;">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 10px;">
+                Doanh Thu Theo Khách Hàng
+            </h2>
+        </div>
+
+        <!-- Form chọn khoảng thời gian -->
+        <form asp-action="TotalRevenue" method="get" class="row g-3">
+            <div class="col-md-5">
+                <label for="StartDate" class="form-label fw-bold">Ngày bắt đầu</label>
+                <input type="date" id="StartDate" name="StartDate" class="form-control" value="@Model.StartDate?.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-5">
+                <label for="EndDate" class="form-label fw-bold">Ngày kết thúc</label>
+                <input type="date" id="EndDate" name="EndDate" class="form-control" value="@Model.EndDate?.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Xem thống kê</button>
+            </div>
+        </form>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger mt-3">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div>@error.ErrorMessage</div>
+                }
+            </div>
+        }
+
+        <!-- Thông tin tổng quan -->
+        <div class="row text-center mb-4 g-4">
+            <div class="col-md-3">
+                <div class="p-4 border rounded bg-light shadow-sm" style="background-color: #e9f7ef;">
+                    <h5 class="text-success fw-bold">Tổng Doanh Thu</h5>
+                    <h3 class="fw-bold text-dark">@Model.TotalRevenue.ToString("C")</h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-4 border rounded bg-light shadow-sm" style="background-color: #e9f7ef;">
+                    <h5 class="text-success fw-bold">Tổng Đơn Hàng</h5>
+                    <h3 class="fw-bold text-dark">@Model.TotalOrders</h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-4 border rounded bg-light shadow-sm" style="background-color: #e9f7ef;">
+                    <h5 class="text-success fw-bold">Tổng Sản Phẩm</h5>
+                    <h3 class="fw-bold text-dark">@Model.TotalProducts</h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-4 border rounded bg-light shadow-sm" style="background-color: #e9f7ef;">
+                    <h5 class="text-success fw-bold">Tổng Khách Hàng</h5>
+                    <h3 class="fw-bold text-dark">@Model.TotalCustomers</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hiển thị bảng xếp hạng -->
+        <div class="mt-4">
+            <h3 class="text-center">Bảng Xếp Hạng Doanh Thu Theo Khách Hàng</h3>
+            @if (Model.CustomerRevenues != null && Model.CustomerRevenues.Any())
+            {
+                <table class="table table-bordered table-hover">
+                    <thead class="table-success text-center">
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên Khách Hàng</th>
+                            <th>Số Đơn Hàng</th>
+                            <th>Số Sản Phẩm Đã Mua</th>
+                            <th>Doanh Thu</th>
+                            <th>Trạng Thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.CustomerRevenues.Count; i++)
+                        {
+                            var customer = Model.CustomerRevenues[i];
+                            <tr>
+                                <td class="text-center">@(i + 1)</td>
+                                <td>@customer.CustomerName</td>
+                                <td class="text-center">@customer.OrderCount</td>
+                                <td class="text-center">@customer.ProductCount</td>
+                                <td class="text-end">@customer.Revenue.ToString("C")</td>
+                                <td class="text-center">@customer.CustomerStatus</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="text-center text-muted">Không có dữ liệu doanh thu theo khách hàng trong khoảng thời gian này.</p>
+            }
+        </div>
+
+         <!-- Hiển thị biểu đồ cột -->
+        <div class="mt-5">
+            <h3 class="text-center">Biểu Đồ Doanh Thu Theo Khách Hàng</h3>
+            <canvas id="customerRevenueChart" style="max-height: 300px;"></canvas> <!-- Giảm chiều cao bằng CSS -->
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    var ctx = document.getElementById('customerRevenueChart').getContext('2d');
+                    var customerRevenueChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: @Html.Raw(Json.Serialize(Model.CustomerRevenues.Select(c => c.CustomerName))),
+                            datasets: [{
+                                label: 'Doanh Thu',
+                                data: @Html.Raw(Json.Serialize(Model.CustomerRevenues.Select(c => c.Revenue))),
+                                backgroundColor: '#36A2EB',
+                                borderColor: '#36A2EB',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false, // Cho phép tùy chỉnh chiều cao
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Doanh Thu Theo Khách Hàng'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                });
+            </script>
+        </div>
+    </div>
+</div>

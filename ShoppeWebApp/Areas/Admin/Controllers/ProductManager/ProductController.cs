@@ -143,7 +143,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
             string? imagePath = null;
             if (model.UrlAnh != null)
             {
-                var fileName = $"{Guid.NewGuid()}_{model.UrlAnh.FileName}";
+                var fileName = $"{Guid.NewGuid()}";
                 var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Images/Products");
                 if (!Directory.Exists(uploadPath))
                 {
@@ -375,29 +375,34 @@ namespace ShoppeWebApp.Areas.Admin.Controllers.ProductManager
             sanPham.MoTa = model.MoTa;
 
             // Xử lý ảnh mới nếu có
-            if (model.AnhMoi != null)
+            if (model.AnhMoi != null && model.AnhMoi.Length > 0)
             {
-                // Lưu ảnh mới vào thư mục và cập nhật đường dẫn
-                var fileName = $"{Guid.NewGuid()}_{model.AnhMoi.FileName}";
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/products", fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                // Đường dẫn lưu tệp
+                string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/products");
+                Directory.CreateDirectory(uploadsFolder); // Tạo thư mục nếu chưa tồn tại
+            
+                // Tạo tên tệp duy nhất
+                string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.AnhMoi.FileName);
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+            
+                // Lưu tệp vào thư mục
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    model.AnhMoi.CopyTo(stream);
+                    model.AnhMoi.CopyTo(fileStream);
                 }
-
+            
                 // Xóa ảnh cũ nếu cần
-                if (!string.IsNullOrEmpty(sanPham.UrlAnh))
+                if (!string.IsNullOrEmpty(sanPham.UrlAnh) && sanPham.UrlAnh != "/images/products/default.png")
                 {
-                    var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", sanPham.UrlAnh);
-                    if (System.IO.File.Exists(oldImagePath))
+                    string oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", sanPham.UrlAnh.TrimStart('/'));
+                    if (System.IO.File.Exists(oldFilePath))
                     {
-                        System.IO.File.Delete(oldImagePath);
+                        System.IO.File.Delete(oldFilePath);
                     }
                 }
-
-                // Cập nhật đường dẫn ảnh mới
-                sanPham.UrlAnh = $"/images/products/{fileName}";
+            
+                // Cập nhật đường dẫn ảnh mới vào cơ sở dữ liệu
+                sanPham.UrlAnh = $"/images/products/{uniqueFileName}";
             }
 
             // Lưu thay đổi vào cơ sở dữ liệu

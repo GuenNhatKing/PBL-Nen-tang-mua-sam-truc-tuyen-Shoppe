@@ -1,0 +1,112 @@
+@model ShoppeWebApp.ViewModels.Admin.RevenueByStoreViewModel
+@{
+    Layout = "~/Areas/Admin/Shared/_Layout.cshtml"; 
+} 
+<div class="container mt-4">
+    <div class="p-5 border border-success rounded" style="background-color: #fdfdfd; min-height: 80vh;">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-white p-3" style="background-color: #28a745; border-radius: 10px;">
+                Doanh Thu Theo Cửa Hàng
+            </h2>
+        </div>
+
+        <!-- Form chọn khoảng thời gian -->
+        <form asp-action="TotalRevenue" method="get" class="row g-3">
+            <div class="col-md-5">
+                <label for="StartDate" class="form-label fw-bold">Ngày bắt đầu</label>
+                <input type="date" id="StartDate" name="StartDate" class="form-control" value="@Model.StartDate?.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-5">
+                <label for="EndDate" class="form-label fw-bold">Ngày kết thúc</label>
+                <input type="date" id="EndDate" name="EndDate" class="form-control" value="@Model.EndDate?.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Xem thống kê</button>
+            </div>
+        </form>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger mt-3">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div>@error.ErrorMessage</div>
+                }
+            </div>
+        }
+
+        <!-- Hiển thị bảng xếp hạng -->
+        <div class="mt-4">
+            <h3 class="text-center">Bảng Xếp Hạng Doanh Thu Theo Cửa Hàng</h3>
+            @if (Model.StoreRevenues != null && Model.StoreRevenues.Any())
+            {
+                <table class="table table-bordered table-hover">
+                    <thead class="table-success text-center">
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên cửa hàng</th>
+                            <th>Số đơn hàng</th>
+                            <th>Số sản phẩm đã bán</th>
+                            <th>Doanh thu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.StoreRevenues.Count; i++)
+                        {
+                            var store = Model.StoreRevenues[i];
+                            <tr>
+                                <td class="text-center">@(i + 1)</td>
+                                <td>@store.StoreName</td>
+                                <td class="text-center">@store.OrderCount</td>
+                                <td class="text-center">@store.ProductCount</td>
+                                <td class="text-end">@store.Revenue.ToString("C")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="text-center text-muted">Không có dữ liệu doanh thu theo cửa hàng trong khoảng thời gian này.</p>
+            }
+        </div>
+
+        <!-- Hiển thị biểu đồ cột -->
+        <div class="mt-5">
+            <h3 class="text-center">Biểu Đồ Doanh Thu Theo Cửa Hàng</h3>
+            <canvas id="storeRevenueChart" width="400" height="400"></canvas>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    var ctx = document.getElementById('storeRevenueChart').getContext('2d');
+                    var storeRevenueChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: @Html.Raw(Json.Serialize(Model.StoreRevenues.Select(s => s.StoreName))),
+                            datasets: [{
+                                label: 'Doanh Thu',
+                                data: @Html.Raw(Json.Serialize(Model.StoreRevenues.Select(s => s.Revenue))),
+                                backgroundColor: '#36A2EB',
+                                borderColor: '#36A2EB',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                });
+            </script>
+        </div>
+    </div>
+</div>

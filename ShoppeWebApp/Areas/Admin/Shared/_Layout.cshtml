@@ -38,7 +38,8 @@
     <!-- Bố cục chính với Sidebar và nội dung -->
     <div class="row flex-grow-1 pt-5">
         <!-- Sidebar Section -->
-        <div class="col-md-2 bg-dark text-white vh-100 position-fixed">
+        <div class="bg-dark text-white vh-100 position-fixed" style="width: 20%;">
+
             <h5 class="ms-3 mt-3">Chức năng</h5>
             <div class="d-flex flex-column align-items-start mt-4 px-3">
                 <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-light w-100 mb-3 text-start">
@@ -53,16 +54,44 @@
                 <a asp-area="Admin" asp-controller="Order" asp-action="Index" class="btn btn-outline-light w-100 mb-3 text-start">
                     <i class="fas fa-file-invoice"></i> Quản lý hóa đơn
                 </a>
-                <a asp-area="Admin" asp-controller="Statistics" asp-action="Statistics" class="btn btn-outline-light w-100 mb-3 text-start">
-                    <i class="fas fa-chart-bar"></i> Thống kê doanh thu
-                </a>
+<div class="w-100">
+    <!-- Nút chính -->
+    <button class="btn btn-outline-light w-100 mb-3 text-start d-flex justify-content-between align-items-center"
+            type="button" id="dropdownStatisticsToggle">
+        <span><i class="fas fa-chart-bar me-2"></i> Thống kê doanh thu</span>
+        <i class="fas fa-chevron-down" id="chevronIcon"></i>
+    </button>
+
+    <!-- Mục con (submenu) -->
+    <div class="w-100 ps-4" id="dropdownStatisticsMenu" style="display: none;">
+        <a asp-area="Admin" asp-controller="Statistics" asp-action="TotalRevenue"
+           class="btn btn-outline-light w-100 mb-2 text-start">
+            <i class="fas fa-coins me-2"></i> Tổng doanh thu
+        </a>
+        <a asp-area="Admin" asp-controller="Statistics" asp-action="TopSellingProducts"
+           class="btn btn-outline-light w-100 mb-2 text-start">
+            <i class="fas fa-fire me-2"></i> Sản phẩm bán chạy
+        </a>
+        <a asp-area="Admin" asp-controller="Statistics" asp-action="RevenueByStore"
+           class="btn btn-outline-light w-100 mb-2 text-start">
+            <i class="fas fa-store me-2"></i> Hiệu suất cửa hàng 
+        </a>
+        <a asp-area="Admin" asp-controller="Statistics" asp-action="RevenueByCustomer"
+           class="btn btn-outline-light w-100 text-start">
+            <i class="fas fa-user-friends me-2"></i> Khách hàng tiềm năng
+        </a>
+    </div>
+</div>
+
+
+
             </div>
         </div>
 
         <!-- Main Content Section -->
-        <div class="col-md-10 offset-md-2">
-            <div class="container mt-4">
-                @RenderBody()  <!-- Nội dung của các trang con sẽ hiển thị ở đây -->
+        <div class="ps-0" style="margin-left: 20%; width: 80%;">
+            <div class="container mt-5">
+                @RenderBody()
             </div>
         </div>
     </div>
@@ -71,3 +100,29 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+<script>
+    const toggleButton = document.getElementById('dropdownStatisticsToggle');
+    const dropdownMenu = document.getElementById('dropdownStatisticsMenu');
+
+    toggleButton.addEventListener('click', function () {
+        if (dropdownMenu.style.display === 'block') {
+            dropdownMenu.style.display = 'none';
+        } else {
+            dropdownMenu.style.display = 'block';
+        }
+    });
+</script>
+
+<script>
+    const toggleButton = document.getElementById('dropdownStatisticsToggle');
+    const dropdownMenu = document.getElementById('dropdownStatisticsMenu');
+    const chevronIcon = document.getElementById('chevronIcon');
+
+    toggleButton.addEventListener('click', function () {
+        const isOpen = dropdownMenu.style.display === 'block';
+        dropdownMenu.style.display = isOpen ? 'none' : 'block';
+        chevronIcon.classList.toggle('fa-rotate-180'); // Xoay mũi tên
+    });
+</script>
+
