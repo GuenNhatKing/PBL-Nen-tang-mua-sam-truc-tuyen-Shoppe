@@ -59,7 +59,7 @@
                                 <td>@store.StoreName</td>
                                 <td class="text-center">@store.OrderCount</td>
                                 <td class="text-center">@store.ProductCount</td>
-                                <td class="text-end">@store.Revenue.ToString("C")</td>
+                                <td class="text-end">@store.Revenue.ToString("c0", CultureInfo.GetCultureInfo("vi-VN"))</td>
                             </tr>
                         }
                     </tbody>

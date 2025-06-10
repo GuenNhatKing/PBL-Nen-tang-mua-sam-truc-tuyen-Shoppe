@@ -88,7 +88,7 @@
                                 <td>@customer.CustomerName</td>
                                 <td class="text-center">@customer.OrderCount</td>
                                 <td class="text-center">@customer.ProductCount</td>
-                                <td class="text-end">@customer.Revenue.ToString("C")</td>
+                                <td class="text-end">@customer.Revenue.ToString("c0", CultureInfo.GetCultureInfo("vi-VN"))</td>
                                 <td class="text-center">@customer.CustomerStatus</td>
                             </tr>
                         }

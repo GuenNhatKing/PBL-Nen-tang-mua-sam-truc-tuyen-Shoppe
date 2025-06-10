@@ -104,7 +104,7 @@
         <div class="mt-4 text-center">
             <div class="p-4 border border-success rounded shadow-sm" style="background-color: #e9f7ef;">
                 <h3 class="fw-bold text-uppercase" style="color: #28a745;">Tổng Doanh Thu</h3>
-                <h1 class="fw-bold text-success" style="font-size: 3rem;">@Model.TotalRevenue.ToString("C")</h1>
+                <h1 class="fw-bold text-success" style="font-size: 3rem;">@Model.TotalRevenue.ToString("c0", CultureInfo.GetCultureInfo("vi-VN"))</h1>
             </div>
         </div>
 
@@ -128,14 +128,14 @@
                 <!-- Doanh thu trung bình mỗi đơn -->
                 <div class="p-4 border rounded bg-light shadow-sm mb-4">
                     <h5 class="text-center">Doanh thu trung bình mỗi đơn</h5>
-                    <h2 class="text-center text-success">@avgRevenue.ToString("C")</h2>
+                    <h2 class="text-center text-success">@avgRevenue.ToString("c0", CultureInfo.GetCultureInfo("vi-VN"))</h2>
                 </div>
         
                 <!-- Ngày có doanh thu cao nhất -->
                 <div class="p-4 border rounded bg-light shadow-sm">
                     <h5 class="text-center">Ngày có doanh thu cao nhất</h5>
                     <p class="text-center">@peakDate.ToString("dd/MM/yyyy")</p>
-                    <p class="text-center"><strong>@peakValue.ToString("C")</strong></p>
+                    <p class="text-center"><strong>@peakValue.ToString("c0", CultureInfo.GetCultureInfo("vi-VN"))</strong></p>
                 </div>
             </div>
         </div>
