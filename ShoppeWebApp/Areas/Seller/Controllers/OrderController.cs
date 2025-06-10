@@ -80,6 +80,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
             {
                 query = query.Where(o => o.IdDonHang.Contains(searchTerm) || 
                     _context.Thongtinlienhes
+                        .IgnoreQueryFilters()
                         .Where(t => t.IdLienHe == o.IdLienHe)
                         .Select(t => t.HoVaTen)
                         .FirstOrDefault()
@@ -97,6 +98,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                 {
                     MaDonHang = o.IdDonHang,
                     TenKhachHang = _context.Thongtinlienhes
+                        .IgnoreQueryFilters()
                         .Where(t => t.IdLienHe == o.IdLienHe)
                         .Select(t => t.HoVaTen)
                         .FirstOrDefault(),
@@ -164,6 +166,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                                 o.TrangThai == Constants.DA_XAC_NHAN ? "Đã xác nhận" :
                                 o.TrangThai == Constants.DA_GIAO ? "Đã giao" : "Không xác định",
                     ThongTinLienHe = _context.Thongtinlienhes
+                        .IgnoreQueryFilters()
                         .Where(t => t.IdLienHe == o.IdLienHe)
                         .Select(t => new ThongTinLienHeViewModel
                         {
@@ -324,6 +327,7 @@ namespace ShoppeWebApp.Areas.Seller.Controllers
                                 o.TrangThai == Constants.DA_XAC_NHAN ? "Đã xác nhận" :
                                 o.TrangThai == Constants.DA_GIAO ? "Đã giao" : "Không xác định",
                     ThongTinLienHe = _context.Thongtinlienhes
+                        .IgnoreQueryFilters()
                         .Where(t => t.IdLienHe == o.IdLienHe)
                         .Select(t => new ThongTinLienHeViewModel
                         {

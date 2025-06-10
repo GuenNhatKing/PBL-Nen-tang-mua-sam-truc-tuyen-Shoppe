@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ShoppeWebApp.Data;
 using ShoppeWebApp.ViewModels.Admin;
 using System.Linq;
@@ -31,6 +32,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers
             {
                 query = query.Where(o => o.IdDonHang.Contains(searchTerm) || 
                     _context.Thongtinlienhes
+                        .IgnoreQueryFilters()
                         .Where(t => t.IdLienHe == o.IdLienHe)
                         .Select(t => t.HoVaTen)
                         .FirstOrDefault()
@@ -47,6 +49,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers
                 {
                     MaDonHang = o.IdDonHang,
                     TenKhachHang = _context.Thongtinlienhes
+                        .IgnoreQueryFilters()
                         .Where(t => t.IdLienHe == o.IdLienHe)
                         .Select(t => t.HoVaTen)
                         .FirstOrDefault(),
@@ -89,6 +92,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers
                                 o.TrangThai == Constants.DA_XAC_NHAN ? "Đã xác nhận" :
                                 o.TrangThai == Constants.DA_GIAO ? "Đã giao" : "Không xác định",
                     ThongTinLienHe = _context.Thongtinlienhes
+                        .IgnoreQueryFilters()
                         .Where(t => t.IdLienHe == o.IdLienHe)
                         .Select(t => new ThongTinLienHeViewModel
                         {
@@ -158,6 +162,7 @@ namespace ShoppeWebApp.Areas.Admin.Controllers
                                 o.TrangThai == Constants.DA_XAC_NHAN ? "Đã xác nhận" :
                                 o.TrangThai == Constants.DA_GIAO ? "Đã giao" : "Không xác định",
                     ThongTinLienHe = _context.Thongtinlienhes
+                        .IgnoreQueryFilters()
                         .Where(t => t.IdLienHe == o.IdLienHe)
                         .Select(t => new ThongTinLienHeViewModel
                         {
