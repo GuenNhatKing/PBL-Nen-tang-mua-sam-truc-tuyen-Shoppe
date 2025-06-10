@@ -76,7 +76,7 @@
                             <tr>
                                 <td class="text-center">@(i + 1)</td>
                                 <td class="text-center">
-                                    <img src="@Url.Content($"~{product.ImageUrl}")" 
+                                    <img src="@Url.Content(product.ImageUrl?.StartsWith("/") == true ? product.ImageUrl : $"/{product.ImageUrl}")" 
                                          alt="@product.ProductName" 
                                          style="width: 100px; height: 100px; object-fit: cover; border-radius: 5px;" />
                                 </td>
@@ -84,7 +84,7 @@
                                 <td>@product.ProductName</td>
                                 <td class="text-center">@product.QuantitySold</td>
                                 <td class="text-center">@product.OrderCount</td>
-                                <td class="text-end">@product.TotalRevenue.ToString("C")</td>
+                                <td class="text-end">@product.TotalRevenue.ToString("c0", CultureInfo.GetCultureInfo("vi-VN"))</td>
                             </tr>
                         }
                     </tbody>
@@ -125,7 +125,7 @@
                                     {
                                         <tr>
                                             <td>@category.CategoryName</td>
-                                            <td>@category.Revenue.ToString("C")</td>
+                                            <td>@category.Revenue.ToString("c0", CultureInfo.GetCultureInfo("vi-VN"))</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -138,7 +138,7 @@
                                     <strong class="text-success">@Model.TopCategoryName</strong>
                                 </p>
                                 <p class="text-center">
-                                    <span class="text-muted">Doanh thu:</span> <strong class="text-success">@Model.TopCategoryRevenue.ToString("C")</strong>
+                                    <span class="text-muted">Doanh thu:</span> <strong class="text-success">@Model.TopCategoryRevenue.ToString("c0", CultureInfo.GetCultureInfo("vi-VN"))</strong>
                                 </p>
                             </div>
                         </div>
