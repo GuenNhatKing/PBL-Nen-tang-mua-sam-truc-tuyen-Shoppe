@@ -1,4 +1,5 @@
 @model ShoppeWebApp.ViewModels.Admin.TotalRevenueViewModel
+@using System.Globalization
 @{
     Layout = "~/Areas/Admin/Shared/_Layout.cshtml"; 
     var totalOrders = Model.TotalOrders > 0 ? Model.TotalOrders : 1; // Tránh chia 0
