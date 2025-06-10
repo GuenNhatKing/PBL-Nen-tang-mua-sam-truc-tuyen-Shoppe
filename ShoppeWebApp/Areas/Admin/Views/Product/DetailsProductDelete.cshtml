@@ -1,9 +1,7 @@
 @model ShoppeWebApp.ViewModels.Admin.DetailsProductViewModel
-
 @{
-    Layout = "~/Areas/Admin/Shared/_Layout.cshtml";
+    Layout = "~/Areas/Admin/Shared/_Layout.cshtml"; 
 }
-
 <div class="container mt-5">
     <!-- Tiêu đề -->
     <div class="text-center mb-4">
@@ -19,7 +17,7 @@
             <div class="col-md-4 text-center">
                 <label class="form-label fw-bold">Ảnh sản phẩm</label>
                 <div>
-                    <img src="@Url.Content("~" + Model.UrlAnh)" alt="Ảnh sản phẩm" 
+                    <img src="/@Model.UrlAnh" alt="Ảnh sản phẩm" 
                          class="img-thumbnail mb-3 shadow-sm" 
                          style="width: 300px; height: 300px; object-fit: cover;" />
                 </div>
