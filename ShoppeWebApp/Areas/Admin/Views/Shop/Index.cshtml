@@ -59,7 +59,7 @@
                         <div class="card h-100 shadow-sm">
                             @if (!string.IsNullOrEmpty(shop.UrlAnh))
                             {
-                                <img src="@Url.Content(shop.UrlAnh)" alt="Ảnh đại diện cửa hàng"
+                                <img src="@shop.UrlAnh" alt="Ảnh đại diện cửa hàng"
                                      class="card-img-top mx-auto d-block"
                                      style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px;" />
                             }
@@ -78,10 +78,13 @@
                                    class="btn btn-dark btn-sm me-1">
                                     <i class="fas fa-info-circle"></i> Chi tiết
                                 </a>
-                                <a asp-area="Admin" asp-controller="Shop" asp-action="Delete" asp-route-id="@shop.IdCuaHang"
-                                   class="btn btn-danger btn-sm">
-                                    <i class="fas fa-trash-alt"></i> Xóa
-                                </a>
+                                @if (shop.TrangThai != 0)
+                                {
+                                    <a asp-area="Admin" asp-controller="Shop" asp-action="Delete" asp-route-id="@shop.IdCuaHang"
+                                       class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash-alt"></i> Xóa
+                                    </a>
+                                }
                             </div>
                         </div>
                     </div>
