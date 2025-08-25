@@ -158,7 +158,7 @@ Before you begin, make sure you have the following installed:
 
 1. **Clone the repository**
    ```sh
-   git clone https://github.com/GuenNhatKing/ShoppeWebApp.git
+   git clone https://github.com/GuenNhatKing/PBL-Nen-tang-mua-sam-truc-tuyen-Shoppe.git
    ```
 
 
