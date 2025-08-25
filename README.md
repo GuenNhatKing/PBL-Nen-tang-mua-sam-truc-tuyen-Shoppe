@@ -207,7 +207,7 @@ dotnet run
 
 ### Testing
 
-ShoppeWebApp uses the xUnit test framework (replace with your actual one if different). Run the test suite with:
+Shoppe uses the xUnit test framework (replace with your actual one if different). Run the test suite with:
 ```sh
 dotnet test
 ```
@@ -215,7 +215,7 @@ dotnet test
 ## Contributing
 
 - **💬 [Join the Discussions](https://github.com/GuenNhatKing/PBL-Nen-tang-mua-sam-truc-tuyen-Shoppe/discussions)**: Share your insights, provide feedback, or ask questions.  
-- **🐛 [Report Issues](https://github.com/GuenNhatKing/PBL-Nen-tang-mua-sam-truc-tuyen-Shoppe/issues)**: Submit bugs found or log feature requests for the `ShoppeWebApp` project.  
+- **🐛 [Report Issues](https://github.com/GuenNhatKing/PBL-Nen-tang-mua-sam-truc-tuyen-Shoppe/issues)**: Submit bugs found or log feature requests for the `Shoppe` project.  
 
 <details closed>
 <summary>Contributing Guidelines</summary>
@@ -246,8 +246,8 @@ dotnet test
 <summary>Contributor Graph</summary>
 <br>
 <p align="left">
-   <a href="https://github.com/GuenNhatKing/ShoppeWebApp/graphs/contributors">
-      <img src="https://contrib.rocks/image?repo=GuenNhatKing/ShoppeWebApp">
+   <a href="https://github.com/GuenNhatKing/PBL-Nen-tang-mua-sam-truc-tuyen-Shoppe/graphs/contributors">
+      <img src="https://contrib.rocks/image?repo=GuenNhatKing/PBL-Nen-tang-mua-sam-truc-tuyen-Shoppe">
    </a>
 </p>
 </details>
